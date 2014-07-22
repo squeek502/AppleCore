@@ -1,0 +1,16 @@
+[
+{
+  "modid": "AppleCore",
+  "name": "Apple Core",
+  "description": "An API for modifying the food and hunger mechanics of Minecraft",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["squeek"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
