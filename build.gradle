@@ -27,8 +27,6 @@ archivesBaseName = project.projectDir.name + "-mc" + project.minecraft.version
 sourceSets.main{
     java {
 		srcDirs 'java', 'apis' //set the source folder as the /src subfolder
-        exclude 'squeek/applecore/example/**'
-        exclude 'squeek/applecore/reference/**'
 	}
     resources {
 		srcDirs 'resources' //set the resources folder as the /resources subfolder
@@ -50,10 +48,16 @@ task processSourcesCustom(type:Copy){
 	into project.buildDir.getPath()+"/sources/java"
 }
 
+task removeExampleAndReferenceFiles(type:Delete){
+    delete project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/example", project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/reference"
+}
+
 // correct task ordering
 compileJava.dependsOn processSourcesCustom
+compileJava.dependsOn removeExampleAndReferenceFiles
 afterEvaluate { project ->
 	processSourcesCustom.shouldRunAfter(sourceMainJava)
+    removeExampleAndReferenceFiles.shouldRunAfter(processSourcesCustom)
 }
 
 // Add Coremod Manifest
