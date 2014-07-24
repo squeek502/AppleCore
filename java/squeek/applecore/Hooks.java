@@ -5,8 +5,11 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.common.MinecraftForge;
-import squeek.applecore.api.FoodEvent;
-import squeek.applecore.api.FoodValues;
+import squeek.applecore.api.food.FoodEvent;
+import squeek.applecore.api.food.FoodValues;
+import squeek.applecore.api.hunger.ExhaustionEvent;
+import squeek.applecore.api.hunger.HealthRegenEvent;
+import squeek.applecore.api.hunger.StarvationEvent;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 
 public class Hooks
@@ -29,58 +32,58 @@ public class Hooks
 		MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemFood, itemStack, foodValues, hungerAdded, saturationAdded));
 	}
 
-	public static FoodEvent.Exhaustion.Tick fireExhaustionTickEvent(EntityPlayer player, float foodExhaustionLevel)
+	public static ExhaustionEvent.Tick fireExhaustionTickEvent(EntityPlayer player, float foodExhaustionLevel)
 	{
-		FoodEvent.Exhaustion.Tick event = new FoodEvent.Exhaustion.Tick(player, foodExhaustionLevel);
+		ExhaustionEvent.Tick event = new ExhaustionEvent.Tick(player, foodExhaustionLevel);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
 
-	public static FoodEvent.Exhaustion.MaxReached fireExhaustionMaxEvent(EntityPlayer player, float maxExhaustionLevel, float foodExhaustionLevel)
+	public static ExhaustionEvent.MaxReached fireExhaustionMaxEvent(EntityPlayer player, float maxExhaustionLevel, float foodExhaustionLevel)
 	{
-		FoodEvent.Exhaustion.MaxReached event = new FoodEvent.Exhaustion.MaxReached(player, maxExhaustionLevel, foodExhaustionLevel);
+		ExhaustionEvent.MaxReached event = new ExhaustionEvent.MaxReached(player, maxExhaustionLevel, foodExhaustionLevel);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
 
 	public static Result fireAllowRegenEvent(EntityPlayer player)
 	{
-		FoodEvent.RegenHealth.AllowRegen event = new FoodEvent.RegenHealth.AllowRegen(player);
+		HealthRegenEvent.AllowRegen event = new HealthRegenEvent.AllowRegen(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getResult();
 	}
 
 	public static int fireRegenTickEvent(EntityPlayer player)
 	{
-		FoodEvent.RegenHealth.Tick event = new FoodEvent.RegenHealth.Tick(player);
+		HealthRegenEvent.Tick event = new HealthRegenEvent.Tick(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.regenTickPeriod;
 	}
 
-	public static FoodEvent.RegenHealth.Regen fireRegenEvent(EntityPlayer player)
+	public static HealthRegenEvent.Regen fireRegenEvent(EntityPlayer player)
 	{
-		FoodEvent.RegenHealth.Regen event = new FoodEvent.RegenHealth.Regen(player);
+		HealthRegenEvent.Regen event = new HealthRegenEvent.Regen(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
 
 	public static Result fireAllowStarvation(EntityPlayer player)
 	{
-		FoodEvent.Starvation.AllowStarvation event = new FoodEvent.Starvation.AllowStarvation(player);
+		StarvationEvent.AllowStarvation event = new StarvationEvent.AllowStarvation(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getResult();
 	}
 
 	public static int fireStarvationTickEvent(EntityPlayer player)
 	{
-		FoodEvent.Starvation.Tick event = new FoodEvent.Starvation.Tick(player);
+		StarvationEvent.Tick event = new StarvationEvent.Tick(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.starveTickPeriod;
 	}
 
-	public static FoodEvent.Starvation.Starve fireStarveEvent(EntityPlayer player)
+	public static StarvationEvent.Starve fireStarveEvent(EntityPlayer player)
 	{
-		FoodEvent.Starvation.Starve event = new FoodEvent.Starvation.Starve(player);
+		StarvationEvent.Starve event = new StarvationEvent.Starve(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}

@@ -4,23 +4,26 @@ General:
   [ ] Fix example mod metadata
 
 API:
-  [x] Implement event-driven configurable exhaustion @done (2014-07-24 01:38)
-  [x] Implement event-driven configurable health regen @done (2014-07-24 01:38)
   [ ] Implement event-driven growth ticks
-  [x] Implement event-driven starvation @done (2014-07-24 01:38)
-  [ ] Break FoodEvent up into multiple files
   [ ] Implement event-driven FoodStats modification canceling
+  [ ] Event documentation
+  [ ] Implement better food eating speed modification event
 
 Test/Sample Implementations:
-  [x] Modifying eating speed @done (2014-07-24 01:38)
-  [x] Modifying hunger/saturation @done (2014-07-24 01:38)
   [ ] Canceling food stats changes
-  [x] Modifying regen health @done (2014-07-24 01:38)
-  [x] Modifying starvation @done (2014-07-24 01:38)
-  [x] Modifying exhaustion @done (2014-07-24 01:38)
+  [ ] Modifying eating speed
 
 Project Log/Notes:
- - Modifying food eating duration using the Forge event PlayerUseItemEvent.Start does not produce clean visuals; it just adds a delay to the start of the animation. The solution should be player-specific, which isn't possible by only hooking into ItemFood. @date(2014-07-24 01:45)
+  Modifying food eating duration using the Forge event PlayerUseItemEvent.Start does not produce clean visuals; it just adds a delay to the start of the animation. The solution should be player-specific, which isn't possible by only hooking into ItemFood. @date(2014-07-24 01:45)
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [-] Modifying eating speed using PlayerUseItemEvent.Start @cancelled (2014-07-24 12:23) @project(Test/Sample Implementations)
+ [x] Break FoodEvent up into multiple files @started(2014-07-24 12:03) @done (2014-07-24 12:14) @lasted(0:11) @project(API)
+ [x] Modifying starvation @done (2014-07-24 01:38) @project(Test/Sample Implementations)
+ [x] Modifying regen health @done (2014-07-24 01:38) @project(Test/Sample Implementations)
+ [x] Modifying hunger/saturation @done (2014-07-24 01:38) @project(Test/Sample Implementations)
+ [x] Modifying exhaustion @done (2014-07-24 01:38) @project(Test/Sample Implementations)
+ [x] Implement event-driven starvation @done (2014-07-24 01:38) @project(API)
+ [x] Implement event-driven configurable health regen @done (2014-07-24 01:38) @project(API)
+ [x] Implement event-driven configurable exhaustion @done (2014-07-24 01:38) @project(API)

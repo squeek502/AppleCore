@@ -1,6 +1,6 @@
 package squeek.applecore.example;
 
-import squeek.applecore.api.FoodEvent;
+import squeek.applecore.api.hunger.StarvationEvent;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -8,21 +8,21 @@ public class StarvationModifier
 {
 
 	@SubscribeEvent
-	public void allowStarvation(FoodEvent.Starvation.AllowStarvation event)
+	public void allowStarvation(StarvationEvent.AllowStarvation event)
 	{
 		event.setResult(Result.ALLOW);
 	}
 
 	@SubscribeEvent
-	public void onStarveTick(FoodEvent.Starvation.Tick event)
+	public void onStarveTick(StarvationEvent.Tick event)
 	{
-		event.starveTickPeriod = 600;
+		event.starveTickPeriod = 60;
 	}
 
 	@SubscribeEvent
-	public void onStarve(FoodEvent.Starvation.Starve event)
+	public void onStarve(StarvationEvent.Starve event)
 	{
-		event.starveDamage = 10;
+		event.starveDamage = 1;
 	}
 
 }

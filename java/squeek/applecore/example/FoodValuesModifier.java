@@ -1,8 +1,8 @@
 package squeek.applecore.example;
 
 import net.minecraft.init.Items;
-import squeek.applecore.api.FoodEvent;
-import squeek.applecore.api.FoodValues;
+import squeek.applecore.api.food.FoodEvent;
+import squeek.applecore.api.food.FoodValues;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class FoodValuesModifier
@@ -19,7 +19,7 @@ public class FoodValuesModifier
 	{
 		if (event.player != null)
 		{
-			event.foodValues = new FoodValues(-event.player.getFoodStats().getFoodLevel() / 2, 0);
+			event.foodValues = new FoodValues((20 - event.player.getFoodStats().getFoodLevel()) / 2, 0);
 		}
 	}
 }

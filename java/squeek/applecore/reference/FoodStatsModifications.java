@@ -7,8 +7,10 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
 import squeek.applecore.Hooks;
-import squeek.applecore.api.FoodEvent;
-import squeek.applecore.api.FoodValues;
+import squeek.applecore.api.food.FoodValues;
+import squeek.applecore.api.hunger.ExhaustionEvent;
+import squeek.applecore.api.hunger.HealthRegenEvent;
+import squeek.applecore.api.hunger.StarvationEvent;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 
 /*
@@ -55,11 +57,11 @@ public class FoodStatsModifications extends FoodStats
 		EnumDifficulty enumdifficulty = player.worldObj.difficultySetting;
 		this.prevFoodLevel = this.foodLevel;
 
-		FoodEvent.Exhaustion.Tick exhaustionTickEvent = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
+		ExhaustionEvent.Tick exhaustionTickEvent = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
 		this.foodExhaustionLevel = exhaustionTickEvent.exhaustionLevel;
 		if (!exhaustionTickEvent.isCanceled() && this.foodExhaustionLevel >= exhaustionTickEvent.maxExhaustionLevel)
 		{
-			FoodEvent.Exhaustion.MaxReached exhaustionMaxEvent = Hooks.fireExhaustionMaxEvent(player, exhaustionTickEvent.maxExhaustionLevel, foodExhaustionLevel);
+			ExhaustionEvent.MaxReached exhaustionMaxEvent = Hooks.fireExhaustionMaxEvent(player, exhaustionTickEvent.maxExhaustionLevel, foodExhaustionLevel);
 
 			if (!exhaustionMaxEvent.isCanceled())
 			{
@@ -76,7 +78,7 @@ public class FoodStatsModifications extends FoodStats
 
 			if (this.foodTimer >= Hooks.fireRegenTickEvent(player))
 			{
-				FoodEvent.RegenHealth.Regen regenEvent = Hooks.fireRegenEvent(player);
+				HealthRegenEvent.Regen regenEvent = Hooks.fireRegenEvent(player);
 				if (!regenEvent.isCanceled())
 				{
 					player.heal(regenEvent.deltaHealth);
@@ -97,7 +99,7 @@ public class FoodStatsModifications extends FoodStats
 
 			if (this.starveTimer >= Hooks.fireStarvationTickEvent(player))
 			{
-				FoodEvent.Starvation.Starve starveEvent = Hooks.fireStarveEvent(player);
+				StarvationEvent.Starve starveEvent = Hooks.fireStarveEvent(player);
 				if (!starveEvent.isCanceled())
 				{
 					player.attackEntityFrom(DamageSource.starve, starveEvent.starveDamage);

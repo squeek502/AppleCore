@@ -1,6 +1,6 @@
 package squeek.applecore.example;
 
-import squeek.applecore.api.FoodEvent;
+import squeek.applecore.api.food.FoodEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class FoodEatenResult
