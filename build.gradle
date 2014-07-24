@@ -27,6 +27,8 @@ archivesBaseName = project.projectDir.name + "-mc" + project.minecraft.version
 sourceSets.main{
     java {
 		srcDirs 'java', 'apis' //set the source folder as the /src subfolder
+        exclude 'squeek/applecore/example/**'
+        exclude 'squeek/applecore/reference/**'
 	}
     resources {
 		srcDirs 'resources' //set the resources folder as the /resources subfolder
@@ -48,30 +50,32 @@ task processSourcesCustom(type:Copy){
 	into project.buildDir.getPath()+"/sources/java"
 }
 
-// delete mcmod.info so that it gets a fresh version copied in every time
-task cleanModInfo(type: Delete) {
-	delete file(sourceSets.main.output.resourcesDir.getPath()+"/mcmod.info")
-}
-
 // correct task ordering
-processResources.dependsOn cleanModInfo
 compileJava.dependsOn processSourcesCustom
 afterEvaluate { project ->
 	processSourcesCustom.shouldRunAfter(sourceMainJava)
 }
 
+// Add Coremod Manifest
+jar {
+    manifest {
+        attributes 'FMLCorePlugin': 'squeek.applecore.AppleCore'
+        attributes 'FMLCorePluginContainsFMLMod': 'false'
+    }
+}
+
 processResources
 {
-    // replace stuff in mcmod.info, nothing else
+    // replace stuff in *.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
+        include '*.info'
                 
         // replace version and mcversion
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
-        
+
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+        exclude '*.info'
     }
 }

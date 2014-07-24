@@ -7,8 +7,8 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.RETURN;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-import squeek.applecore.Hooks;
 import squeek.applecore.asm.ASMHelper;
+import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
 
 public class ModuleCrops implements IClassTransformerModule

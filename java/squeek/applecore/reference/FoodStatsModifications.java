@@ -6,11 +6,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
-import squeek.applecore.Hooks;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
+import squeek.applecore.asm.Hooks;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 
 /*

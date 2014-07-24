@@ -1,5 +1,4 @@
 General:
-  [ ] Exclude example/reference packages in build.gradle
   [ ] Setup build.gradle to be maven-ready
   [ ] Fix example mod metadata
 
@@ -18,6 +17,7 @@ Project Log/Notes:
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [x] Exclude example/reference packages in build.gradle @done (2014-07-24 12:35) @project(General)
  [-] Modifying eating speed using PlayerUseItemEvent.Start @cancelled (2014-07-24 12:23) @project(Test/Sample Implementations)
  [x] Break FoodEvent up into multiple files @started(2014-07-24 12:03) @done (2014-07-24 12:14) @lasted(0:11) @project(API)
  [x] Modifying starvation @done (2014-07-24 01:38) @project(Test/Sample Implementations)

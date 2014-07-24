@@ -7,12 +7,12 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-import squeek.applecore.Hooks;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.ASMHelper;
+import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
 import cpw.mods.fml.common.eventhandler.Event;
 

@@ -1,4 +1,4 @@
-package squeek.applecore;
+package squeek.applecore.asm;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
