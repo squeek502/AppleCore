@@ -7,13 +7,19 @@ import squeek.applecore.asm.TransformerModuleHandler;
 import com.google.common.eventbus.EventBus;
 import cpw.mods.fml.common.DummyModContainer;
 import cpw.mods.fml.common.LoadController;
+import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.SortingIndex(-100)
+@IFMLLoadingPlugin.MCVersion("1.7.10")
 public class AppleCore extends DummyModContainer implements IFMLLoadingPlugin
 {
 	public static Logger Log = LogManager.getLogger(ModInfo.MODID);
-
+	
+    public AppleCore() {
+        super(MetadataCollection.from(MetadataCollection.class.getResourceAsStream("/applecore.info"), ModInfo.MODID).getMetadataForId(ModInfo.MODID, null));
+    }
+    
 	@Override
 	public boolean registerBus(EventBus bus, LoadController controller)
 	{

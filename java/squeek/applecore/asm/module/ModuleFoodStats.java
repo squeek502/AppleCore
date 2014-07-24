@@ -1,16 +1,18 @@
 package squeek.applecore.asm.module;
 
 import static org.objectweb.asm.Opcodes.*;
-import java.util.List;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.DamageSource;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.Hooks;
+import squeek.applecore.api.FoodEvent;
 import squeek.applecore.api.FoodValues;
 import squeek.applecore.asm.ASMHelper;
 import squeek.applecore.asm.IClassTransformerModule;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.util.DamageSource;
+import cpw.mods.fml.common.eventhandler.Event;
 
 public class ModuleFoodStats implements IClassTransformerModule
 {
@@ -54,7 +56,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 			MethodNode addStatsMethodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "addStats", "(IF)V");
 			if (addStatsMethodNode != null)
 			{
-				addHungerLossRateCheck(addStatsMethodNode);
+				//addHungerLossRateCheck(addStatsMethodNode);
 			}
 			else
 				throw new RuntimeException("FoodStats: addStats(IF)V method not found");
@@ -70,9 +72,9 @@ public class ModuleFoodStats implements IClassTransformerModule
 			MethodNode updateMethodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "onUpdate", isObfuscated ? "(Lyz;)V" : "(Lnet/minecraft/entity/player/EntityPlayer;)V");
 			if (updateMethodNode != null)
 			{
-				addMinHungerToHeal(updateMethodNode, isObfuscated);
-				addConfigurableHungerLoss(classNode, updateMethodNode, isObfuscated);
-				addSeparateStarveTimer(classNode, updateMethodNode, isObfuscated);
+				hookHealthRegen(classNode, updateMethodNode, isObfuscated);
+				hookExhaustion(classNode, updateMethodNode, isObfuscated);
+				hookStarvation(classNode, updateMethodNode, isObfuscated);
 			}
 			else
 				throw new RuntimeException("FoodStats: onUpdate method not found");
@@ -132,7 +134,6 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 	public void addItemStackAwareFoodStatsHook(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		String internalFoodStatsName = classNode.name.replace(".", "/");
 		// injected code:
 		/*
 		FoodValues modifiedFoodValues;
@@ -148,6 +149,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		}
 		*/
 
+		String internalFoodStatsName = classNode.name.replace(".", "/");
 		AbstractInsnNode targetNode = ASMHelper.findFirstInstruction(method);
 
 		InsnList toInject = new InsnList();
@@ -179,7 +181,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 2));					// param 2: ItemStack
 		toInject.add(new VarInsnNode(ALOAD, 0));					// this.player (together with below line)
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, "player", Type.getDescriptor(EntityPlayer.class)));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "onFoodStatsAdded", "(Lnet/minecraft/util/FoodStats;Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/EntityPlayer;)Liguanaman/hungeroverhaul/api/FoodValues;"));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "onFoodStatsAdded", "(Lnet/minecraft/util/FoodStats;Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/FoodValues;"));
 		toInject.add(new InsnNode(DUP));
 		toInject.add(new VarInsnNode(ASTORE, modifiedFoodValues.index));		// modifiedFoodValues = hookClass.hookMethod(...)
 		toInject.add(modifiedFoodValuesStart);								// variable scope start
@@ -232,7 +234,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		// player
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, "player", Type.getDescriptor(EntityPlayer.class)));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "onPostFoodStatsAdded", "(Lnet/minecraft/util/FoodStats;Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;Liguanaman/hungeroverhaul/api/FoodValues;IFLnet/minecraft/entity/player/EntityPlayer;)V"));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "onPostFoodStatsAdded", "(Lnet/minecraft/util/FoodStats;Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;Lsqueek/applecore/api/FoodValues;IFLnet/minecraft/entity/player/EntityPlayer;)V"));
 		/*
 		 * End onPostFoodStatsAdded call
 		 */
@@ -269,173 +271,284 @@ public class ModuleFoodStats implements IClassTransformerModule
 		method.instructions.insertBefore(targetNode, ifGreaterThan);
 	}
 
-	private void addMinHungerToHeal(MethodNode method, boolean isObfuscated)
+	private void hookExhaustion(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		// modified code:
+		// exhaustion block replaced with:
 		/*
-		this.foodLevel >= 18
-			modified to:
-		this.foodLevel >= IguanaConfig.minHungerToHeal && IguanaConfig.healthRegenRatePercentage > 0
+		FoodEvent.Exhaustion.Tick exhaustionTickEvent = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
+		this.foodExhaustionLevel = exhaustionTickEvent.exhaustionLevel;
+		if (!exhaustionTickEvent.isCanceled() && this.foodExhaustionLevel >= exhaustionTickEvent.maxExhaustionLevel)
+		{
+			FoodEvent.Exhaustion.MaxReached exhaustionMaxEvent = Hooks.fireExhaustionMaxEvent(player, exhaustionTickEvent.maxExhaustionLevel, foodExhaustionLevel);
+
+			if (!exhaustionMaxEvent.isCanceled())
+			{
+				this.foodExhaustionLevel += exhaustionMaxEvent.deltaExhaustion;
+				this.foodSaturationLevel = Math.max(this.foodSaturationLevel + exhaustionMaxEvent.deltaSaturation, 0.0F);
+				this.foodLevel = Math.max(this.foodLevel + exhaustionMaxEvent.deltaHunger, 0);
+			}
+		}
 		*/
 
-		AbstractInsnNode targetNode = ASMHelper.findField(method, isObfuscated ? "a" : "foodLevel", "I", 3).getNext().getNext();
-
-		method.instructions.remove(targetNode.getPrevious());
-		//method.instructions.insertBefore(targetNode, new FieldInsnNode(GETSTATIC, Type.getInternalName(IguanaConfig.class), "minHungerToHeal", "I"));
-
-		LabelNode ifLabel = null;
-		if (targetNode.getOpcode() == IF_ICMPLT)
-			ifLabel = ((JumpInsnNode) targetNode).label;
-		else
-			throw new RuntimeException("IF_ICMPLT node not found");
-
-		InsnList ifRegenRateInstructions = new InsnList();
-		//ifRegenRateInstructions.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(IguanaConfig.class), "healthRegenRatePercentage", "I"));
-		ifRegenRateInstructions.add(new JumpInsnNode(IFLE, ifLabel));
-
-		method.instructions.insert(targetNode, ifRegenRateInstructions);
-
-		while (targetNode != null && targetNode.getOpcode() != BIPUSH)
-		{
-			targetNode = targetNode.getNext();
-		}
-		targetNode = targetNode.getNext();
-
-		// remove BIPUSH
-		method.instructions.remove(targetNode.getPrevious());
+		String internalFoodStatsName = classNode.name.replace(".", "/");
+		LabelNode endLabel = ASMHelper.findEndLabel(method);
 
 		InsnList toInject = new InsnList();
-		toInject.add(new InsnNode(I2F));
+
+		AbstractInsnNode injectPoint = ASMHelper.findFirstInstructionOfType(method, PUTFIELD);
+		AbstractInsnNode foodExhaustionIf = ASMHelper.findFirstInstructionOfType(method, IFLE);
+		LabelNode foodExhaustionBlockEndLabel = ((JumpInsnNode) foodExhaustionIf).label;
+
+		// remove the entire exhaustion block
+		ASMHelper.removeNodesFromMethodUntil(method, injectPoint.getNext(), foodExhaustionBlockEndLabel);
+
+		// create exhaustionTickEvent variable
+		LabelNode exhaustionTickEventStart = new LabelNode();
+		LocalVariableNode exhaustionTickEvent = new LocalVariableNode("exhaustionTickEvent", Type.getDescriptor(FoodEvent.Exhaustion.Tick.class), null, exhaustionTickEventStart, endLabel, method.maxLocals);
+		method.maxLocals += 1;
+		method.localVariables.add(exhaustionTickEvent);
+
+		// FoodEvent.Exhaustion.Tick exhaustionTickEvent = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "getHealthRegenPeriod", "(Lnet/minecraft/entity/player/EntityPlayer;)F"));
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireExhaustionTickEvent", "(Lnet/minecraft/entity/player/EntityPlayer;F)Lsqueek/applecore/api/FoodEvent$Exhaustion$Tick;"));
+		toInject.add(new VarInsnNode(ASTORE, exhaustionTickEvent.index));
+		toInject.add(exhaustionTickEventStart);
+
+		// this.foodExhaustionLevel = exhaustionTickEvent.exhaustionLevel;
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new VarInsnNode(ALOAD, exhaustionTickEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodEvent.Exhaustion.Tick.class), "exhaustionLevel", "F"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+
+		// if (!exhaustionTickEvent.isCanceled() && this.foodExhaustionLevel >= exhaustionTickEvent.maxExhaustionLevel)
+		toInject.add(new VarInsnNode(ALOAD, exhaustionTickEvent.index));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(FoodEvent.Exhaustion.Tick.class), "isCanceled", "()Z"));
+		toInject.add(new JumpInsnNode(IFNE, foodExhaustionBlockEndLabel));
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+		toInject.add(new VarInsnNode(ALOAD, exhaustionTickEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodEvent.Exhaustion.Tick.class), "maxExhaustionLevel", "F"));
 		toInject.add(new InsnNode(FCMPL));
+		toInject.add(new JumpInsnNode(IFLT, foodExhaustionBlockEndLabel));
 
-		// change to IFLT
-		((JumpInsnNode) targetNode).setOpcode(IFLT);
+		// create exhaustionTickEvent variable
+		LabelNode exhaustionMaxEventStart = new LabelNode();
+		LocalVariableNode exhaustionMaxEvent = new LocalVariableNode("exhaustionMaxEvent", Type.getDescriptor(FoodEvent.Exhaustion.MaxReached.class), null, exhaustionMaxEventStart, foodExhaustionBlockEndLabel, method.maxLocals);
+		method.maxLocals += 1;
+		method.localVariables.add(exhaustionMaxEvent);
 
-		method.instructions.insertBefore(targetNode, toInject);
+		// FoodEvent.Exhaustion.MaxReached exhaustionMaxEvent = Hooks.fireExhaustionMaxEvent(player, exhaustionTickEvent.maxExhaustionLevel, foodExhaustionLevel);
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new VarInsnNode(ALOAD, exhaustionTickEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodEvent.Exhaustion.Tick.class), "maxExhaustionLevel", "F"));
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireExhaustionMaxEvent", "(Lnet/minecraft/entity/player/EntityPlayer;FF)Lsqueek/applecore/api/FoodEvent$Exhaustion$MaxReached;"));
+		toInject.add(new VarInsnNode(ASTORE, exhaustionMaxEvent.index));
+		toInject.add(exhaustionMaxEventStart);
 
-		while (targetNode != null && targetNode.getOpcode() != LDC)
-		{
-			targetNode = targetNode.getNext();
-		}
+		// if (!exhaustionMaxEvent.isCanceled())
+		toInject.add(new VarInsnNode(ALOAD, exhaustionMaxEvent.index));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(FoodEvent.Exhaustion.MaxReached.class), "isCanceled", "()Z"));
+		toInject.add(new JumpInsnNode(IFNE, foodExhaustionBlockEndLabel));
 
-		LabelNode ifHungerDrainDisabled = new LabelNode();
+		// this.foodExhaustionLevel += exhaustionMaxEvent.deltaExhaustion;
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new InsnNode(DUP));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+		toInject.add(new VarInsnNode(ALOAD, exhaustionMaxEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodEvent.Exhaustion.MaxReached.class), "deltaExhaustion", "F"));
+		toInject.add(new InsnNode(FADD));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
 
-		toInject.clear();
-		//toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(IguanaConfig.class), "disableHealingHungerDrain", "Z"));
-		toInject.add(new JumpInsnNode(IFNE, ifHungerDrainDisabled));
+		// this.foodSaturationLevel = Math.max(this.foodSaturationLevel + exhaustionMaxEvent.deltaSaturation, 0.0F);
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "b" : "foodSaturationLevel", "F"));
+		toInject.add(new VarInsnNode(ALOAD, exhaustionMaxEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodEvent.Exhaustion.MaxReached.class), "deltaSaturation", "F"));
+		toInject.add(new InsnNode(FADD));
+		toInject.add(new InsnNode(FCONST_0));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, "java/lang/Math", "max", "(FF)F"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "b" : "foodSaturationLevel", "F"));
 
-		method.instructions.insertBefore(targetNode.getPrevious(), toInject);
-		method.instructions.insert(targetNode.getNext(), ifHungerDrainDisabled);
+		// this.foodLevel = Math.max(this.foodLevel + exhaustionMaxEvent.deltaHunger, 0);
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
+		toInject.add(new VarInsnNode(ALOAD, exhaustionMaxEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodEvent.Exhaustion.MaxReached.class), "deltaHunger", "I"));
+		toInject.add(new InsnNode(IADD));
+		toInject.add(new InsnNode(ICONST_0));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, "java/lang/Math", "max", "(II)I"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
 
-		// remove the else if block by removing all the way until hitting the GOTO
-		AbstractInsnNode insnToRemove = ifLabel.getNext();
-		while (insnToRemove != null && insnToRemove.getOpcode() != GOTO)
-		{
-			insnToRemove = insnToRemove.getNext();
-			method.instructions.remove(insnToRemove.getPrevious());
-		}
-		// remove the GOTO as well
-		if (insnToRemove != null)
-			method.instructions.remove(insnToRemove);
+		method.instructions.insert(injectPoint, toInject);
 	}
 
-	private void addConfigurableHungerLoss(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookHealthRegen(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		// code modified to:
+		// health regen block replaced with:
 		/*
-		if (IguanaConfig.hungerLossRatePercentage == 0)
+		Result allowRegenResult = Hooks.fireAllowRegenEvent(player);
+		if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().getGameRuleBooleanValue("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
 		{
-			foodExhaustionLevel = 0.0F;
-			foodSaturationLevel = 0.0F;
-			foodLevel = 19;
+			++this.foodTimer;
+
+			if (this.foodTimer >= Hooks.fireRegenTickEvent(player))
+			{
+				FoodEvent.RegenHealth.Regen regenEvent = Hooks.fireRegenEvent(player);
+				if (!regenEvent.isCanceled())
+				{
+					player.heal(regenEvent.deltaHealth);
+					this.addExhaustion(regenEvent.deltaExhaustion);
+				}
+				this.foodTimer = 0;
+			}
 		}
-		else if (this.foodExhaustionLevel > Hooks.getMaxExhaustion(player))
+		else
 		{
-		    this.foodExhaustionLevel = 0.0F;
-
-			// default code
+			this.foodTimer = 0;
 		}
-		 */
-
-		AbstractInsnNode firstInjectPoint = ASMHelper.findFirstInstructionOfType(method, PUTFIELD);
-		AbstractInsnNode maxExhaustionReplacePoint = ASMHelper.findFirstInstructionOfType(method, LDC);
-
-		LabelNode afterFoodExhaustionCheck = null;
-		AbstractInsnNode ifLE = maxExhaustionReplacePoint.getNext().getNext();
-		if (ifLE.getOpcode() == IFLE)
-			afterFoodExhaustionCheck = ((JumpInsnNode) ifLE).label;
-
-		if (firstInjectPoint == null || maxExhaustionReplacePoint == null || ifLE == null || afterFoodExhaustionCheck == null)
-			throw new RuntimeException("Unexpected instructions found in FoodStats.onUpdate");
+		*/
+		
+		String internalFoodStatsName = classNode.name.replace(".", "/");
+		LabelNode endLabel = ASMHelper.findEndLabel(method);
 
 		InsnList toInject = new InsnList();
 
-		LabelNode ifHungerLossPercentageNotZero = new LabelNode();
+		AbstractInsnNode entryPoint = ASMHelper.findFirstInstructionOfTypeWithDesc(method, LDC, "naturalRegeneration");
+		AbstractInsnNode injectPoint = entryPoint.getPrevious().getPrevious().getPrevious().getPrevious();
+		AbstractInsnNode healthBlockJumpToEnd = ASMHelper.findNextInstructionOfType(entryPoint, GOTO);
+		LabelNode healthBlockEndLabel = ((JumpInsnNode) healthBlockJumpToEnd).label;
 
-		//toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(IguanaConfig.class), "hungerLossRatePercentage", "I"));
-		toInject.add(new JumpInsnNode(IFNE, ifHungerLossPercentageNotZero));
+		// remove the entire health regen block
+		ASMHelper.removeNodesFromMethodUntil(method, injectPoint.getNext(), healthBlockEndLabel);
 
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new InsnNode(FCONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, classNode.name.replace(".", "/"), isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+		// create allowRegenResult variable
+		LabelNode allowRegenResultStart = new LabelNode();
+		LocalVariableNode allowRegenResult = new LocalVariableNode("allowRegenResult", Type.getDescriptor(Event.Result.class), null, allowRegenResultStart, endLabel, method.maxLocals);
+		method.maxLocals += 1;
+		method.localVariables.add(allowRegenResult);
 
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new InsnNode(FCONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, classNode.name.replace(".", "/"), isObfuscated ? "b" : "foodSaturationLevel", "F"));
-
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new VarInsnNode(BIPUSH, 19));
-		toInject.add(new FieldInsnNode(PUTFIELD, classNode.name.replace(".", "/"), isObfuscated ? "a" : "foodLevel", "I"));
-
-		toInject.add(new JumpInsnNode(GOTO, afterFoodExhaustionCheck));
-		toInject.add(ifHungerLossPercentageNotZero);
-
-		method.instructions.insert(firstInjectPoint, toInject);
-
-		toInject.clear();
+		// Result allowRegenResult = Hooks.fireAllowRegenEvent(player);
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "getMaxExhaustion", "(Lnet/minecraft/entity/player/EntityPlayer;)F"));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireAllowRegenEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new VarInsnNode(ASTORE, allowRegenResult.index));
+		toInject.add(allowRegenResultStart);
 
-		method.instructions.insertBefore(maxExhaustionReplacePoint, toInject);
-		method.instructions.remove(maxExhaustionReplacePoint);
+		// if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().getGameRuleBooleanValue("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
+		toInject.add(new VarInsnNode(ALOAD, allowRegenResult.index));
+		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "ALLOW", Type.getDescriptor(Event.Result.class)));
+		LabelNode ifAllowed = new LabelNode();
+		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowed));
+		toInject.add(new VarInsnNode(ALOAD, allowRegenResult.index));
+		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DEFAULT", Type.getDescriptor(Event.Result.class)));
+		LabelNode elseStart = new LabelNode();
+		toInject.add(new JumpInsnNode(IF_ACMPNE, elseStart));
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(EntityPlayer.class), isObfuscated ? "o" : "worldObj", isObfuscated ? "Lahb;" : "Lnet/minecraft/world/World;"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(World.class), isObfuscated ? "O" : "getGameRules", isObfuscated ? "()Lagy;" : "()Lnet/minecraft/world/GameRules;"));
+		toInject.add(new LdcInsnNode("naturalRegeneration"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(GameRules.class), isObfuscated ? "b" : "getGameRuleBooleanValue", "(Ljava/lang/String;)Z"));
+		toInject.add(new JumpInsnNode(IFEQ, elseStart));
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
+		toInject.add(new IntInsnNode(BIPUSH, 18));
+		toInject.add(new JumpInsnNode(IF_ICMPLT, elseStart));
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(EntityPlayer.class), isObfuscated ? "bR" : "shouldHeal", "()Z"));
+		toInject.add(new JumpInsnNode(IFEQ, elseStart));
+		toInject.add(ifAllowed);
 
-		AbstractInsnNode setToZeroTarget = ifLE.getNext();
-		while (setToZeroTarget != null && setToZeroTarget.getOpcode() != DUP)
-		{
-			setToZeroTarget = setToZeroTarget.getNext();
-		}
+		// ++this.foodTimer;
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new InsnNode(DUP));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, "foodTimer", "I"));
+		toInject.add(new InsnNode(ICONST_1));
+		toInject.add(new InsnNode(IADD));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, "foodTimer", "I"));
 
-		if (setToZeroTarget == null)
-			throw new RuntimeException("Failed to find DUP instruction after IFLE");
+		// if (this.foodTimer >= Hooks.fireRegenTickEvent(player))
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, "foodTimer", "I"));
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireRegenTickEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)I"));
+		toInject.add(new JumpInsnNode(IF_ICMPLT, healthBlockEndLabel));
 
-		method.instructions.insertBefore(setToZeroTarget, new InsnNode(FCONST_0));
+		// create regenEvent variable
+		LabelNode regenEventStart = new LabelNode();
+		LabelNode regenEventEnd = new LabelNode();
+		LocalVariableNode regenEvent = new LocalVariableNode("regenEvent", Type.getDescriptor(FoodEvent.RegenHealth.Regen.class), null, regenEventStart, regenEventEnd, method.maxLocals);
+		method.maxLocals += 1;
+		method.localVariables.add(regenEvent);
 
-		AbstractInsnNode insnToRemove = setToZeroTarget;
-		while (insnToRemove != null && insnToRemove.getOpcode() != PUTFIELD)
-		{
-			insnToRemove = insnToRemove.getNext();
-			method.instructions.remove(insnToRemove.getPrevious());
-		}
+		// FoodEvent.RegenHealth.Regen regenEvent = Hooks.fireRegenEvent(player);
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireRegenEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/FoodEvent$RegenHealth$Regen;"));
+		toInject.add(new VarInsnNode(ASTORE, regenEvent.index));
+		toInject.add(regenEventStart);
+
+		// if (!regenEvent.isCanceled())
+		toInject.add(new VarInsnNode(ALOAD, regenEvent.index));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(FoodEvent.RegenHealth.Regen.class), "isCanceled", "()Z"));
+		LabelNode ifCanceled = new LabelNode();
+		toInject.add(new JumpInsnNode(IFNE, ifCanceled));
+
+		// player.heal(regenEvent.deltaHealth);
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new VarInsnNode(ALOAD, regenEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodEvent.RegenHealth.Regen.class), "deltaHealth", "F"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(EntityPlayer.class), isObfuscated ? "f" : "heal", "(F)V"));
+	    
+		// this.addExhaustion(regenEvent.deltaExhaustion);
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new VarInsnNode(ALOAD, regenEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodEvent.RegenHealth.Regen.class), "deltaExhaustion", "F"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, internalFoodStatsName, isObfuscated ? "a" : "addExhaustion", "(F)V"));
+	    
+		// this.foodTimer = 0;
+		toInject.add(ifCanceled);
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new InsnNode(ICONST_0));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, "foodTimer", "I"));
+		toInject.add(regenEventEnd);
+		toInject.add(new JumpInsnNode(GOTO, healthBlockEndLabel));
+
+		// else
+		toInject.add(elseStart);
+
+		// this.foodTimer = 0;
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new InsnNode(ICONST_0));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, "foodTimer", "I"));
+		
+		method.instructions.insert(injectPoint, toInject);
 	}
 
-	private void addSeparateStarveTimer(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookStarvation(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
 		// add starveTimer field
 		classNode.fields.add(new FieldNode(ACC_PUBLIC, "starveTimer", "I", null, null));
 
-		// injected code:
+		// injected at the bottom of the function:
 		/*
-		if (this.foodLevel <= 0)
+		Result allowStarvationResult = Hooks.fireAllowStarvation(player);
+		if (allowStarvationResult == Result.ALLOW || (allowStarvationResult == Result.DEFAULT && this.foodLevel <= 0))
 		{
-		    ++this.starveTimer;
+			++this.starveTimer;
 
-		    if (this.starveTimer >= 80)
-		    {
-		        player.attackEntityFrom(DamageSource.starve, IguanaConfig.damageOnStarve);
-		        this.starveTimer = 0;
-		    }
+			if (this.starveTimer >= Hooks.fireStarvationTickEvent(player))
+			{
+				FoodEvent.Starvation.Starve starveEvent = Hooks.fireStarveEvent(player);
+				if (!starveEvent.isCanceled())
+				{
+					player.attackEntityFrom(DamageSource.starve, starveEvent.starveDamage);
+				}
+				this.starveTimer = 0;
+			}
 		}
 		else
 		{
@@ -443,50 +556,98 @@ public class ModuleFoodStats implements IClassTransformerModule
 		}
 		 */
 
+		String internalFoodStatsName = classNode.name.replace(".", "/");
 		AbstractInsnNode lastReturn = ASMHelper.findLastInstructionOfType(method, RETURN);
-
-		LabelNode ifFoodLevelNotLEZero = new LabelNode();
-		LabelNode afterElse = new LabelNode();
+		LabelNode endLabel = ASMHelper.findEndLabel(method);
 
 		InsnList toInject = new InsnList();
 
-		// if foodLevel <= 0
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, classNode.name.replace(".", "/"), isObfuscated ? "a" : "foodLevel", "I"));
-		toInject.add(new JumpInsnNode(IFGT, ifFoodLevelNotLEZero));
+		// create allowStarvationResult variable
+		LabelNode allowStarvationResultStart = new LabelNode();
+		LocalVariableNode allowStarvationResult = new LocalVariableNode("allowStarvationResult", Type.getDescriptor(Event.Result.class), null, allowStarvationResultStart, endLabel, method.maxLocals);
+		method.maxLocals += 1;
+		method.localVariables.add(allowStarvationResult);
 
-		// increment starveTimer
+		// Result allowStarvationResult = Hooks.fireAllowStarvation(player);
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireAllowStarvation", "(Lnet/minecraft/entity/player/EntityPlayer;)Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new VarInsnNode(ASTORE, allowStarvationResult.index));
+		toInject.add(allowStarvationResultStart);
+
+		// if (allowStarvationResult == Result.ALLOW || (allowStarvationResult == Result.DEFAULT && this.foodLevel <= 0))
+		toInject.add(new VarInsnNode(ALOAD, allowStarvationResult.index));
+		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "ALLOW", Type.getDescriptor(Event.Result.class)));
+		LabelNode ifAllowed = new LabelNode();
+		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowed));
+		toInject.add(new VarInsnNode(ALOAD, allowStarvationResult.index));
+		LabelNode elseStart = new LabelNode();
+		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DEFAULT", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new JumpInsnNode(IF_ACMPNE, elseStart));
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
+		toInject.add(new JumpInsnNode(IFGT, elseStart));
+		toInject.add(ifAllowed);
+
+		// ++this.starveTimer;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DUP));
-		toInject.add(new FieldInsnNode(GETFIELD, classNode.name.replace(".", "/"), "starveTimer", "I"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, "starveTimer", "I"));
 		toInject.add(new InsnNode(ICONST_1));
 		toInject.add(new InsnNode(IADD));
-		toInject.add(new FieldInsnNode(PUTFIELD, classNode.name.replace(".", "/"), "starveTimer", "I"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, "starveTimer", "I"));
 
-		// if starveTimer >= 80 then do starve damage
+		// if (this.starveTimer >= Hooks.fireStarvationTickEvent(player))
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, classNode.name.replace(".", "/"), "starveTimer", "I"));
-		toInject.add(new VarInsnNode(BIPUSH, 80));
-		toInject.add(new JumpInsnNode(IF_ICMPLT, afterElse));
-		toInject.add(new VarInsnNode(ALOAD, 1)); // player
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, "starveTimer", "I"));
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireStarvationTickEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)I"));
+		LabelNode beforeReturn = new LabelNode();
+		toInject.add(new JumpInsnNode(IF_ICMPLT, beforeReturn));
+
+		// create starveEvent variable
+		LabelNode starveEventStart = new LabelNode();
+		LabelNode starveEventEnd = new LabelNode();
+		LocalVariableNode starveEvent = new LocalVariableNode("starveEvent", Type.getDescriptor(FoodEvent.Starvation.Starve.class), null, starveEventStart, starveEventEnd, method.maxLocals);
+		method.maxLocals += 1;
+		method.localVariables.add(starveEvent);
+
+		// FoodEvent.Starvation.Starve starveEvent = Hooks.fireStarveEvent(player);
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireStarveEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/FoodEvent$Starvation$Starve;"));
+		toInject.add(new VarInsnNode(ASTORE, starveEvent.index));
+		toInject.add(starveEventStart);
+
+		// if (!starveEvent.isCanceled())
+		toInject.add(new VarInsnNode(ALOAD, starveEvent.index));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(FoodEvent.Starvation.Starve.class), "isCanceled", "()Z"));
+		LabelNode ifCanceled = new LabelNode();
+		toInject.add(new JumpInsnNode(IFNE, ifCanceled));
+
+		// player.attackEntityFrom(DamageSource.starve, starveEvent.starveDamage);
+		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(DamageSource.class), isObfuscated ? "f" : "starve", Type.getDescriptor(DamageSource.class)));
-		//toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(IguanaConfig.class), "damageOnStarve", "I"));
-		toInject.add(new InsnNode(I2F));
+		toInject.add(new VarInsnNode(ALOAD, starveEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodEvent.Starvation.Starve.class), "starveDamage", "F"));
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(EntityPlayer.class), isObfuscated ? "a" : "attackEntityFrom", isObfuscated ? "(Lro;F)Z" : "(Lnet/minecraft/util/DamageSource;F)Z"));
 		toInject.add(new InsnNode(POP));
+
+		// this.starveTimer = 0;
+		toInject.add(ifCanceled);
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, classNode.name.replace(".", "/"), "starveTimer", "I"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, "starveTimer", "I"));
+		toInject.add(starveEventEnd);
+		toInject.add(new JumpInsnNode(GOTO, beforeReturn));
 
-		toInject.add(new JumpInsnNode(GOTO, afterElse));
-		toInject.add(ifFoodLevelNotLEZero);
+		// else
+		toInject.add(elseStart);
 
-		// else set starveTimer to 0
+		// this.starveTimer = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, classNode.name.replace(".", "/"), "starveTimer", "I"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, "starveTimer", "I"));
 
-		toInject.add(afterElse);
+		toInject.add(beforeReturn);
 
 		method.instructions.insertBefore(lastReturn, toInject);
 	}

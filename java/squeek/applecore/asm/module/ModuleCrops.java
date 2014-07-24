@@ -40,7 +40,7 @@ public class ModuleCrops implements IClassTransformerModule
 
 		if (methodNode != null)
 		{
-			addUpdateTickHook(methodNode, isObfuscated);
+			//addUpdateTickHook(methodNode, isObfuscated);
 		}
 		else
 			throw new RuntimeException(classNode.name + ": updateTick method not found");

@@ -50,56 +50,6 @@ public abstract class FoodEvent extends Event
 		}
 	}
 
-	@Cancelable
-	public static class RegenHealth extends FoodEvent
-	{
-		public int regenTickPeriod = 80;
-		public float exhaustionFromRegen = 3f;
-		public int minHungerToHeal = 18;
-
-		public RegenHealth(EntityPlayer player)
-		{
-			super(player);
-		}
-	}
-
-	public abstract static class Starvation extends FoodEvent
-	{
-		private Starvation(EntityPlayer player)
-		{
-			super(player);
-		}
-
-		@Cancelable
-		public static class Tick extends Starvation
-		{
-			public int starveTickPeriod = 80;
-			public int starvationHungerThreshold = 0;
-
-			public Tick(EntityPlayer player, float exhaustionLevel)
-			{
-				super(player);
-			}
-		}
-
-		@Cancelable
-		public static class OnStarve extends Starvation
-		{
-			public float starveDamage = 1f;
-
-			public OnStarve(EntityPlayer player)
-			{
-				super(player);
-
-				EnumDifficulty difficulty = player.worldObj.difficultySetting;
-				boolean shouldDoDamage = player.getHealth() > 10.0F || difficulty == EnumDifficulty.HARD || player.getHealth() > 1.0F && difficulty == EnumDifficulty.NORMAL;
-
-				if (!shouldDoDamage)
-					starveDamage = 0f;
-			}
-		}
-	}
-
 	public abstract static class Exhaustion extends FoodEvent
 	{
 		private Exhaustion(EntityPlayer player)
@@ -116,20 +66,116 @@ public abstract class FoodEvent extends Event
 			public Tick(EntityPlayer player, float exhaustionLevel)
 			{
 				super(player);
-
+				this.exhaustionLevel = exhaustionLevel;
 			}
 		}
 
 		@Cancelable
-		public static class OnMaxReached extends Exhaustion
+		public static class MaxReached extends Exhaustion
 		{
-			public float exhaustion;
-			public float deltaHunger = 1f;
-			public float deltaSaturation = 1f;
+			public final float currentExhaustionLevel;
+			public float deltaExhaustion;
+			public int deltaHunger = -1;
+			public float deltaSaturation = -1f;
 
-			public OnMaxReached(EntityPlayer player)
+			public MaxReached(EntityPlayer player, float exhaustionToRemove, float currentExhaustionLevel)
 			{
 				super(player);
+				this.deltaExhaustion = -exhaustionToRemove;
+				this.currentExhaustionLevel = currentExhaustionLevel;
+
+				boolean shouldDecreaseSaturationLevel = player.getFoodStats().getSaturationLevel() > 0f;
+				
+				if (!shouldDecreaseSaturationLevel)
+					deltaSaturation = 0f;
+				
+				EnumDifficulty difficulty = player.worldObj.difficultySetting;
+				boolean shouldDecreaseFoodLevel = !shouldDecreaseSaturationLevel && difficulty != EnumDifficulty.PEACEFUL;
+
+				if (!shouldDecreaseFoodLevel)
+					deltaHunger = 0;
+			}
+		}
+	}
+
+	public abstract static class RegenHealth extends FoodEvent
+	{
+		private RegenHealth(EntityPlayer player)
+		{
+			super(player);
+		}
+		
+		public static class AllowRegen extends RegenHealth
+		{
+			public AllowRegen(EntityPlayer player)
+			{
+				super(player);
+			}
+		}
+		
+		@Cancelable
+		public static class Tick extends RegenHealth
+		{
+			public int regenTickPeriod = 80;
+
+			public Tick(EntityPlayer player)
+			{
+				super(player);
+			}
+		}
+
+		@Cancelable
+		public static class Regen extends RegenHealth
+		{
+			public float deltaHealth = 1f;
+			public float deltaExhaustion = -3f;
+
+			public Regen(EntityPlayer player)
+			{
+				super(player);
+			}
+		}
+	}
+
+	public abstract static class Starvation extends FoodEvent
+	{
+		private Starvation(EntityPlayer player)
+		{
+			super(player);
+		}
+
+		public static class AllowStarvation extends Starvation
+		{
+			public AllowStarvation(EntityPlayer player)
+			{
+				super(player);
+			}
+		}
+
+		public static class Tick extends Starvation
+		{
+			public int starveTickPeriod = 80;
+
+			public Tick(EntityPlayer player)
+			{
+				super(player);
+			}
+		}
+
+		@Cancelable
+		public static class Starve extends Starvation
+		{
+			public float starveDamage = 1f;
+
+			public Starve(EntityPlayer player)
+			{
+				super(player);
+
+				EnumDifficulty difficulty = player.worldObj.difficultySetting;
+				boolean shouldDoDamage = player.getHealth() > 10.0F || difficulty == EnumDifficulty.HARD || player.getHealth() > 1.0F && difficulty == EnumDifficulty.NORMAL;
+
+				if (!shouldDoDamage)
+					starveDamage = 0f;
 			}
 		}
 	}

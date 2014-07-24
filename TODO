@@ -1,0 +1,26 @@
+General:
+  [ ] Exclude example/reference packages in build.gradle
+  [ ] Setup build.gradle to be maven-ready
+  [ ] Fix example mod metadata
+
+API:
+  [x] Implement event-driven configurable exhaustion @done (2014-07-24 01:38)
+  [x] Implement event-driven configurable health regen @done (2014-07-24 01:38)
+  [ ] Implement event-driven growth ticks
+  [x] Implement event-driven starvation @done (2014-07-24 01:38)
+  [ ] Break FoodEvent up into multiple files
+  [ ] Implement event-driven FoodStats modification canceling
+
+Test/Sample Implementations:
+  [x] Modifying eating speed @done (2014-07-24 01:38)
+  [x] Modifying hunger/saturation @done (2014-07-24 01:38)
+  [ ] Canceling food stats changes
+  [x] Modifying regen health @done (2014-07-24 01:38)
+  [x] Modifying starvation @done (2014-07-24 01:38)
+  [x] Modifying exhaustion @done (2014-07-24 01:38)
+
+Project Log/Notes:
+ - Modifying food eating duration using the Forge event PlayerUseItemEvent.Start does not produce clean visuals; it just adds a delay to the start of the animation. The solution should be player-specific, which isn't possible by only hooking into ItemFood. @date(2014-07-24 01:45)
+
+＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
+Archive:
