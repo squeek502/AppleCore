@@ -1,6 +1,8 @@
 General:
   [ ] Setup build.gradle to be maven-ready
   [ ] Fix example mod metadata
+  [ ] Move saturation/exhaustion syncing from The Spice of Life to AppleCore
+  [ ] Move saturation/exhaustion values shown in debug info from The Spice of Life to AppleCore
 
 API:
   [ ] Implement event-driven growth ticks
