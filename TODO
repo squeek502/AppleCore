@@ -16,6 +16,7 @@ Project Log/Notes:
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [x] Exclude example mod metadata file from gradle build @started(2014-07-24 19:54) @done (2014-07-24 20:04) @lasted(0:10) @project(General)
  [x] Implement event-driven FoodStats modification canceling @done (2014-07-24 19:47) @project(API)
  [x] Fix example mod metadata @done (2014-07-24 19:47) @project(General)
  [x] Canceling food stats changes @done (2014-07-24 19:47) @project(Test/Sample Implementations)

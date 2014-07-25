@@ -49,7 +49,9 @@ task processSourcesCustom(type:Copy){
 }
 
 task removeExampleAndReferenceFiles(type:Delete){
-    delete project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/example", project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/reference"
+    delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/example"
+    delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/reference"
+    delete += file(sourceSets.main.output.resourcesDir.getPath()+"/mcmod.info")
 }
 
 // correct task ordering
