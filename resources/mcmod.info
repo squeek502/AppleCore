@@ -1,0 +1,17 @@
+[
+{
+  "modid": "AppleCoreExample",
+  "name": "AppleCore Example",
+  "description": "An example mod that uses the AppleCore API to make various test modifications",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["squeek"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": [],
+  "parent": "AppleCore"
+}
+]

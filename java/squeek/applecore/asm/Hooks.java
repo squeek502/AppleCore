@@ -87,4 +87,11 @@ public class Hooks
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
+	
+	public static boolean fireFoodStatsAdditionEvent(EntityPlayer player, FoodValues foodValuesToBeAdded)
+	{
+		FoodEvent.FoodStatsAddition event = new FoodEvent.FoodStatsAddition(player, foodValuesToBeAdded);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.isCancelable() ? event.isCanceled() : false;
+	}
 }

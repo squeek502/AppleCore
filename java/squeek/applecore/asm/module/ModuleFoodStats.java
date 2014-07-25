@@ -58,7 +58,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 			MethodNode addStatsMethodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "addStats", "(IF)V");
 			if (addStatsMethodNode != null)
 			{
-				//addHungerLossRateCheck(addStatsMethodNode);
+				hookFoodStatsAddition(classNode, addStatsMethodNode, isObfuscated);
 			}
 			else
 				throw new RuntimeException("FoodStats: addStats(IF)V method not found");
@@ -248,11 +248,11 @@ public class ModuleFoodStats implements IClassTransformerModule
 		method.instructions.insertBefore(targetNode, toInject);
 	}
 
-	private void addHungerLossRateCheck(MethodNode method)
+	private void hookFoodStatsAddition(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
 		// injected code:
 		/*
-		if(IguanaConfig.hungerLossRatePercentage > 0)
+		if (!Hooks.fireFoodStatsAdditionEvent(player, new FoodValues(p_75122_1_, p_75122_2_)))
 		{
 		    // default code
 		}
@@ -260,17 +260,24 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		AbstractInsnNode targetNode = ASMHelper.findFirstInstruction(method);
 
-		LabelNode ifGreaterThan = new LabelNode();
+		LabelNode ifCanceled = new LabelNode();
 
 		InsnList toInject = new InsnList();
-		//toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(IguanaConfig.class), "hungerLossRatePercentage", "I"));
-		toInject.add(new JumpInsnNode(IFLE, ifGreaterThan));
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new FieldInsnNode(GETFIELD, classNode.name.replace(".", "/"), "player", Type.getDescriptor(EntityPlayer.class)));
+		toInject.add(new TypeInsnNode(NEW, Type.getInternalName(FoodValues.class)));
+		toInject.add(new InsnNode(DUP));
+		toInject.add(new VarInsnNode(ILOAD, 1));
+		toInject.add(new VarInsnNode(FLOAD, 2));
+		toInject.add(new MethodInsnNode(INVOKESPECIAL, Type.getInternalName(FoodValues.class), "<init>", "(IF)V"));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireFoodStatsAdditionEvent", "(Lnet/minecraft/entity/player/EntityPlayer;Lsqueek/applecore/api/food/FoodValues;)Z"));
+		toInject.add(new JumpInsnNode(IFNE, ifCanceled));
 
 		method.instructions.insertBefore(targetNode, toInject);
 
 		targetNode = ASMHelper.findLastInstructionOfType(method, PUTFIELD).getNext().getNext();
 
-		method.instructions.insertBefore(targetNode, ifGreaterThan);
+		method.instructions.insertBefore(targetNode, ifCanceled);
 	}
 
 	private void hookExhaustion(ClassNode classNode, MethodNode method, boolean isObfuscated)
@@ -415,7 +422,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 			this.foodTimer = 0;
 		}
 		*/
-		
+
 		String internalFoodStatsName = classNode.name.replace(".", "/");
 		LabelNode endLabel = ASMHelper.findEndLabel(method);
 
@@ -504,13 +511,13 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, regenEvent.index));
 		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(HealthRegenEvent.Regen.class), "deltaHealth", "F"));
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(EntityPlayer.class), isObfuscated ? "f" : "heal", "(F)V"));
-	    
+
 		// this.addExhaustion(regenEvent.deltaExhaustion);
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, regenEvent.index));
 		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(HealthRegenEvent.Regen.class), "deltaExhaustion", "F"));
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, internalFoodStatsName, isObfuscated ? "a" : "addExhaustion", "(F)V"));
-	    
+
 		// this.foodTimer = 0;
 		toInject.add(ifCanceled);
 		toInject.add(new VarInsnNode(ALOAD, 0));
@@ -526,7 +533,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
 		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, "foodTimer", "I"));
-		
+
 		method.instructions.insert(injectPoint, toInject);
 	}
 

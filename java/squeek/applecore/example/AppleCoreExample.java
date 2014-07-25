@@ -21,9 +21,11 @@ public class AppleCoreExample
 	public void init(FMLInitializationEvent event)
 	{
 		MinecraftForge.EVENT_BUS.register(new EatingSpeedModifier());
+		MinecraftForge.EVENT_BUS.register(new ExhaustionModifier());
+		MinecraftForge.EVENT_BUS.register(new FoodEatenResult());
+		MinecraftForge.EVENT_BUS.register(new FoodStatsAdditionCanceler());
 		MinecraftForge.EVENT_BUS.register(new FoodValuesModifier());
 		MinecraftForge.EVENT_BUS.register(new HealthRegenModifier());
 		MinecraftForge.EVENT_BUS.register(new StarvationModifier());
-		MinecraftForge.EVENT_BUS.register(new FoodEatenResult());
 	}
 }

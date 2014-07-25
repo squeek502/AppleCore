@@ -3,11 +3,12 @@ package squeek.applecore.api.food;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
 
 public abstract class FoodEvent extends Event
 {
-	public EntityPlayer player;
+	public final EntityPlayer player;
 
 	public FoodEvent(EntityPlayer player)
 	{
@@ -31,11 +32,11 @@ public abstract class FoodEvent extends Event
 
 	public static class FoodEaten extends FoodEvent
 	{
-		public FoodValues foodValues;
-		public int hungerAdded;
-		public float saturationAdded;
-		public ItemFood itemFood;
-		public ItemStack food;
+		public final FoodValues foodValues;
+		public final int hungerAdded;
+		public final float saturationAdded;
+		public final ItemFood itemFood;
+		public final ItemStack food;
 
 		public FoodEaten(EntityPlayer player, ItemFood itemFood, ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded)
 		{
@@ -45,6 +46,18 @@ public abstract class FoodEvent extends Event
 			this.foodValues = foodValues;
 			this.hungerAdded = hungerAdded;
 			this.saturationAdded = saturationAdded;
+		}
+	}
+
+	@Cancelable
+	public static class FoodStatsAddition extends FoodEvent
+	{
+		public final FoodValues foodValuesToBeAdded;
+
+		public FoodStatsAddition(EntityPlayer player, FoodValues foodValuesToBeAdded)
+		{
+			super(player);
+			this.foodValuesToBeAdded = foodValuesToBeAdded;
 		}
 	}
 }

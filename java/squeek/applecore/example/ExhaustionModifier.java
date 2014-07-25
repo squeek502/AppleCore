@@ -7,13 +7,13 @@ public class ExhaustionModifier
 {
 
 	@SubscribeEvent
-	public void onStarveTick(ExhaustionEvent.Tick event)
+	public void onExhaustionTick(ExhaustionEvent.Tick event)
 	{
 		event.maxExhaustionLevel = 30f;
 	}
 
 	@SubscribeEvent
-	public void onStarve(ExhaustionEvent.MaxReached event)
+	public void onExhausted(ExhaustionEvent.MaxReached event)
 	{
 		event.deltaHunger = -1;
 	}
