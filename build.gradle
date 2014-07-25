@@ -18,7 +18,7 @@ buildscript {
 apply plugin: 'forge'
 
 minecraft {
-    version = "1.7.10-10.13.0.1180"
+    version = minecraft_version + "-" + forge_version
 }
 
 group = project.projectDir.name.toLowerCase()
@@ -26,40 +26,15 @@ archivesBaseName = project.projectDir.name + "-mc" + project.minecraft.version
 
 sourceSets.main{
     java {
-		srcDirs 'java', 'apis' //set the source folder as the /src subfolder
+		srcDirs 'java', 'apis'
 	}
     resources {
-		srcDirs 'resources' //set the resources folder as the /resources subfolder
+		srcDirs 'resources'
 	}
 }
 
 dependencies {
 	compile fileTree(dir: 'libs', include: '*.jar,*.zip')
-}
-
-// variable replacement in source files
-task processSourcesCustom(type:Copy){
-	from('java')
-	{
-		include '**/ModInfo.java'
-
-		expand 'version':project.version, 'mcversion':project.minecraft.version
-	}
-	into project.buildDir.getPath()+"/sources/java"
-}
-
-task removeExampleAndReferenceFiles(type:Delete){
-    delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/example"
-    delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/reference"
-    delete += file(sourceSets.main.output.resourcesDir.getPath()+"/mcmod.info")
-}
-
-// correct task ordering
-compileJava.dependsOn processSourcesCustom
-compileJava.dependsOn removeExampleAndReferenceFiles
-afterEvaluate { project ->
-	processSourcesCustom.shouldRunAfter(sourceMainJava)
-    removeExampleAndReferenceFiles.shouldRunAfter(processSourcesCustom)
 }
 
 // Add Coremod Manifest
@@ -70,8 +45,30 @@ jar {
     }
 }
 
+task deobfArtifact(type: Jar) {
+    from sourceSets.main.output
+    manifest = jar.manifest
+    classifier = 'deobf'
+}
+
+task apiArtifact(type: Jar) {
+    from(sourceSets.main.java) {
+        include "squeek/applecore/api/**"
+    }
+    classifier = 'api'
+}
+
+artifacts {
+    archives deobfArtifact
+    archives apiArtifact
+}
+
 processResources
 {
+    // force run when variables change
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
     // replace stuff in *.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include '*.info'
@@ -84,4 +81,37 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude '*.info'
     }
+}
+
+// variable replacement in source files
+task processSourceMainJava(type:Copy) {
+    // force run when variables change
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+    inputs.property "apiversion", api_version
+
+	from('java')
+	{
+		include '**/ModInfo.java'
+        include '**/package-info.java'
+
+		expand 'version':project.version, 'mcversion':project.minecraft.version, 'apiversion':api_version
+	}
+	into project.buildDir.getPath()+"/sources/java"
+}
+
+task removeExampleAndReferenceSources(type:Delete) {
+    delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/example"
+    delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/reference"
+}
+
+task removeExampleAndReferenceResources(type:Delete) {
+    delete += file(sourceSets.main.output.resourcesDir.getPath()+"/mcmod.info")
+}
+
+// insert custom tasks
+afterEvaluate { project ->
+	sourceMainJava.finalizedBy(processSourceMainJava)
+    sourceMainJava.finalizedBy(removeExampleAndReferenceSources)
+    processResources.finalizedBy(removeExampleAndReferenceResources)
 }
