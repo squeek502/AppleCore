@@ -24,6 +24,9 @@ minecraft {
 group = project.projectDir.name.toLowerCase()
 archivesBaseName = project.projectDir.name + "-mc" + project.minecraft.version
 
+if (System.getenv("BUILD_NUMBER") != null)
+	version += ".${System.getenv("BUILD_NUMBER")}"
+
 sourceSets.main{
 	java {
 		srcDirs 'java', 'apis'
@@ -37,7 +40,6 @@ dependencies {
 	compile fileTree(dir: 'libs', include: '*.jar,*.zip')
 }
 
-// Add Coremod Manifest
 jar {
 	manifest {
 		attributes 'FMLCorePlugin': 'squeek.applecore.AppleCore'
@@ -63,38 +65,24 @@ artifacts {
 	archives apiArtifact
 }
 
-processResources
-{
-	// force run when variables change
-	inputs.property "version", project.version
-	inputs.property "mcversion", project.minecraft.version
-
-	// replace stuff in *.info, nothing else
+processResources {
+	inputs.property "vars", project.version + project.minecraft.version + api_version
 	from(sourceSets.main.resources.srcDirs) {
-		include '*.info'
-				
-		// replace version and mcversion
-		expand 'version':project.version, 'mcversion':project.minecraft.version
+		include '**/*.info'
+		expand 'version':project.version, 'mcversion':project.minecraft.version, 'apiversion':api_version
 	}
-
-	// copy everything else, thats not the mcmod.info
 	from(sourceSets.main.resources.srcDirs) {
-		exclude '*.info'
+		exclude '**/*.info'
 	}
 }
 
-// variable replacement in source files
+// variable substitution in java files
 task processSourceMainJava(type:Copy) {
-	// force run when variables change
-	inputs.property "version", project.version
-	inputs.property "mcversion", project.minecraft.version
-	inputs.property "apiversion", api_version
-
+	inputs.property "vars", project.version + project.minecraft.version + api_version
 	from('java')
 	{
 		include '**/ModInfo.java'
 		include '**/package-info.java'
-
 		expand 'version':project.version, 'mcversion':project.minecraft.version, 'apiversion':api_version
 	}
 	into project.buildDir.getPath()+"/sources/java"
@@ -114,4 +102,14 @@ afterEvaluate { project ->
 	sourceMainJava.finalizedBy(processSourceMainJava)
 	sourceMainJava.finalizedBy(removeExampleAndReferenceSources)
 	processResources.finalizedBy(removeExampleAndReferenceResources)
+}
+
+uploadArchives {
+	repositories {
+		if(project.hasProperty("local_maven")) {
+			mavenDeployer {
+				repository(url: "file://${local_maven}")
+			}
+		}
+	}
 }
