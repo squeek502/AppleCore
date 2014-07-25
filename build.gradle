@@ -1,34 +1,34 @@
 buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-    }
+	repositories {
+		mavenCentral()
+		maven {
+			name = "forge"
+			url = "http://files.minecraftforge.net/maven"
+		}
+		maven {
+			name = "sonatype"
+			url = "https://oss.sonatype.org/content/repositories/snapshots/"
+		}
+	}
+	dependencies {
+		classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+	}
 }
 
 apply plugin: 'forge'
 
 minecraft {
-    version = minecraft_version + "-" + forge_version
+	version = minecraft_version + "-" + forge_version
 }
 
 group = project.projectDir.name.toLowerCase()
 archivesBaseName = project.projectDir.name + "-mc" + project.minecraft.version
 
 sourceSets.main{
-    java {
+	java {
 		srcDirs 'java', 'apis'
 	}
-    resources {
+	resources {
 		srcDirs 'resources'
 	}
 }
@@ -39,61 +39,61 @@ dependencies {
 
 // Add Coremod Manifest
 jar {
-    manifest {
-        attributes 'FMLCorePlugin': 'squeek.applecore.AppleCore'
-        attributes 'FMLCorePluginContainsFMLMod': 'false'
-    }
+	manifest {
+		attributes 'FMLCorePlugin': 'squeek.applecore.AppleCore'
+		attributes 'FMLCorePluginContainsFMLMod': 'false'
+	}
 }
 
 task deobfArtifact(type: Jar) {
-    from sourceSets.main.output
-    manifest = jar.manifest
-    classifier = 'deobf'
+	from sourceSets.main.output
+	manifest = jar.manifest
+	classifier = 'deobf'
 }
 
 task apiArtifact(type: Jar) {
-    from(sourceSets.main.java) {
-        include "squeek/applecore/api/**"
-    }
-    classifier = 'api'
+	from(sourceSets.main.java) {
+		include "squeek/applecore/api/**"
+	}
+	classifier = 'api'
 }
 
 artifacts {
-    archives deobfArtifact
-    archives apiArtifact
+	archives deobfArtifact
+	archives apiArtifact
 }
 
 processResources
 {
-    // force run when variables change
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+	// force run when variables change
+	inputs.property "version", project.version
+	inputs.property "mcversion", project.minecraft.version
 
-    // replace stuff in *.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include '*.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
+	// replace stuff in *.info, nothing else
+	from(sourceSets.main.resources.srcDirs) {
+		include '*.info'
+				
+		// replace version and mcversion
+		expand 'version':project.version, 'mcversion':project.minecraft.version
+	}
 
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude '*.info'
-    }
+	// copy everything else, thats not the mcmod.info
+	from(sourceSets.main.resources.srcDirs) {
+		exclude '*.info'
+	}
 }
 
 // variable replacement in source files
 task processSourceMainJava(type:Copy) {
-    // force run when variables change
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-    inputs.property "apiversion", api_version
+	// force run when variables change
+	inputs.property "version", project.version
+	inputs.property "mcversion", project.minecraft.version
+	inputs.property "apiversion", api_version
 
 	from('java')
 	{
 		include '**/ModInfo.java'
-        include '**/package-info.java'
+		include '**/package-info.java'
 
 		expand 'version':project.version, 'mcversion':project.minecraft.version, 'apiversion':api_version
 	}
@@ -101,17 +101,17 @@ task processSourceMainJava(type:Copy) {
 }
 
 task removeExampleAndReferenceSources(type:Delete) {
-    delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/example"
-    delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/reference"
+	delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/example"
+	delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/reference"
 }
 
 task removeExampleAndReferenceResources(type:Delete) {
-    delete += file(sourceSets.main.output.resourcesDir.getPath()+"/mcmod.info")
+	delete += file(sourceSets.main.output.resourcesDir.getPath()+"/mcmod.info")
 }
 
 // insert custom tasks
 afterEvaluate { project ->
 	sourceMainJava.finalizedBy(processSourceMainJava)
-    sourceMainJava.finalizedBy(removeExampleAndReferenceSources)
-    processResources.finalizedBy(removeExampleAndReferenceResources)
+	sourceMainJava.finalizedBy(removeExampleAndReferenceSources)
+	processResources.finalizedBy(removeExampleAndReferenceResources)
 }
