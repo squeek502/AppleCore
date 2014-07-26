@@ -22,12 +22,15 @@ minecraft {
 }
 
 group = project.projectDir.name.toLowerCase()
-archivesBaseName = project.projectDir.name + "-mc" + project.minecraft.version
+def modId = project.projectDir.name
+archivesBaseName = modId + "-mc" + project.minecraft.version
 
+if (version == "unspecified")
+	version = ""
 if (System.getenv("GIT_COMMIT") != null)
-	version += "+${System.getenv("GIT_COMMIT").take(7)}"
+	version += (version ? "+" : "") + "${System.getenv("GIT_COMMIT").take(4)}"
 if (System.getenv("BUILD_NUMBER") != null)
-	version += ".${System.getenv("BUILD_NUMBER")}"
+	version += (version ? "." : "") + "${System.getenv("BUILD_NUMBER")}"
 
 sourceSets.main{
 	java {
@@ -55,7 +58,7 @@ task deobfArtifact(type: Jar) {
 	classifier = 'deobf'
 }
 
-task apiArtifact(type: Jar) {
+task apiArtifact(type: Jar, dependsOn: compileJava) {
 	from(sourceSets.main.java) {
 		include "squeek/applecore/api/**"
 	}
@@ -107,11 +110,25 @@ afterEvaluate { project ->
 }
 
 if (System.getenv("MAVEN_URL")) {
+	apply plugin: 'maven'
+
+	configurations {
+		deployerJars
+	}
+	dependencies {
+		deployerJars "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
+	}
 	uploadArchives {
 		repositories.mavenDeployer {
+			configuration = configurations.deployerJars
+			pom.artifactId = modId
+			pom.version = project.version + "_" + project.minecraft.version
 			repository(url: System.getenv("MAVEN_URL")) {
 				authentication(userName: System.getenv("MAVEN_USER"), password: System.getenv("MAVEN_PASS"))
 			}
 		}
+	}
+	afterEvaluate { project ->
+		build.finalizedBy(uploadArchives)
 	}
 }
