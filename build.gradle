@@ -24,6 +24,8 @@ minecraft {
 group = project.projectDir.name.toLowerCase()
 archivesBaseName = project.projectDir.name + "-mc" + project.minecraft.version
 
+if (System.getenv("GIT_COMMIT") != null)
+	version += "+${System.getenv("GIT_COMMIT")}"
 if (System.getenv("BUILD_NUMBER") != null)
 	version += ".${System.getenv("BUILD_NUMBER")}"
 
@@ -104,11 +106,11 @@ afterEvaluate { project ->
 	processResources.finalizedBy(removeExampleAndReferenceResources)
 }
 
-uploadArchives {
-	repositories {
-		if(project.hasProperty("local_maven")) {
-			mavenDeployer {
-				repository(url: "file://${local_maven}")
+if (System.getenv("MAVEN_URL")) {
+	uploadArchives {
+		repositories.mavenDeployer {
+			repository(url: System.getenv("MAVEN_URL")) {
+				authentication(userName: System.getenv("MAVEN_USER"), password: System.getenv("MAVEN_PASS"))
 			}
 		}
 	}
