@@ -122,7 +122,7 @@ if (System.getenv("MAVEN_URL")) {
 		repositories.mavenDeployer {
 			configuration = configurations.deployerJars
 			pom.artifactId = modId
-			pom.version = project.version + "_" + project.minecraft.version
+			pom.version = project.minecraft.version + "-" + project.version
 			repository(url: System.getenv("MAVEN_URL")) {
 				authentication(userName: System.getenv("MAVEN_USER"), password: System.getenv("MAVEN_PASS"))
 			}
