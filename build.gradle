@@ -27,10 +27,10 @@ archivesBaseName = modId + "-mc" + project.minecraft.version
 
 if (version == "unspecified")
 	version = ""
-if (System.getenv("GIT_COMMIT") != null)
-	version += (version ? "+" : "") + "${System.getenv("GIT_COMMIT").take(4)}"
 if (System.getenv("BUILD_NUMBER") != null)
-	version += (version ? "." : "") + "${System.getenv("BUILD_NUMBER")}"
+	version += (version ? "+" : "") + "${System.getenv("BUILD_NUMBER")}"
+if (System.getenv("GIT_COMMIT") != null)
+	version += (version ? "." : "") + "${System.getenv("GIT_COMMIT").take(5)}"
 
 sourceSets.main{
 	java {
