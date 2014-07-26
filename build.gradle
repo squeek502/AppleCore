@@ -123,6 +123,7 @@ if (System.getenv("MAVEN_URL")) {
 			configuration = configurations.deployerJars
 			pom.artifactId = modId
 			pom.version = project.minecraft.version + "-" + project.version
+			pom.project.url = "https://github.com/squeek502/" + modId
 			repository(url: System.getenv("MAVEN_URL")) {
 				authentication(userName: System.getenv("MAVEN_USER"), password: System.getenv("MAVEN_PASS"))
 			}
