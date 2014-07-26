@@ -8,7 +8,6 @@ import com.mojang.authlib.GameProfile;
 public abstract class EntityPlayerModifications extends EntityPlayer
 {
 	// modified initialization of foodStats field to use the added constructor
-	// actually FoodStats
 	protected FoodStats foodStats = new FoodStatsModifications(this);
 
 	// unmodified; required for compilation

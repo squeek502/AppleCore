@@ -19,12 +19,10 @@ import cpw.mods.fml.common.eventhandler.Event.Result;
 public class FoodStatsModifications extends FoodStats
 {
 	// added fields
-	// actually is EntityPlayer
 	EntityPlayer player;
 	int starveTimer;
 
 	// added constructor
-	// actually is EntityPlayer
 	public FoodStatsModifications(EntityPlayer player)
 	{
 		this.player = player;
