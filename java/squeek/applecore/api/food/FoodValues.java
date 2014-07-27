@@ -5,6 +5,17 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 
+/**
+ * FoodValues is a utility class used to retrieve and hold food values.
+ * 
+ * To get food values for any given food, use any of the static {@link #get} methods.
+ * 
+ * <pre>
+ * {@code
+ * FoodValues appleFoodValues = FoodValues.get(new ItemStack(Items.apple));
+ * }
+ * </pre>
+ */
 public class FoodValues
 {
 	public final int hunger;
@@ -21,13 +32,16 @@ public class FoodValues
 		this(other.hunger, other.saturationModifier);
 	}
 
+	/**
+	 * @return The amount of saturation that the food values would provide.
+	 */
 	public float getSaturationIncrement()
 	{
 		return Math.min(20, hunger * saturationModifier * 2f);
 	}
 
 	/**
-	 * Get unmodified food values
+	 * Get unmodified (vanilla) food values.
 	 */
 	public static FoodValues getUnmodified(ItemStack itemStack)
 	{
@@ -43,7 +57,7 @@ public class FoodValues
 	}
 
 	/**
-	 * Get player-agnostic food values
+	 * Get player-agnostic food values.
 	 */
 	public static FoodValues get(ItemStack itemStack)
 	{
@@ -59,7 +73,7 @@ public class FoodValues
 	}
 
 	/**
-	 * Get player-specific food values
+	 * Get player-specific food values.
 	 */
 	public static FoodValues get(ItemStack itemStack, EntityPlayer player)
 	{

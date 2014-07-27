@@ -1,10 +1,17 @@
 package squeek.applecore.api.hunger;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
 
+/**
+ * Base class for all StarvationEvent events.<br>
+ * <br>
+ * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
+ */
 public abstract class StarvationEvent extends Event
 {
 	public EntityPlayer player;
@@ -14,6 +21,19 @@ public abstract class StarvationEvent extends Event
 		this.player = player;
 	}
 
+	/**
+	 * Fired each FoodStats update to determine whether or not starvation is allowed for the {@link #player}.
+	 * 
+	 * This event is fired in {@link FoodStats#onUpdate}.<br>
+	 * <br>
+	 * This event is not {@link Cancelable}.<br>
+	 * <br>
+	 * This event uses the {@link Result}. {@link HasResult}<br>
+	 * {@link Result#DEFAULT} will use the vanilla conditionals.
+	 * {@link Result#ALLOW} will allow starvation without condition.
+	 * {@link Result#DENY} will deny starvation without condition.
+	 */
+	@HasResult
 	public static class AllowStarvation extends StarvationEvent
 	{
 		public AllowStarvation(EntityPlayer player)
@@ -22,6 +42,17 @@ public abstract class StarvationEvent extends Event
 		}
 	}
 
+	/**
+	 * Fired each FoodStats update to control the time between starvation damage being done.
+	 * 
+	 * This event is fired in {@link FoodStats#onUpdate}.<br>
+	 * <br>
+	 * {@link #starveTickPeriod} contains the number of ticks between starvation damage being done.<br>
+	 * <br>
+	 * This event is not {@link Cancelable}.<br>
+	 * <br>
+	 * This event does not have a {@link Result}. {@link HasResult}<br>
+	 */
 	public static class Tick extends StarvationEvent
 	{
 		public int starveTickPeriod = 80;
@@ -32,6 +63,19 @@ public abstract class StarvationEvent extends Event
 		}
 	}
 
+	/**
+	 * Fired once the time since last starvation damage reaches starveTickPeriod (see {@link Tick}),
+	 * in order to control how much starvation damage to do.
+	 * 
+	 * This event is fired in {@link FoodStats#onUpdate}.<br>
+	 * <br>
+	 * {@link #starveDamage} contains the amount of damage to deal from starvation.<br>
+	 * <br>
+	 * This event is {@link Cancelable}.<br>
+	 * If this event is canceled, it will skip dealing starvation damage.<br>
+	 * <br>
+	 * This event does not have a {@link Result}. {@link HasResult}<br>
+	 */
 	@Cancelable
 	public static class Starve extends StarvationEvent
 	{
