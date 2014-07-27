@@ -1,11 +1,9 @@
 General:
-  [ ] Setup build.gradle to be maven-ready
   [ ] Move saturation/exhaustion syncing from The Spice of Life to AppleCore
   [ ] Move saturation/exhaustion values shown in debug info from The Spice of Life to AppleCore
 
 API:
   [ ] Implement event-driven growth ticks
-  [ ] Event documentation
   [ ] Implement better food eating speed modification event
 
 Test/Sample Implementations:
@@ -16,6 +14,8 @@ Project Log/Notes:
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [x] Setup build.gradle to be maven-ready @done (2014-07-27 02:19) @project(General)
+ [x] Event documentation @done (2014-07-27 02:19) @project(API)
  [x] Exclude example mod metadata file from gradle build @started(2014-07-24 19:54) @done (2014-07-24 20:04) @lasted(0:10) @project(General)
  [x] Implement event-driven FoodStats modification canceling @done (2014-07-24 19:47) @project(API)
  [x] Fix example mod metadata @done (2014-07-24 19:47) @project(General)
