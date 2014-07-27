@@ -1,5 +1,5 @@
-<img src="http://www.ryanliptak.com/images/applecore.png" style="vertical-align:bottom; width:32px;" /> AppleCore &nbsp; [![Build Status](https://drone.io/github.com/squeek502/AppleCore/status.png)](https://drone.io/github.com/squeek502/AppleCore/latest)
-=========
+<img src="http://www.ryanliptak.com/images/applecore.png" width="32" /> AppleCore [![Build Status](https://drone.io/github.com/squeek502/AppleCore/status.png)](https://drone.io/github.com/squeek502/AppleCore/latest)
+===========
 
 An API for modifying the food and hunger mechanics of Minecraft
 
