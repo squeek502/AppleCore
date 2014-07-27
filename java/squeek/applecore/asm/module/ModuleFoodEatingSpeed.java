@@ -7,10 +7,10 @@ import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import net.minecraft.item.ItemStack;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.ASMHelper;
 import squeek.applecore.asm.IClassTransformerModule;
-import com.sun.xml.internal.ws.org.objectweb.asm.Type;
 
 public class ModuleFoodEatingSpeed implements IClassTransformerModule
 {
