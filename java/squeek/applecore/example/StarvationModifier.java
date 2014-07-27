@@ -2,6 +2,7 @@ package squeek.applecore.example;
 
 import squeek.applecore.api.hunger.StarvationEvent;
 import cpw.mods.fml.common.eventhandler.Event.Result;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class StarvationModifier
@@ -19,7 +20,7 @@ public class StarvationModifier
 		event.starveTickPeriod = 60;
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public void onStarve(StarvationEvent.Starve event)
 	{
 		event.starveDamage = 1;

@@ -1,19 +1,24 @@
 General:
-  [ ] Move saturation/exhaustion syncing from The Spice of Life to AppleCore
-  [ ] Move saturation/exhaustion values shown in debug info from The Spice of Life to AppleCore
+ [ ] Move saturation/exhaustion syncing from The Spice of Life to AppleCore
+ [ ] Move saturation/exhaustion values shown in debug info from The Spice of Life to AppleCore
 
 API:
-  [ ] Implement event-driven growth ticks
-  [ ] Implement better food eating speed modification event
+ [ ] Implement event-driven growth ticks
 
 Test/Sample Implementations:
-  [ ] Modifying eating speed
+ [ ] Crop growth modification
 
 Project Log/Notes:
-  Modifying food eating duration using the Forge event PlayerUseItemEvent.Start does not produce clean visuals; it just adds a delay to the start of the animation. The solution should be player-specific, which isn't possible by only hooking into ItemFood. @date(2014-07-24 01:45)
+  Modifying food eating duration using the Forge event PlayerUseItemEvent.Start does not produce 
+  clean visuals; it just adds a delay to the start of the animation. The solution should be 
+  player-specific, which isn't possible by only hooking into ItemFood. @date(2014-07-24 01:45)
+    * Fixed by modifying ItemRenderer to get the modified max duration instead of getting it from 
+    the item each time @date(2014-07-27 13:30)
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [x] Implement better food eating speed modification event @done (2014-07-27 13:31) @project(API)
+ [x] Modifying eating speed @done (2014-07-27 13:28) @project(Test/Sample Implementations)
  [x] Setup build.gradle to be maven-ready @done (2014-07-27 02:19) @project(General)
  [x] Event documentation @done (2014-07-27 02:19) @project(API)
  [x] Exclude example mod metadata file from gradle build @started(2014-07-24 19:54) @done (2014-07-24 20:04) @lasted(0:10) @project(General)

@@ -52,7 +52,17 @@ public class ASMHelper
 
 	public static AbstractInsnNode findNextInstructionOfType(AbstractInsnNode instruction, int opcode)
 	{
-		for (; instruction != null; instruction = instruction.getNext())
+		for (instruction = instruction.getNext(); instruction != null; instruction = instruction.getNext())
+		{
+			if (instruction.getOpcode() == opcode)
+				return instruction;
+		}
+		return null;
+	}
+
+	public static AbstractInsnNode findPreviousInstructionOfType(AbstractInsnNode instruction, int opcode)
+	{
+		for (instruction = instruction.getPrevious(); instruction != null; instruction = instruction.getPrevious())
 		{
 			if (instruction.getOpcode() == opcode)
 				return instruction;

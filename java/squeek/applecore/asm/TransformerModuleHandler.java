@@ -3,8 +3,7 @@ package squeek.applecore.asm;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.launchwrapper.IClassTransformer;
-import squeek.applecore.asm.module.ModuleCrops;
-import squeek.applecore.asm.module.ModuleFoodStats;
+import squeek.applecore.asm.module.*;
 
 public class TransformerModuleHandler implements IClassTransformer
 {
@@ -13,6 +12,7 @@ public class TransformerModuleHandler implements IClassTransformer
 	{
 		registerTransformerModule(new ModuleFoodStats());
 		registerTransformerModule(new ModuleCrops());
+		registerTransformerModule(new ModuleFoodEatingSpeed());
 	}
 
 	public static void registerTransformerModule(IClassTransformerModule transformerModule)
