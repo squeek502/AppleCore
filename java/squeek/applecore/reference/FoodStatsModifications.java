@@ -123,9 +123,9 @@ public class FoodStatsModifications extends FoodStats
 	}
 
 	// start unmodified
-	int foodLevel;
-	float foodSaturationLevel;
-	int prevFoodLevel;
+	int foodLevel = 20;
+	float foodSaturationLevel = 5f;
+	int prevFoodLevel = 20;
 	int foodTimer;
 	float foodExhaustionLevel;
 	// end unmodified

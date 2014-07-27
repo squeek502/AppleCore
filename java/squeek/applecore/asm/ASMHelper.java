@@ -1,15 +1,11 @@
 package squeek.applecore.asm;
 
 import static org.objectweb.asm.Opcodes.GETFIELD;
+import java.util.HashMap;
+import java.util.Map;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.*;
 
 public class ASMHelper
 {
@@ -156,5 +152,29 @@ public class ASMHelper
 			insnToRemove = insnToRemove.getNext();
 			method.instructions.remove(insnToRemove.getPrevious());
 		}
+	}
+
+	public static InsnList cloneInsnList(InsnList source)
+	{
+		InsnList clone = new InsnList();
+
+		// used to map the old labels to their cloned counterpart
+		Map<LabelNode, LabelNode> labelMap = new HashMap<LabelNode, LabelNode>();
+
+		// build the label map
+		for (AbstractInsnNode instruction = source.getFirst(); instruction != null; instruction = instruction.getNext())
+		{
+			if (instruction instanceof LabelNode)
+			{
+				labelMap.put(((LabelNode) instruction), new LabelNode());
+			}
+		}
+
+		for (AbstractInsnNode instruction = source.getFirst(); instruction != null; instruction = instruction.getNext())
+		{
+			clone.add(instruction.clone(labelMap));
+		}
+
+		return clone;
 	}
 }

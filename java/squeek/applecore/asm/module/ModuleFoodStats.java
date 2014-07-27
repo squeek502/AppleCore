@@ -118,18 +118,19 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 	public void injectFoodStatsConstructor(ClassNode classNode, boolean isObfuscated)
 	{
+		// get the default constructor and copy it
+		MethodNode defaultConstructor = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "()V");
 		MethodNode constructor = new MethodNode(ACC_PUBLIC, "<init>", isObfuscated ? "(Lyz;)V" : "(Lnet/minecraft/entity/player/EntityPlayer;)V", null, null);
+		constructor.instructions = ASMHelper.cloneInsnList(defaultConstructor.instructions);
 
-		constructor.visitVarInsn(ALOAD, 0);
-		constructor.visitMethodInsn(INVOKESPECIAL, classNode.superName, "<init>", "()V");
+		AbstractInsnNode targetNode = ASMHelper.findLastInstructionOfType(constructor, RETURN);
 
-		constructor.visitVarInsn(ALOAD, 0); // this
-		constructor.visitVarInsn(ALOAD, 1); // player param
-		constructor.visitFieldInsn(PUTFIELD, classNode.name, "player", Type.getDescriptor(EntityPlayer.class));
+		InsnList toInject = new InsnList();
+		toInject.add(new VarInsnNode(ALOAD, 0)); // this
+		toInject.add(new VarInsnNode(ALOAD, 1)); // player param
+		toInject.add(new FieldInsnNode(PUTFIELD, classNode.name, "player", Type.getDescriptor(EntityPlayer.class)));
 
-		constructor.visitInsn(RETURN);
-		constructor.visitMaxs(2, 2);
-		constructor.visitEnd();
+		constructor.instructions.insertBefore(targetNode, toInject);
 
 		classNode.methods.add(constructor);
 	}
