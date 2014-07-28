@@ -18,6 +18,7 @@ Project Log/Notes:
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [x] Document AppleCoreAccessor/IAppleCoreAccessor @done (2014-07-28 12:53) @project(API)
  [x] Add a way to get starvation damage period @done (2014-07-27 22:24) @project(API)
  [x] Add a way to get max exhaustion @done (2014-07-27 22:24) @project(API)
  [x] Add a way to get health regen period @done (2014-07-27 22:24) @project(API)

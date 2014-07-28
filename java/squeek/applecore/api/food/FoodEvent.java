@@ -87,15 +87,13 @@ public abstract class FoodEvent extends Event
 		public final FoodValues foodValues;
 		public final int hungerAdded;
 		public final float saturationAdded;
-		public final ItemFood itemFood;
 		public final ItemStack food;
 		public final EntityPlayer player;
 
-		public FoodEaten(EntityPlayer player, ItemFood itemFood, ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded)
+		public FoodEaten(EntityPlayer player, ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded)
 		{
 			this.player = player;
 			this.food = itemStack;
-			this.itemFood = itemFood;
 			this.foodValues = foodValues;
 			this.hungerAdded = hungerAdded;
 			this.saturationAdded = saturationAdded;

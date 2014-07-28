@@ -2,6 +2,7 @@ package squeek.applecore.accessor;
 
 import java.lang.reflect.Field;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
@@ -34,15 +35,23 @@ public enum AppleCoreAccessorImpl implements IAppleCoreAccessor
 	}
 
 	@Override
+	public boolean isFood(ItemStack food)
+	{
+		return getUnmodifiedFoodValues(food) != null;
+	}
+
+	@Override
 	public FoodValues getUnmodifiedFoodValues(ItemStack food)
 	{
 		if (food.getItem() instanceof ItemFood)
-			return getUnmodifiedFoodValues((ItemFood) food.getItem(), food);
+			return getItemFoodValues((ItemFood) food.getItem(), food);
+		else if (food.getItem() == Items.cake)
+			return new FoodValues(2, 0.1f);
 		else
 			return null;
 	}
 
-	public FoodValues getUnmodifiedFoodValues(ItemFood itemFood, ItemStack itemStack)
+	private FoodValues getItemFoodValues(ItemFood itemFood, ItemStack itemStack)
 	{
 		return new FoodValues(itemFood.func_150905_g(itemStack), itemFood.func_150906_h(itemStack));
 	}
@@ -50,33 +59,27 @@ public enum AppleCoreAccessorImpl implements IAppleCoreAccessor
 	@Override
 	public FoodValues getFoodValues(ItemStack food)
 	{
-		if (food.getItem() instanceof ItemFood)
-			return getFoodValues((ItemFood) food.getItem(), food);
-		else
-			return null;
-	}
-
-	public FoodValues getFoodValues(ItemFood itemFood, ItemStack itemStack)
-	{
-		FoodEvent.GetFoodValues event = new FoodEvent.GetFoodValues(itemStack, getUnmodifiedFoodValues(itemFood, itemStack));
-		MinecraftForge.EVENT_BUS.post(event);
-		return event.foodValues;
+		FoodValues foodValues = getUnmodifiedFoodValues(food);
+		if (foodValues != null)
+		{
+			FoodEvent.GetFoodValues event = new FoodEvent.GetFoodValues(food, foodValues);
+			MinecraftForge.EVENT_BUS.post(event);
+			return event.foodValues;
+		}
+		return null;
 	}
 
 	@Override
 	public FoodValues getFoodValuesForPlayer(ItemStack food, EntityPlayer player)
 	{
-		if (food.getItem() instanceof ItemFood)
-			return getFoodValuesForPlayer((ItemFood) food.getItem(), food, player);
-		else
-			return null;
-	}
-
-	public FoodValues getFoodValuesForPlayer(ItemFood itemFood, ItemStack itemStack, EntityPlayer player)
-	{
-		FoodEvent.GetPlayerFoodValues event = new FoodEvent.GetPlayerFoodValues(player, itemStack, getFoodValues(itemFood, itemStack));
-		MinecraftForge.EVENT_BUS.post(event);
-		return event.foodValues;
+		FoodValues foodValues = getFoodValues(food);
+		if (foodValues != null)
+		{
+			FoodEvent.GetPlayerFoodValues event = new FoodEvent.GetPlayerFoodValues(player, food, foodValues);
+			MinecraftForge.EVENT_BUS.post(event);
+			return event.foodValues;
+		}
+		return null;
 	}
 
 	@Override
@@ -115,7 +118,7 @@ public enum AppleCoreAccessorImpl implements IAppleCoreAccessor
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.starveTickPeriod;
 	}
-	
+
 	public static void setExhaustion(EntityPlayer player, float exhaustion)
 	{
 		try

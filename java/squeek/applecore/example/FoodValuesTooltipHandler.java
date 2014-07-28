@@ -1,7 +1,6 @@
 package squeek.applecore.example;
 
 import java.text.DecimalFormat;
-import net.minecraft.item.ItemFood;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import squeek.applecore.api.AppleCoreAccessor;
 import squeek.applecore.api.food.FoodValues;
@@ -15,7 +14,7 @@ public class FoodValuesTooltipHandler
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onItemTooltip(ItemTooltipEvent event)
 	{
-		if (event.itemStack.getItem() instanceof ItemFood)
+		if (AppleCoreAccessor.get().isFood(event.itemStack))
 		{
 			FoodValues unmodifiedValues = AppleCoreAccessor.get().getUnmodifiedFoodValues(event.itemStack);
 			FoodValues modifiedValues = AppleCoreAccessor.get().getFoodValues(event.itemStack);

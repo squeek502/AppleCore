@@ -3,6 +3,7 @@ package squeek.applecore.api.food;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import squeek.applecore.api.AppleCoreAccessor;
+import squeek.applecore.api.IAppleCoreAccessor;
 
 /**
  * FoodValues is a utility class used to retrieve and hold food values.
@@ -40,7 +41,7 @@ public class FoodValues
 	}
 
 	/**
-	 * Get unmodified (vanilla) food values.
+	 * See {@link IAppleCoreAccessor#getUnmodifiedFoodValues}
 	 */
 	public static FoodValues getUnmodified(ItemStack itemStack)
 	{
@@ -48,7 +49,7 @@ public class FoodValues
 	}
 
 	/**
-	 * Get player-agnostic food values.
+	 * See {@link IAppleCoreAccessor#getFoodValues}
 	 */
 	public static FoodValues get(ItemStack itemStack)
 	{
@@ -56,7 +57,7 @@ public class FoodValues
 	}
 
 	/**
-	 * Get player-specific food values.
+	 * See {@link IAppleCoreAccessor#getFoodValuesForPlayer}
 	 */
 	public static FoodValues get(ItemStack itemStack, EntityPlayer player)
 	{
