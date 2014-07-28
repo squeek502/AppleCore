@@ -27,5 +27,6 @@ public class AppleCoreExample
 		MinecraftForge.EVENT_BUS.register(new FoodValuesModifier());
 		MinecraftForge.EVENT_BUS.register(new HealthRegenModifier());
 		MinecraftForge.EVENT_BUS.register(new StarvationModifier());
+		MinecraftForge.EVENT_BUS.register(new FoodValuesTooltipHandler());
 	}
 }
