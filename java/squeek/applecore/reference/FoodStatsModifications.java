@@ -66,17 +66,17 @@ public class FoodStatsModifications extends FoodStats
 		EnumDifficulty enumdifficulty = player.worldObj.difficultySetting;
 		this.prevFoodLevel = this.foodLevel;
 
-		ExhaustionEvent.Tick exhaustionTickEvent = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
-		this.foodExhaustionLevel = exhaustionTickEvent.exhaustionLevel;
-		if (!exhaustionTickEvent.isCanceled() && this.foodExhaustionLevel >= exhaustionTickEvent.maxExhaustionLevel)
+		Result allowExhaustionResult = Hooks.fireAllowExhaustionEvent(player);
+		float maxExhaustion = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
+		if (allowExhaustionResult == Result.ALLOW || (allowExhaustionResult == Result.DEFAULT && this.foodExhaustionLevel >= maxExhaustion))
 		{
-			ExhaustionEvent.MaxReached exhaustionMaxEvent = Hooks.fireExhaustionMaxEvent(player, exhaustionTickEvent.maxExhaustionLevel, foodExhaustionLevel);
+			ExhaustionEvent.Exhausted exhaustedEvent = Hooks.fireExhaustionMaxEvent(player, maxExhaustion, foodExhaustionLevel);
 
-			if (!exhaustionMaxEvent.isCanceled())
+			this.foodExhaustionLevel += exhaustedEvent.deltaExhaustion;
+			if (!exhaustedEvent.isCanceled())
 			{
-				this.foodExhaustionLevel += exhaustionMaxEvent.deltaExhaustion;
-				this.foodSaturationLevel = Math.max(this.foodSaturationLevel + exhaustionMaxEvent.deltaSaturation, 0.0F);
-				this.foodLevel = Math.max(this.foodLevel + exhaustionMaxEvent.deltaHunger, 0);
+				this.foodSaturationLevel = Math.max(this.foodSaturationLevel + exhaustedEvent.deltaSaturation, 0.0F);
+				this.foodLevel = Math.max(this.foodLevel + exhaustedEvent.deltaHunger, 0);
 			}
 		}
 

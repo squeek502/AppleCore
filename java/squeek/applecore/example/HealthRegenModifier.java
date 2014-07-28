@@ -14,7 +14,7 @@ public class HealthRegenModifier
 	}
 
 	@SubscribeEvent
-	public void onRegenTick(HealthRegenEvent.Tick event)
+	public void onRegenTick(HealthRegenEvent.GetRegenTickPeriod event)
 	{
 		event.regenTickPeriod = 6;
 	}

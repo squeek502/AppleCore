@@ -15,11 +15,8 @@ public class FoodValuesModifier
 	}
 
 	@SubscribeEvent
-	public void getPlayerSpecificFoodValues(FoodEvent.GetFoodValues event)
+	public void getPlayerSpecificFoodValues(FoodEvent.GetPlayerFoodValues event)
 	{
-		if (event.player != null)
-		{
-			event.foodValues = new FoodValues((20 - event.player.getFoodStats().getFoodLevel()) / 2, 0);
-		}
+		event.foodValues = new FoodValues((20 - event.player.getFoodStats().getFoodLevel()) / 2, 1);
 	}
 }

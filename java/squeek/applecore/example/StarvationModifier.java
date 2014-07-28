@@ -15,7 +15,7 @@ public class StarvationModifier
 	}
 
 	@SubscribeEvent
-	public void onStarveTick(StarvationEvent.Tick event)
+	public void onStarveTick(StarvationEvent.GetStarveTickPeriod event)
 	{
 		event.starveTickPeriod = 60;
 	}

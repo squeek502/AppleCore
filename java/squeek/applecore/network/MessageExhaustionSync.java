@@ -1,7 +1,7 @@
 package squeek.applecore.network;
 
-import squeek.applecore.helpers.FoodStatsHelper;
 import io.netty.buffer.ByteBuf;
+import squeek.applecore.accessor.AppleCoreAccessorImpl;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
@@ -35,7 +35,7 @@ public class MessageExhaustionSync implements IMessage, IMessageHandler<MessageE
 	@Override
 	public IMessage onMessage(MessageExhaustionSync message, MessageContext ctx)
 	{
-		FoodStatsHelper.setExhaustionLevel(FMLClientHandler.instance().getClientPlayerEntity().getFoodStats(), message.exhaustionLevel);
+		AppleCoreAccessorImpl.setExhaustion(FMLClientHandler.instance().getClientPlayerEntity(), message.exhaustionLevel);
 		return null;
 	}
 }

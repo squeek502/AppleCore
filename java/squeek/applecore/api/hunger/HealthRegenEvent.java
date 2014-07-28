@@ -13,7 +13,7 @@ import cpw.mods.fml.common.eventhandler.Event;
  */
 public abstract class HealthRegenEvent extends Event
 {
-	public EntityPlayer player;
+	public final EntityPlayer player;
 
 	public HealthRegenEvent(EntityPlayer player)
 	{
@@ -42,9 +42,9 @@ public abstract class HealthRegenEvent extends Event
 	}
 
 	/**
-	 * Fired each FoodStats update to control the time between each regen.
+	 * Fired every time the regen tick period is retrieved to allow control over its value.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate}.<br>
+	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAccessor}.<br>
 	 * <br>
 	 * {@link #regenTickPeriod} contains the number of ticks between each regen.<br>
 	 * <br>
@@ -52,18 +52,18 @@ public abstract class HealthRegenEvent extends Event
 	 * <br>
 	 * This event does not have a {@link Result}. {@link HasResult}<br>
 	 */
-	public static class Tick extends HealthRegenEvent
+	public static class GetRegenTickPeriod extends HealthRegenEvent
 	{
 		public int regenTickPeriod = 80;
 
-		public Tick(EntityPlayer player)
+		public GetRegenTickPeriod(EntityPlayer player)
 		{
 			super(player);
 		}
 	}
 
 	/**
-	 * Fired once the time since last regen reaches regenTickPeriod (see {@link Tick}),
+	 * Fired once the time since last regen reaches regenTickPeriod (see {@link GetRegenTickPeriod}),
 	 * in order to control how regen affects health/exhaustion.
 	 * 
 	 * This event is fired in {@link FoodStats#onUpdate}.<br>

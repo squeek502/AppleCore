@@ -1,9 +1,8 @@
 package squeek.applecore.api.food;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
+import squeek.applecore.api.AppleCoreAccessor;
 
 /**
  * FoodValues is a utility class used to retrieve and hold food values.
@@ -45,15 +44,7 @@ public class FoodValues
 	 */
 	public static FoodValues getUnmodified(ItemStack itemStack)
 	{
-		if (itemStack.getItem() instanceof ItemFood)
-			return FoodValues.getUnmodified((ItemFood) itemStack.getItem(), itemStack);
-		else
-			return null;
-	}
-
-	public static FoodValues getUnmodified(ItemFood itemFood, ItemStack itemStack)
-	{
-		return new FoodValues(itemFood.func_150905_g(itemStack), itemFood.func_150906_h(itemStack));
+		return AppleCoreAccessor.get().getUnmodifiedFoodValues(itemStack);
 	}
 
 	/**
@@ -61,15 +52,7 @@ public class FoodValues
 	 */
 	public static FoodValues get(ItemStack itemStack)
 	{
-		if (itemStack.getItem() instanceof ItemFood)
-			return FoodValues.get((ItemFood) itemStack.getItem(), itemStack);
-		else
-			return null;
-	}
-
-	public static FoodValues get(ItemFood itemFood, ItemStack itemStack)
-	{
-		return FoodValues.getUnmodified(itemFood, itemStack).applyDefaultModifiers(itemFood, itemStack);
+		return AppleCoreAccessor.get().getFoodValues(itemStack);
 	}
 
 	/**
@@ -77,29 +60,7 @@ public class FoodValues
 	 */
 	public static FoodValues get(ItemStack itemStack, EntityPlayer player)
 	{
-		if (itemStack.getItem() instanceof ItemFood)
-			return FoodValues.get((ItemFood) itemStack.getItem(), itemStack, player);
-		else
-			return null;
-	}
-
-	public static FoodValues get(ItemFood itemFood, ItemStack itemStack, EntityPlayer player)
-	{
-		return FoodValues.get(itemFood, itemStack).applyContextualModifiers(itemFood, itemStack, player);
-	}
-
-	FoodValues applyDefaultModifiers(ItemFood itemFood, ItemStack itemStack)
-	{
-		FoodEvent.GetFoodValues event = new FoodEvent.GetFoodValues(null, itemStack, this);
-		MinecraftForge.EVENT_BUS.post(event);
-		return event.foodValues;
-	}
-
-	FoodValues applyContextualModifiers(ItemFood itemFood, ItemStack itemStack, EntityPlayer player)
-	{
-		FoodEvent.GetFoodValues event = new FoodEvent.GetFoodValues(player, itemStack, this);
-		MinecraftForge.EVENT_BUS.post(event);
-		return event.foodValues;
+		return AppleCoreAccessor.get().getFoodValuesForPlayer(itemStack, player);
 	}
 
 	@Override

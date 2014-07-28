@@ -285,17 +285,17 @@ public class ModuleFoodStats implements IClassTransformerModule
 	{
 		// exhaustion block replaced with:
 		/*
-		FoodEvent.Exhaustion.Tick exhaustionTickEvent = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
-		this.foodExhaustionLevel = exhaustionTickEvent.exhaustionLevel;
-		if (!exhaustionTickEvent.isCanceled() && this.foodExhaustionLevel >= exhaustionTickEvent.maxExhaustionLevel)
+		Result allowExhaustionResult = Hooks.fireAllowExhaustionEvent(player);
+		float maxExhaustion = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
+		if (allowExhaustionResult == Result.ALLOW || (allowExhaustionResult == Result.DEFAULT && this.foodExhaustionLevel >= maxExhaustion))
 		{
-			FoodEvent.Exhaustion.MaxReached exhaustionMaxEvent = Hooks.fireExhaustionMaxEvent(player, exhaustionTickEvent.maxExhaustionLevel, foodExhaustionLevel);
+			ExhaustionEvent.Exhausted exhaustedEvent = Hooks.fireExhaustionMaxEvent(player, maxExhaustion, foodExhaustionLevel);
 
+			this.foodExhaustionLevel += exhaustedEvent.deltaExhaustion;
 			if (!exhaustionMaxEvent.isCanceled())
 			{
-				this.foodExhaustionLevel += exhaustionMaxEvent.deltaExhaustion;
-				this.foodSaturationLevel = Math.max(this.foodSaturationLevel + exhaustionMaxEvent.deltaSaturation, 0.0F);
-				this.foodLevel = Math.max(this.foodLevel + exhaustionMaxEvent.deltaHunger, 0);
+				this.foodSaturationLevel = Math.max(this.foodSaturationLevel + exhaustedEvent.deltaSaturation, 0.0F);
+				this.foodLevel = Math.max(this.foodLevel + exhaustedEvent.deltaHunger, 0);
 			}
 		}
 		*/
@@ -312,73 +312,82 @@ public class ModuleFoodStats implements IClassTransformerModule
 		// remove the entire exhaustion block
 		ASMHelper.removeNodesFromMethodUntil(method, injectPoint.getNext(), foodExhaustionBlockEndLabel);
 
-		// create exhaustionTickEvent variable
-		LabelNode exhaustionTickEventStart = new LabelNode();
-		LocalVariableNode exhaustionTickEvent = new LocalVariableNode("exhaustionTickEvent", Type.getDescriptor(ExhaustionEvent.Tick.class), null, exhaustionTickEventStart, endLabel, method.maxLocals);
+		// create allowExhaustionResult variable
+		LabelNode allowExhaustionResultStart = new LabelNode();
+		LocalVariableNode allowExhaustionResult = new LocalVariableNode("allowExhaustionResult", Type.getDescriptor(Event.Result.class), null, allowExhaustionResultStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
-		method.localVariables.add(exhaustionTickEvent);
+		method.localVariables.add(allowExhaustionResult);
 
-		// FoodEvent.Exhaustion.Tick exhaustionTickEvent = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
+		// Result allowExhaustionResult = Hooks.fireAllowExhaustionEvent(player);
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireAllowExhaustionEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new VarInsnNode(ASTORE, allowExhaustionResult.index));
+		toInject.add(allowExhaustionResultStart);
+
+		// create maxExhaustion variable
+		LabelNode maxExhaustionStart = new LabelNode();
+		LocalVariableNode maxExhaustion = new LocalVariableNode("maxExhaustion", "F", null, maxExhaustionStart, endLabel, method.maxLocals);
+		method.maxLocals += 1;
+		method.localVariables.add(maxExhaustion);
+
+		// float maxExhaustion = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireExhaustionTickEvent", "(Lnet/minecraft/entity/player/EntityPlayer;F)Lsqueek/applecore/api/hunger/ExhaustionEvent$Tick;"));
-		toInject.add(new VarInsnNode(ASTORE, exhaustionTickEvent.index));
-		toInject.add(exhaustionTickEventStart);
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireExhaustionTickEvent", "(Lnet/minecraft/entity/player/EntityPlayer;F)F"));
+		toInject.add(new VarInsnNode(FSTORE, maxExhaustion.index));
+		toInject.add(maxExhaustionStart);
 
-		// this.foodExhaustionLevel = exhaustionTickEvent.exhaustionLevel;
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new VarInsnNode(ALOAD, exhaustionTickEvent.index));
-		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.Tick.class), "exhaustionLevel", "F"));
-		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
-
-		// if (!exhaustionTickEvent.isCanceled() && this.foodExhaustionLevel >= exhaustionTickEvent.maxExhaustionLevel)
-		toInject.add(new VarInsnNode(ALOAD, exhaustionTickEvent.index));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(ExhaustionEvent.Tick.class), "isCanceled", "()Z"));
-		toInject.add(new JumpInsnNode(IFNE, foodExhaustionBlockEndLabel));
+		// if (allowExhaustionResult == Result.ALLOW || (allowExhaustionResult == Result.DEFAULT && this.foodExhaustionLevel >= maxExhaustion))
+		toInject.add(new VarInsnNode(ALOAD, allowExhaustionResult.index));
+		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "ALLOW", Type.getDescriptor(Event.Result.class)));
+		LabelNode ifAllowed = new LabelNode();
+		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowed));
+		toInject.add(new VarInsnNode(ALOAD, allowExhaustionResult.index));
+		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DEFAULT", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new JumpInsnNode(IF_ACMPNE, foodExhaustionBlockEndLabel));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
-		toInject.add(new VarInsnNode(ALOAD, exhaustionTickEvent.index));
-		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.Tick.class), "maxExhaustionLevel", "F"));
+		toInject.add(new VarInsnNode(FLOAD, maxExhaustion.index));
 		toInject.add(new InsnNode(FCMPL));
 		toInject.add(new JumpInsnNode(IFLT, foodExhaustionBlockEndLabel));
+		toInject.add(ifAllowed);
 
-		// create exhaustionTickEvent variable
-		LabelNode exhaustionMaxEventStart = new LabelNode();
-		LocalVariableNode exhaustionMaxEvent = new LocalVariableNode("exhaustionMaxEvent", Type.getDescriptor(ExhaustionEvent.MaxReached.class), null, exhaustionMaxEventStart, foodExhaustionBlockEndLabel, method.maxLocals);
+		// create exhaustedEvent variable
+		LabelNode exhaustedEventStart = new LabelNode();
+		LocalVariableNode exhaustedEvent = new LocalVariableNode("exhaustionMaxEvent", Type.getDescriptor(ExhaustionEvent.Exhausted.class), null, exhaustedEventStart, foodExhaustionBlockEndLabel, method.maxLocals);
 		method.maxLocals += 1;
-		method.localVariables.add(exhaustionMaxEvent);
+		method.localVariables.add(exhaustedEvent);
 
 		// FoodEvent.Exhaustion.MaxReached exhaustionMaxEvent = Hooks.fireExhaustionMaxEvent(player, exhaustionTickEvent.maxExhaustionLevel, foodExhaustionLevel);
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new VarInsnNode(ALOAD, exhaustionTickEvent.index));
-		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.Tick.class), "maxExhaustionLevel", "F"));
+		toInject.add(new VarInsnNode(FLOAD, maxExhaustion.index));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireExhaustionMaxEvent", "(Lnet/minecraft/entity/player/EntityPlayer;FF)Lsqueek/applecore/api/hunger/ExhaustionEvent$MaxReached;"));
-		toInject.add(new VarInsnNode(ASTORE, exhaustionMaxEvent.index));
-		toInject.add(exhaustionMaxEventStart);
-
-		// if (!exhaustionMaxEvent.isCanceled())
-		toInject.add(new VarInsnNode(ALOAD, exhaustionMaxEvent.index));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(ExhaustionEvent.MaxReached.class), "isCanceled", "()Z"));
-		toInject.add(new JumpInsnNode(IFNE, foodExhaustionBlockEndLabel));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireExhaustionMaxEvent", "(Lnet/minecraft/entity/player/EntityPlayer;FF)Lsqueek/applecore/api/hunger/ExhaustionEvent$Exhausted;"));
+		toInject.add(new VarInsnNode(ASTORE, exhaustedEvent.index));
+		toInject.add(exhaustedEventStart);
 
 		// this.foodExhaustionLevel += exhaustionMaxEvent.deltaExhaustion;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DUP));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
-		toInject.add(new VarInsnNode(ALOAD, exhaustionMaxEvent.index));
-		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.MaxReached.class), "deltaExhaustion", "F"));
+		toInject.add(new VarInsnNode(ALOAD, exhaustedEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.Exhausted.class), "deltaExhaustion", "F"));
 		toInject.add(new InsnNode(FADD));
 		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+
+		// if (!exhaustionMaxEvent.isCanceled())
+		toInject.add(new VarInsnNode(ALOAD, exhaustedEvent.index));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(ExhaustionEvent.Exhausted.class), "isCanceled", "()Z"));
+		toInject.add(new JumpInsnNode(IFNE, foodExhaustionBlockEndLabel));
 
 		// this.foodSaturationLevel = Math.max(this.foodSaturationLevel + exhaustionMaxEvent.deltaSaturation, 0.0F);
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "b" : "foodSaturationLevel", "F"));
-		toInject.add(new VarInsnNode(ALOAD, exhaustionMaxEvent.index));
-		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.MaxReached.class), "deltaSaturation", "F"));
+		toInject.add(new VarInsnNode(ALOAD, exhaustedEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.Exhausted.class), "deltaSaturation", "F"));
 		toInject.add(new InsnNode(FADD));
 		toInject.add(new InsnNode(FCONST_0));
 		toInject.add(new MethodInsnNode(INVOKESTATIC, "java/lang/Math", "max", "(FF)F"));
@@ -388,8 +397,8 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
-		toInject.add(new VarInsnNode(ALOAD, exhaustionMaxEvent.index));
-		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.MaxReached.class), "deltaHunger", "I"));
+		toInject.add(new VarInsnNode(ALOAD, exhaustedEvent.index));
+		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.Exhausted.class), "deltaHunger", "I"));
 		toInject.add(new InsnNode(IADD));
 		toInject.add(new InsnNode(ICONST_0));
 		toInject.add(new MethodInsnNode(INVOKESTATIC, "java/lang/Math", "max", "(II)I"));

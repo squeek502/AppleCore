@@ -1,10 +1,8 @@
 General:
+ [ ] Add support for block-based foods (cake)
 
 API:
  [ ] Implement event-driven growth ticks
- [ ] Add a way to get max exhaustion
- [ ] Add a way to get health regen period
- [ ] Add a way to get starvation damage period
 
 Test/Sample Implementations:
  [ ] Crop growth modification
@@ -20,6 +18,9 @@ Project Log/Notes:
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [x] Add a way to get starvation damage period @done (2014-07-27 22:24) @project(API)
+ [x] Add a way to get max exhaustion @done (2014-07-27 22:24) @project(API)
+ [x] Add a way to get health regen period @done (2014-07-27 22:24) @project(API)
  [x] Move saturation/exhaustion values shown in debug info from The Spice of Life to AppleCore @done (2014-07-27 18:42) @project(General)
  [x] Move saturation/exhaustion syncing from The Spice of Life to AppleCore @done (2014-07-27 18:42) @project(General)
  [x] Implement better food eating speed modification event @done (2014-07-27 13:31) @project(API)

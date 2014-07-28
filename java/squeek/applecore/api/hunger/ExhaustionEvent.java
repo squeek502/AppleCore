@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.common.MinecraftForge;
+import squeek.applecore.api.AppleCoreAccessor;
 import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
 
@@ -14,7 +15,7 @@ import cpw.mods.fml.common.eventhandler.Event;
  */
 public abstract class ExhaustionEvent extends Event
 {
-	public EntityPlayer player;
+	public final EntityPlayer player;
 
 	public ExhaustionEvent(EntityPlayer player)
 	{
@@ -22,39 +23,55 @@ public abstract class ExhaustionEvent extends Event
 	}
 
 	/**
-	 * Fired each FoodStats update to control exhaustion level and max exhaustion level
+	 * Fired each FoodStats update to determine whether or not exhaustion is allowed for the {@link #player}.
 	 * 
 	 * This event is fired in {@link FoodStats#onUpdate}.<br>
 	 * <br>
-	 * {@link #exhaustionLevel} contains the exhaustion level of the {@link #player}.<br>
-	 * {@link #maxExhaustionLevel} determines the exhaustion level that will trigger a hunger/saturation decrement.<br>
+	 * This event is not {@link Cancelable}.<br>
 	 * <br>
-	 * This event is {@link Cancelable}.<br>
-	 * If this event is canceled, it will skip any potential hunger/saturation decrements for this update tick.<br>
-	 * <br>
-	 * This event does not have a result. {@link HasResult}<br>
+	 * This event uses the {@link Result}. {@link HasResult}<br>
+	 * {@link Result#DEFAULT} will use the vanilla conditionals.<br>
+	 * {@link Result#ALLOW} will allow exhaustion without condition.<br>
+	 * {@link Result#DENY} will deny exhaustion without condition.<br>
 	 */
-	@Cancelable
-	public static class Tick extends ExhaustionEvent
+	@HasResult
+	public static class AllowExhaustion extends ExhaustionEvent
 	{
-		public float exhaustionLevel;
-		public float maxExhaustionLevel = 4f;
-
-		public Tick(EntityPlayer player, float exhaustionLevel)
+		public AllowExhaustion(EntityPlayer player)
 		{
 			super(player);
-			this.exhaustionLevel = exhaustionLevel;
 		}
 	}
 
 	/**
-	 * Fired once exchaustionLevel exceeds maxExhaustionLevel (see {@link Tick}),
+	 * Fired every time max exhaustion level is retrieved to allow control over its value.
+	 * 
+	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAccessor}.<br>
+	 * <br>
+	 * {@link #maxExhaustionLevel} contains the exhaustion level that will trigger a hunger/saturation decrement.<br>
+	 * <br>
+	 * This event is not {@link Cancelable}.<br>
+	 * <br>
+	 * This event does not have a result. {@link HasResult}<br>
+	 */
+	public static class GetMaxExhaustion extends ExhaustionEvent
+	{
+		public float maxExhaustionLevel = 4f;
+
+		public GetMaxExhaustion(EntityPlayer player)
+		{
+			super(player);
+		}
+	}
+
+	/**
+	 * Fired once exchaustionLevel exceeds maxExhaustionLevel (see {@link GetMaxExhaustion}),
 	 * in order to control how exhaustion affects hunger/saturation.
 	 * 
 	 * This event is fired in {@link FoodStats#onUpdate}.<br>
 	 * <br>
 	 * {@link #currentExhaustionLevel} contains the exhaustion level of the {@link #player}.<br>
-	 * {@link #deltaExhaustion} contains the delta to be applied to exhaustion level (default: {@link Tick#maxExhaustionLevel}).<br>
+	 * {@link #deltaExhaustion} contains the delta to be applied to exhaustion level (default: {@link GetMaxExhaustion#maxExhaustionLevel}).<br>
 	 * {@link #deltaHunger} contains the delta to be applied to hunger.<br>
 	 * {@link #deltaSaturation} contains the delta to be applied to saturation.<br>
 	 * <br>
@@ -62,19 +79,19 @@ public abstract class ExhaustionEvent extends Event
 	 * For example, deltaHunger will be 0 when this event is fired in Peaceful difficulty.<br> 
 	 * <br>
 	 * This event is {@link Cancelable}.<br>
-	 * If this event is canceled, it will skip applying the delta values to exhaustion, hunger, and saturation.<br>
+	 * If this event is canceled, it will skip applying the delta values to hunger and saturation.<br>
 	 * <br>
 	 * This event does not have a result. {@link HasResult}<br>
 	 */
 	@Cancelable
-	public static class MaxReached extends ExhaustionEvent
+	public static class Exhausted extends ExhaustionEvent
 	{
 		public final float currentExhaustionLevel;
 		public float deltaExhaustion;
 		public int deltaHunger = -1;
 		public float deltaSaturation = -1f;
 
-		public MaxReached(EntityPlayer player, float exhaustionToRemove, float currentExhaustionLevel)
+		public Exhausted(EntityPlayer player, float exhaustionToRemove, float currentExhaustionLevel)
 		{
 			super(player);
 			this.deltaExhaustion = -exhaustionToRemove;

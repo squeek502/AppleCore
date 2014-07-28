@@ -14,7 +14,7 @@ import cpw.mods.fml.common.eventhandler.Event;
  */
 public abstract class StarvationEvent extends Event
 {
-	public EntityPlayer player;
+	public final EntityPlayer player;
 
 	public StarvationEvent(EntityPlayer player)
 	{
@@ -43,9 +43,9 @@ public abstract class StarvationEvent extends Event
 	}
 
 	/**
-	 * Fired each FoodStats update to control the time between starvation damage being done.
+	 * Fired every time the starve tick period is retrieved to allow control over its value.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate}.<br>
+	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAccessor}.<br>
 	 * <br>
 	 * {@link #starveTickPeriod} contains the number of ticks between starvation damage being done.<br>
 	 * <br>
@@ -53,18 +53,18 @@ public abstract class StarvationEvent extends Event
 	 * <br>
 	 * This event does not have a {@link Result}. {@link HasResult}<br>
 	 */
-	public static class Tick extends StarvationEvent
+	public static class GetStarveTickPeriod extends StarvationEvent
 	{
 		public int starveTickPeriod = 80;
 
-		public Tick(EntityPlayer player)
+		public GetStarveTickPeriod(EntityPlayer player)
 		{
 			super(player);
 		}
 	}
 
 	/**
-	 * Fired once the time since last starvation damage reaches starveTickPeriod (see {@link Tick}),
+	 * Fired once the time since last starvation damage reaches starveTickPeriod (see {@link GetStarveTickPeriod}),
 	 * in order to control how much starvation damage to do.
 	 * 
 	 * This event is fired in {@link FoodStats#onUpdate}.<br>
