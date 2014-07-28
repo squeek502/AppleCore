@@ -80,7 +80,7 @@ public abstract class HealthRegenEvent extends Event
 	public static class Regen extends HealthRegenEvent
 	{
 		public float deltaHealth = 1f;
-		public float deltaExhaustion = -3f;
+		public float deltaExhaustion = 3f;
 
 		public Regen(EntityPlayer player)
 		{
