@@ -1,9 +1,10 @@
 General:
- [ ] Move saturation/exhaustion syncing from The Spice of Life to AppleCore
- [ ] Move saturation/exhaustion values shown in debug info from The Spice of Life to AppleCore
 
 API:
  [ ] Implement event-driven growth ticks
+ [ ] Add a way to get max exhaustion
+ [ ] Add a way to get health regen period
+ [ ] Add a way to get starvation damage period
 
 Test/Sample Implementations:
  [ ] Crop growth modification
@@ -14,9 +15,13 @@ Project Log/Notes:
   player-specific, which isn't possible by only hooking into ItemFood. @date(2014-07-24 01:45)
     * Fixed by modifying ItemRenderer to get the modified max duration instead of getting it from 
     the item each time @date(2014-07-27 13:30)
+  DummyModContainers can listen for events, but they need to use @Subscribe 
+  instead of @SubscribeEvent @date(2014-07-27 18:47)
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [x] Move saturation/exhaustion values shown in debug info from The Spice of Life to AppleCore @done (2014-07-27 18:42) @project(General)
+ [x] Move saturation/exhaustion syncing from The Spice of Life to AppleCore @done (2014-07-27 18:42) @project(General)
  [x] Implement better food eating speed modification event @done (2014-07-27 13:31) @project(API)
  [x] Modifying eating speed @done (2014-07-27 13:28) @project(Test/Sample Implementations)
  [x] Setup build.gradle to be maven-ready @done (2014-07-27 02:19) @project(General)
