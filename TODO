@@ -1,5 +1,4 @@
 General:
- [ ] Add support for block-based foods (cake)
 
 API:
  [ ] Implement event-driven growth ticks
@@ -8,16 +7,14 @@ Test/Sample Implementations:
  [ ] Crop growth modification
 
 Project Log/Notes:
-  Modifying food eating duration using the Forge event PlayerUseItemEvent.Start does not produce 
-  clean visuals; it just adds a delay to the start of the animation. The solution should be 
-  player-specific, which isn't possible by only hooking into ItemFood. @date(2014-07-24 01:45)
-    * Fixed by modifying ItemRenderer to get the modified max duration instead of getting it from 
-    the item each time @date(2014-07-27 13:30)
-  DummyModContainers can listen for events, but they need to use @Subscribe 
-  instead of @SubscribeEvent @date(2014-07-27 18:47)
+  Modifying food eating duration using the Forge event PlayerUseItemEvent.Start does not produce clean visuals; it just adds a delay to the start of the animation. The solution should be player-specific, which isn't possible by only hooking into ItemFood. @date(2014-07-24 01:45)
+    * Fixed by modifying ItemRenderer to get the modified max duration instead of getting it from the item each time @date(2014-07-27 13:30)
+  DummyModContainers can listen for events, but they need to use @Subscribe instead of @SubscribeEvent @date(2014-07-27 18:47)
+  An incorrect method signature in an INVOKE instruction can cause an ArrayIndexOutOfBoundsException in Frame.merge @date(2014-07-28 16:59)
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [x] Add support for block-based foods (cake) @done (2014-07-28 17:10) @project(General)
  [x] Document AppleCoreAccessor/IAppleCoreAccessor @done (2014-07-28 12:53) @project(API)
  [x] Add a way to get starvation damage period @done (2014-07-27 22:24) @project(API)
  [x] Add a way to get max exhaustion @done (2014-07-27 22:24) @project(API)

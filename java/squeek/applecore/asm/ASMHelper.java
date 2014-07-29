@@ -1,11 +1,15 @@
 package squeek.applecore.asm;
 
-import static org.objectweb.asm.Opcodes.GETFIELD;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.*;
+import org.objectweb.asm.util.Printer;
+import org.objectweb.asm.util.Textifier;
+import org.objectweb.asm.util.TraceMethodVisitor;
 
 public class ASMHelper
 {
@@ -31,9 +35,29 @@ public class ASMHelper
 		return writer.toByteArray();
 	}
 
-	public static AbstractInsnNode findFirstInstruction(MethodNode method)
+	public static AbstractInsnNode getOrFindInstructionOfType(AbstractInsnNode firstInsnToCheck, int opcode)
 	{
-		for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null; instruction = instruction.getNext())
+		return getOrFindInstructionOfType(firstInsnToCheck, opcode, false);
+	}
+
+	public static AbstractInsnNode getOrFindInstructionOfType(AbstractInsnNode firstInsnToCheck, int opcode, boolean reverseDirection)
+	{
+		for (AbstractInsnNode instruction = firstInsnToCheck; instruction != null; instruction = reverseDirection ? instruction.getPrevious() : instruction.getNext())
+		{
+			if (instruction.getOpcode() == opcode)
+				return instruction;
+		}
+		return null;
+	}
+
+	public static AbstractInsnNode getOrFindInstruction(AbstractInsnNode firstInsnToCheck)
+	{
+		return getOrFindInstruction(firstInsnToCheck, false);
+	}
+
+	public static AbstractInsnNode getOrFindInstruction(AbstractInsnNode firstInsnToCheck, boolean reverseDirection)
+	{
+		for (AbstractInsnNode instruction = firstInsnToCheck; instruction != null; instruction = reverseDirection ? instruction.getPrevious() : instruction.getNext())
 		{
 			if (instruction.getType() != AbstractInsnNode.LABEL && instruction.getType() != AbstractInsnNode.LINE)
 				return instruction;
@@ -41,73 +65,59 @@ public class ASMHelper
 		return null;
 	}
 
+	public static AbstractInsnNode findFirstInstruction(MethodNode method)
+	{
+		return getOrFindInstruction(method.instructions.getFirst());
+	}
+
 	public static AbstractInsnNode findFirstInstructionOfType(MethodNode method, int opcode)
 	{
-		return findNextInstructionOfType(method.instructions.getFirst(), opcode);
+		return getOrFindInstructionOfType(method.instructions.getFirst(), opcode);
+	}
+
+	public static AbstractInsnNode findLastInstructionOfType(MethodNode method, int opcode)
+	{
+		return getOrFindInstructionOfType(method.instructions.getLast(), opcode, true);
+	}
+
+	public static AbstractInsnNode findNextInstruction(AbstractInsnNode instruction)
+	{
+		return getOrFindInstruction(instruction.getNext());
 	}
 
 	public static AbstractInsnNode findNextInstructionOfType(AbstractInsnNode instruction, int opcode)
 	{
-		for (instruction = instruction.getNext(); instruction != null; instruction = instruction.getNext())
-		{
-			if (instruction.getOpcode() == opcode)
-				return instruction;
-		}
-		return null;
+		return getOrFindInstructionOfType(instruction.getNext(), opcode);
+	}
+
+	public static AbstractInsnNode findPreviousInstruction(AbstractInsnNode instruction)
+	{
+		return getOrFindInstruction(instruction.getPrevious(), true);
 	}
 
 	public static AbstractInsnNode findPreviousInstructionOfType(AbstractInsnNode instruction, int opcode)
 	{
-		for (instruction = instruction.getPrevious(); instruction != null; instruction = instruction.getPrevious())
-		{
-			if (instruction.getOpcode() == opcode)
-				return instruction;
-		}
-		return null;
+		return getOrFindInstructionOfType(instruction.getPrevious(), opcode, true);
 	}
 
 	public static AbstractInsnNode findFirstInstructionOfTypeWithDesc(MethodNode method, int opcode, Object desc)
 	{
-		for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null; instruction = instruction.getNext())
+		for (AbstractInsnNode instruction = getOrFindInstructionOfType(method.instructions.getFirst(), opcode); instruction != null; instruction = findNextInstructionOfType(instruction, opcode))
 		{
-			if (instruction.getOpcode() == opcode)
+			boolean descMatches = false;
+			switch (instruction.getType())
 			{
-				boolean descMatches = false;
-				switch (instruction.getType())
-				{
-					case AbstractInsnNode.TYPE_INSN:
-						descMatches = desc.equals(((TypeInsnNode) instruction).desc);
-						break;
-					case AbstractInsnNode.LDC_INSN:
-						descMatches = desc.equals(((LdcInsnNode) instruction).cst);
-						break;
-					default:
-						break;
-				}
-				if (descMatches)
-					return instruction;
+				case AbstractInsnNode.TYPE_INSN:
+					descMatches = desc.equals(((TypeInsnNode) instruction).desc);
+					break;
+				case AbstractInsnNode.LDC_INSN:
+					descMatches = desc.equals(((LdcInsnNode) instruction).cst);
+					break;
+				default:
+					break;
 			}
-		}
-		return null;
-	}
-
-	public static AbstractInsnNode findField(MethodNode method, String field, String type, int timeFound)
-	{
-		int found = 0;
-		for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null; instruction = instruction.getNext())
-		{
-			if (instruction.getOpcode() == GETFIELD)
-			{
-				FieldInsnNode fieldNode = (FieldInsnNode) instruction;
-				if (fieldNode.name.equals(field) && fieldNode.desc.equals(type))
-				{
-					++found;
-					if (found == timeFound)
-					{
-						return instruction;
-					}
-				}
-			}
+			if (descMatches)
+				return instruction;
 		}
 		return null;
 	}
@@ -134,24 +144,17 @@ public class ASMHelper
 		return null;
 	}
 
-	public static AbstractInsnNode findLastInstructionOfType(MethodNode method, int bytecode)
-	{
-		for (AbstractInsnNode instruction = method.instructions.getLast(); instruction != null; instruction = instruction.getPrevious())
-		{
-			if (instruction.getOpcode() == bytecode)
-				return instruction;
-		}
-		return null;
-	}
-
-	public static void removeNodesFromMethodUntil(MethodNode method, AbstractInsnNode startInclusive, AbstractInsnNode endNotInclusive)
+	public static int removeFromInsnListUntil(InsnList insnList, AbstractInsnNode startInclusive, AbstractInsnNode endNotInclusive)
 	{
 		AbstractInsnNode insnToRemove = startInclusive;
+		int numDeleted = 0;
 		while (insnToRemove != null && insnToRemove != endNotInclusive)
 		{
+			numDeleted++;
 			insnToRemove = insnToRemove.getNext();
-			method.instructions.remove(insnToRemove.getPrevious());
+			insnList.remove(insnToRemove.getPrevious());
 		}
+		return numDeleted;
 	}
 
 	public static InsnList cloneInsnList(InsnList source)
@@ -176,5 +179,17 @@ public class ASMHelper
 		}
 
 		return clone;
+	}
+
+	private static Printer printer = new Textifier();
+	private static TraceMethodVisitor methodprinter = new TraceMethodVisitor(printer);
+
+	public static String getMethodAsString(MethodNode method)
+	{
+		method.accept(methodprinter);
+		StringWriter sw = new StringWriter();
+		printer.print(new PrintWriter(sw));
+		printer.getText().clear();
+		return sw.toString();
 	}
 }

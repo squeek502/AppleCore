@@ -1,4 +1,4 @@
-package squeek.applecore.reference;
+package squeek.applecore.asm.reference;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

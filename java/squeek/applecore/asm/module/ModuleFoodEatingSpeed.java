@@ -87,7 +87,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 
 		method.instructions.insert(targetNode, getFieldNode);
 
-		ASMHelper.removeNodesFromMethodUntil(method, targetNode, getFieldNode);
+		ASMHelper.removeFromInsnListUntil(method.instructions, targetNode, getFieldNode);
 	}
 
 	private void patchGetItemInUseDuration(ClassNode classNode, MethodNode method, boolean isObfuscated)
@@ -100,7 +100,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		if (targetNode == null)
 			throw new RuntimeException("EntityPlayer.getItemInUseDuration: Encountered unexpected instruction pattern");
 
-		ASMHelper.removeNodesFromMethodUntil(method, deletionPoint, targetNode);
+		ASMHelper.removeFromInsnListUntil(method.instructions, deletionPoint, targetNode);
 
 		method.instructions.insertBefore(targetNode, new FieldInsnNode(GETFIELD, classNode.name.replace('.', '/'), "itemInUseMaxDuration", "I"));
 	}

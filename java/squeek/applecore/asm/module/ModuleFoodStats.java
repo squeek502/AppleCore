@@ -310,7 +310,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		LabelNode foodExhaustionBlockEndLabel = ((JumpInsnNode) foodExhaustionIf).label;
 
 		// remove the entire exhaustion block
-		ASMHelper.removeNodesFromMethodUntil(method, injectPoint.getNext(), foodExhaustionBlockEndLabel);
+		ASMHelper.removeFromInsnListUntil(method.instructions, injectPoint.getNext(), foodExhaustionBlockEndLabel);
 
 		// create allowExhaustionResult variable
 		LabelNode allowExhaustionResultStart = new LabelNode();
@@ -444,7 +444,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		LabelNode healthBlockEndLabel = ((JumpInsnNode) healthBlockJumpToEnd).label;
 
 		// remove the entire health regen block
-		ASMHelper.removeNodesFromMethodUntil(method, injectPoint.getNext(), healthBlockEndLabel);
+		ASMHelper.removeFromInsnListUntil(method.instructions, injectPoint.getNext(), healthBlockEndLabel);
 
 		// create allowRegenResult variable
 		LabelNode allowRegenResultStart = new LabelNode();

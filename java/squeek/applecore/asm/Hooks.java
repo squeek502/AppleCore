@@ -1,9 +1,13 @@
 package squeek.applecore.asm;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockCake;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import squeek.applecore.api.AppleCoreAccessor;
 import squeek.applecore.api.food.FoodEvent;
@@ -15,14 +19,6 @@ import cpw.mods.fml.common.eventhandler.Event.Result;
 
 public class Hooks
 {
-	/**
-	 * Hooks into ItemStack-aware FoodStats.addStats method
-	 * @param foodStats The food stats being added to
-	 * @param itemFood The item of food that is being eaten
-	 * @param itemStack The ItemStack of the food that is being eaten
-	 * @param player The player eating the food
-	 * @return The modified food values or null if the default code should be executed
-	 */
 	public static FoodValues onFoodStatsAdded(FoodStats foodStats, ItemFood itemFood, ItemStack itemStack, EntityPlayer player)
 	{
 		return AppleCoreAccessor.get().getFoodValuesForPlayer(itemStack, player);
@@ -33,13 +29,42 @@ public class Hooks
 		MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemStack, foodValues, hungerAdded, saturationAdded));
 	}
 
+	// should this be moved elsewhere?
+	private static ItemStack getFoodFromBlock(Block block)
+	{
+		if (block instanceof BlockCake)
+			return new ItemStack(Items.cake);
+
+		return null;
+	}
+
+	public static FoodValues onBlockFoodEaten(Block block, World world, EntityPlayer player)
+	{
+		ItemStack itemStack = getFoodFromBlock(block);
+
+		if (itemStack != null)
+			return AppleCoreAccessor.get().getFoodValuesForPlayer(itemStack, player);
+		else
+			return null;
+	}
+
+	public static void onPostBlockFoodEaten(Block block, FoodValues foodValues, int prevFoodLevel, float prevSaturationLevel, EntityPlayer player)
+	{
+		ItemStack itemStack = getFoodFromBlock(block);
+		int hungerAdded = player.getFoodStats().getFoodLevel() - prevFoodLevel;
+		float saturationAdded = player.getFoodStats().getSaturationLevel() - prevSaturationLevel;
+
+		if (itemStack != null)
+			MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemStack, foodValues, hungerAdded, saturationAdded));
+	}
+
 	public static Result fireAllowExhaustionEvent(EntityPlayer player)
 	{
 		ExhaustionEvent.AllowExhaustion event = new ExhaustionEvent.AllowExhaustion(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getResult();
 	}
-	
+
 	public static float fireExhaustionTickEvent(EntityPlayer player, float foodExhaustionLevel)
 	{
 		return AppleCoreAccessor.get().getMaxExhaustion(player);
@@ -89,7 +114,7 @@ public class Hooks
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
-	
+
 	public static boolean fireFoodStatsAdditionEvent(EntityPlayer player, FoodValues foodValuesToBeAdded)
 	{
 		FoodEvent.FoodStatsAddition event = new FoodEvent.FoodStatsAddition(player, foodValuesToBeAdded);

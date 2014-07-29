@@ -15,7 +15,9 @@ public class ExhaustionModifier
 	@SubscribeEvent
 	public void onExhausted(ExhaustionEvent.Exhausted event)
 	{
-		event.deltaHunger = -1;
+		// this will enable hunger loss in peaceful difficulty
+		if (event.player.getFoodStats().getSaturationLevel() <= 0)
+			event.deltaHunger = -1;
 	}
 
 }
