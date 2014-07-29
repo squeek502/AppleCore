@@ -8,7 +8,7 @@ import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.asm.ASMHelper;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
-import com.sun.xml.internal.ws.org.objectweb.asm.Type;
+import org.objectweb.asm.Type;
 
 public class ModuleBlockFood implements IClassTransformerModule
 {
