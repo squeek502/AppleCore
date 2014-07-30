@@ -1,10 +1,8 @@
 General:
 
 API:
- [ ] Implement event-driven growth ticks
 
 Test/Sample Implementations:
- [ ] Crop growth modification
 
 Project Log/Notes:
   Modifying food eating duration using the Forge event PlayerUseItemEvent.Start does not produce clean visuals; it just adds a delay to the start of the animation. The solution should be player-specific, which isn't possible by only hooking into ItemFood. @date(2014-07-24 01:45)
@@ -14,6 +12,17 @@ Project Log/Notes:
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [x] Document PlantGrowthEvents @started(2014-07-29 22:19) @done (2014-07-29 22:22) @lasted(0:03) @project(API)
+ [x] Implement event-driven growth ticks @done (2014-07-29 22:19) @project(API)
+ [x] Crop growth modification @done (2014-07-29 22:19) @project(Test/Sample Implementations)
+ [x] net.minecraft.block.BlockStem @started(2014-07-29 21:51) @done (2014-07-29 22:18) @lasted(0:27) @project(API)
+ [x] net.minecraft.block.BlockSapling @started(2014-07-29 21:45) @done (2014-07-29 21:51) @lasted(0:06) @project(API)
+ [x] net.minecraft.block.BlockNetherWart @started(2014-07-29 21:38) @done (2014-07-29 21:45) @lasted(0:07) @project(API)
+ [x] net.minecraft.block.BlockMushroom @started(2014-07-29 21:34) @done (2014-07-29 21:38) @lasted(0:04) @project(API)
+ [x] net.minecraft.block.BlockCocoa @started(2014-07-29 21:26) @done (2014-07-29 21:34) @lasted(0:08) @project(API)
+ [x] net.minecraft.block.BlockCactus @started(2014-07-29 21:22) @done (2014-07-29 21:26) @lasted(0:04) @project(API)
+ [x] net.minecraft.block.BlockReed @started(2014-07-29 21:03) @done (2014-07-29 21:22) @lasted(0:19) @project(API)
+ [x] net.minecraft.block.BlockCrops @done (2014-07-29 20:50) @project(API)
  [x] Add support for block-based foods (cake) @done (2014-07-28 17:10) @project(General)
  [x] Document AppleCoreAccessor/IAppleCoreAccessor @done (2014-07-28 12:53) @project(API)
  [x] Add a way to get starvation damage period @done (2014-07-27 22:24) @project(API)
