@@ -122,22 +122,6 @@ public class FoodStatsModifications extends FoodStats
 		}
 	}
 
-	@Override
-	// removed SideOnly annotation
-	//@SideOnly(Side.CLIENT)
-	public void setFoodLevel(int p_75114_1_)
-	{
-		this.foodLevel = p_75114_1_;
-	}
-
-	@Override
-	// removed SideOnly annotation
-	//@SideOnly(Side.CLIENT)
-	public void setFoodSaturationLevel(float p_75119_1_)
-	{
-		this.foodSaturationLevel = p_75119_1_;
-	}
-
 	// start unmodified
 	int foodLevel = 20;
 	float foodSaturationLevel = 5f;
