@@ -2,7 +2,6 @@ package squeek.applecore.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.world.EnumDifficulty;
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -35,7 +34,7 @@ public class MessageDifficultySync implements IMessage, IMessageHandler<MessageD
 	@Override
 	public IMessage onMessage(MessageDifficultySync message, MessageContext ctx)
 	{
-		FMLClientHandler.instance().getWorldClient().difficultySetting = message.difficulty;
+		NetworkHelper.getSidedPlayer(ctx).worldObj.difficultySetting = message.difficulty;
 		return null;
 	}
 }

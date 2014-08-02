@@ -2,7 +2,6 @@ package squeek.applecore.network;
 
 import io.netty.buffer.ByteBuf;
 import squeek.applecore.accessor.AppleCoreAccessorImpl;
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -35,7 +34,7 @@ public class MessageExhaustionSync implements IMessage, IMessageHandler<MessageE
 	@Override
 	public IMessage onMessage(MessageExhaustionSync message, MessageContext ctx)
 	{
-		AppleCoreAccessorImpl.setExhaustion(FMLClientHandler.instance().getClientPlayerEntity(), message.exhaustionLevel);
+		AppleCoreAccessorImpl.setExhaustion(NetworkHelper.getSidedPlayer(ctx), message.exhaustionLevel);
 		return null;
 	}
 }

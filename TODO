@@ -1,6 +1,19 @@
 General:
+ [ ] Move HUD/tooltip stuff from TSoL to AppleCore
 
 API:
+
+Core/ASM:
+  Plant growth modification:
+   [ ] BlockPamFlower
+   [ ] BlockPamSapling
+   [ ] BlockPamFruit
+   [ ] mods.natura.blocks.crops.NetherBerryBush
+   [ ] mods.natura.blocks.trees.SaguaroBlock
+   [ ] mods.natura.blocks.trees.CropBlock
+   [ ] mods.natura.blocks.trees.BerryBush
+   [ ] mods.natura.blocks.crops.Glowshroom
+   [ ] mods.natura.blocks.crops.HerbBlock
 
 Test/Sample Implementations:
 

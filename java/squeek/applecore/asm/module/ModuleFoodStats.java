@@ -1,6 +1,7 @@
 package squeek.applecore.asm.module;
 
 import static org.objectweb.asm.Opcodes.*;
+import java.util.Iterator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.GameRules;
@@ -15,6 +16,7 @@ import squeek.applecore.asm.ASMHelper;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
 import cpw.mods.fml.common.eventhandler.Event;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ModuleFoodStats implements IClassTransformerModule
 {
@@ -81,9 +83,30 @@ public class ModuleFoodStats implements IClassTransformerModule
 			else
 				throw new RuntimeException("FoodStats: onUpdate method not found");
 
+			MethodNode setFoodLevel = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "setFoodLevel", "(I)V");
+			MethodNode setFoodSaturationLevel = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "b" : "setFoodSaturationLevel", "(F)V");
+			if (setFoodLevel != null && setFoodSaturationLevel != null)
+			{
+				stripSideOnlyAnnotation(setFoodLevel);
+				stripSideOnlyAnnotation(setFoodSaturationLevel);
+			}
+			else
+				throw new RuntimeException("Method not found in FoodStats. setFoodLevel: " + setFoodLevel + " setFoodSaturationLevel: " + setFoodSaturationLevel);
+
 			return ASMHelper.writeClassToBytes(classNode);
 		}
 		return basicClass;
+	}
+
+	public void stripSideOnlyAnnotation(MethodNode method)
+	{
+		Iterator<AnnotationNode> annotationIterator = method.visibleAnnotations.iterator();
+		while (annotationIterator.hasNext())
+		{
+			AnnotationNode annotation = annotationIterator.next();
+			if (annotation.desc.equals(Type.getDescriptor(SideOnly.class)))
+				annotationIterator.remove();
+		}
 	}
 
 	public void patchEntityPlayerInit(MethodNode method, boolean isObfuscated)
