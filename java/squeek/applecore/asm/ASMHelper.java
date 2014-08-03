@@ -23,14 +23,14 @@ public class ASMHelper
 
 	public static byte[] writeClassToBytes(ClassNode classNode)
 	{
-		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+		ClassWriter writer = new ObfRemappingClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
 		classNode.accept(writer);
 		return writer.toByteArray();
 	}
 
-	public static byte[] writeClassToBytesSkipFrames(ClassNode classNode)
+	public static byte[] writeClassToBytesNoDeobf(ClassNode classNode)
 	{
-		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
 		classNode.accept(writer);
 		return writer.toByteArray();
 	}

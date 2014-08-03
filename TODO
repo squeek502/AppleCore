@@ -22,6 +22,7 @@ Project Log/Notes:
     * Fixed by modifying ItemRenderer to get the modified max duration instead of getting it from the item each time @date(2014-07-27 13:30)
   DummyModContainers can listen for events, but they need to use @Subscribe instead of @SubscribeEvent @date(2014-07-27 18:47)
   An incorrect method signature in an INVOKE instruction can cause an ArrayIndexOutOfBoundsException in Frame.merge @date(2014-07-28 16:59)
+  Using the label past the return as the end label of a newly added local variable in ASM can sometimes cause an ArrayIndexOutOfBoundException in obfuscated environments. Why? Who knows. @date(2014-08-03 02:05)
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:

@@ -1,13 +1,12 @@
 package squeek.applecore.asm.module;
 
 import static org.objectweb.asm.Opcodes.*;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.FoodStats;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.asm.ASMHelper;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
+import squeek.applecore.asm.ObfHelper;
 import org.objectweb.asm.Type;
 
 public class ModuleBlockFood implements IClassTransformerModule
@@ -64,7 +63,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 			throw new RuntimeException("Unexpected instruction pattern found in " + classNode.name + "." + method.name);
 
 		AbstractInsnNode targetNode = ASMHelper.findNextInstructionOfType(deleteStartPoint, INVOKEVIRTUAL);
-		while (targetNode != null && !((MethodInsnNode) targetNode).owner.equals(Type.getInternalName(FoodStats.class)))
+		while (targetNode != null && !((MethodInsnNode) targetNode).owner.equals(ObfHelper.getInternalClassName("net.minecraft.util.FoodStats")))
 		{
 			targetNode = ASMHelper.findNextInstructionOfType(targetNode, INVOKEVIRTUAL);
 		}
@@ -98,8 +97,8 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// int prevFoodLevel = p_150036_5_.getFoodStats().getFoodLevel();
 		toInject.add(new VarInsnNode(ALOAD, 5));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(EntityPlayer.class), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(FoodStats.class), isObfuscated ? "a" : "getFoodLevel", "()I"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), isObfuscated ? "a" : "getFoodLevel", "()I"));
 		toInject.add(new VarInsnNode(ISTORE, prevFoodLevel.index));
 		toInject.add(prevFoodLevelStart);
 
@@ -111,14 +110,14 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// float prevSaturationLevel = p_150036_5_.getFoodStats().getSaturationLevel();
 		toInject.add(new VarInsnNode(ALOAD, 5));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(EntityPlayer.class), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(FoodStats.class), isObfuscated ? "e" : "getSaturationLevel", "()F"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), isObfuscated ? "e" : "getSaturationLevel", "()F"));
 		toInject.add(new VarInsnNode(FSTORE, prevSaturationLevel.index));
 		toInject.add(prevSaturationLevelStart);
 
 		// p_150036_5_.getFoodStats().addStats(modifiedFoodValues.hunger, modifiedFoodValues.saturationModifier);
 		toInject.add(new VarInsnNode(ALOAD, 5));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(EntityPlayer.class), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;"));
 		toInject.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
 		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodValues.class), "hunger", "I"));
 		toInject.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));

@@ -6,11 +6,10 @@ import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
-import net.minecraft.item.ItemStack;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.ASMHelper;
 import squeek.applecore.asm.IClassTransformerModule;
+import squeek.applecore.asm.ObfHelper;
 
 public class ModuleFoodEatingSpeed implements IClassTransformerModule
 {
@@ -67,7 +66,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionOfType(method, INVOKEVIRTUAL);
 		while (targetNode != null && !(((MethodInsnNode) targetNode).name.equals(isObfuscated ? "n" : "getMaxItemUseDuration")
 				&& ((MethodInsnNode) targetNode).desc.equals("()I")
-				&& ((MethodInsnNode) targetNode).owner.equals(Type.getInternalName(ItemStack.class))))
+				&& ((MethodInsnNode) targetNode).owner.equals(ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"))))
 		{
 			targetNode = ASMHelper.findNextInstructionOfType(targetNode, INVOKEVIRTUAL);
 		}

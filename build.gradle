@@ -105,8 +105,11 @@ task removeExampleAndReferenceResources(type:Delete) {
 // insert custom tasks
 afterEvaluate { project ->
 	sourceMainJava.finalizedBy(processSourceMainJava)
-	sourceMainJava.finalizedBy(removeExampleAndReferenceSources)
-	processResources.finalizedBy(removeExampleAndReferenceResources)
+	if (!project.hasProperty('buildexample'))
+	{
+		sourceMainJava.finalizedBy(removeExampleAndReferenceSources)
+		processResources.finalizedBy(removeExampleAndReferenceResources)
+	}
 }
 
 if (System.getenv("MAVEN_URL")) {
