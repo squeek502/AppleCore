@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
-import squeek.applecore.api.AppleCoreAccessor;
+import squeek.applecore.api.AppleCoreAPI;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -32,8 +32,8 @@ public class DebugInfoHandler
 		if (mc.gameSettings.showDebugInfo)
 		{
 			FoodStats stats = mc.thePlayer.getFoodStats();
-			float curExhaustion = AppleCoreAccessor.get().getExhaustion(mc.thePlayer);
-			float maxExhaustion = AppleCoreAccessor.get().getMaxExhaustion(mc.thePlayer);
+			float curExhaustion = AppleCoreAPI.accessor.getExhaustion(mc.thePlayer);
+			float maxExhaustion = AppleCoreAPI.accessor.getMaxExhaustion(mc.thePlayer);
 			textEvent.left.add("hunger: " + stats.getFoodLevel() + ", sat: " + saturationDF.format(stats.getSaturationLevel()) + ", exh: " + exhaustionValDF.format(curExhaustion) + "/" + exhaustionMaxDF.format(maxExhaustion));
 		}
 	}

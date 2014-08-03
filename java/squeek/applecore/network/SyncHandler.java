@@ -6,7 +6,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import squeek.applecore.ModInfo;
-import squeek.applecore.api.AppleCoreAccessor;
+import squeek.applecore.api.AppleCoreAPI;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -53,7 +53,7 @@ public class SyncHandler
 			this.lastSaturationLevel = player.getFoodStats().getSaturationLevel();
 		}
 
-		float exhaustionLevel = AppleCoreAccessor.get().getExhaustion(player);
+		float exhaustionLevel = AppleCoreAPI.accessor.getExhaustion(player);
 		if (Math.abs(this.lastExhaustionLevel - exhaustionLevel) >= 0.01f)
 		{
 			channel.sendTo(new MessageExhaustionSync(exhaustionLevel), player);

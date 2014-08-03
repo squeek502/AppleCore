@@ -18,7 +18,7 @@ public abstract class FoodEvent extends Event
 	/**
 	 * Fired every time food values are retrieved to allow player-independent control over their values.
 	 * 
-	 * This event is fired in {@link FoodStats#func_151686_a(ItemFood, ItemStack)} and in {@link AppleCoreAccessor}.<br>
+	 * This event is fired in {@link FoodStats#func_151686_a(ItemFood, ItemStack)} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #foodValues} contains the values of the {@link #food}.<br>
 	 * {@link #unmodifiedFoodValues} contains the food values of the {@link #food} before the GetFoodValues event was fired.<br>
@@ -46,7 +46,7 @@ public abstract class FoodEvent extends Event
 	 * Fired every time food values are retrieved to allow player-dependent control over their values.
 	 * This event will always be preceded by {@link GetFoodValues} being fired.
 	 * 
-	 * This event is fired in {@link FoodStats#func_151686_a(ItemFood, ItemStack)} and in {@link AppleCoreAccessor}.<br>
+	 * This event is fired in {@link FoodStats#func_151686_a(ItemFood, ItemStack)} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #player} contains the player.<br>
 	 * {@link #foodValues} contains the values of the {@link #food}.<br>

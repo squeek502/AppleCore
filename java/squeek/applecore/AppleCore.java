@@ -3,7 +3,7 @@ package squeek.applecore;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import squeek.applecore.accessor.AppleCoreAccessorImpl;
+import squeek.applecore.api_impl.AppleCoreAccessorMutatorImpl;
 import squeek.applecore.asm.TransformerModuleHandler;
 import squeek.applecore.client.DebugInfoHandler;
 import squeek.applecore.network.SyncHandler;
@@ -32,7 +32,8 @@ public class AppleCore extends DummyModContainer implements IFMLLoadingPlugin
 	@Subscribe
 	public void init(FMLInitializationEvent event)
 	{
-		AppleCoreAccessorImpl.values();
+		// force intitialization of the singleton
+		AppleCoreAccessorMutatorImpl.values();
 		SyncHandler.init();
 
 		if (event.getSide() == Side.CLIENT)

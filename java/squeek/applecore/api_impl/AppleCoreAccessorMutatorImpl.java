@@ -1,4 +1,4 @@
-package squeek.applecore.accessor;
+package squeek.applecore.api_impl;
 
 import java.lang.reflect.Field;
 import net.minecraft.entity.player.EntityPlayer;
@@ -7,8 +7,9 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.common.MinecraftForge;
-import squeek.applecore.api.AppleCoreAccessor;
+import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreAccessor;
+import squeek.applecore.api.IAppleCoreMutator;
 import squeek.applecore.api.food.FoodEvent;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.hunger.ExhaustionEvent;
@@ -16,24 +17,19 @@ import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 
-public enum AppleCoreAccessorImpl implements IAppleCoreAccessor
+public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCoreMutator
 {
 	INSTANCE;
 
-	private AppleCoreAccessorImpl()
+	private AppleCoreAccessorMutatorImpl()
 	{
-		try
-		{
-			Field apiAccessorImpl = AppleCoreAccessor.class.getDeclaredField("accessorImpl");
-			apiAccessorImpl.setAccessible(true);
-			apiAccessorImpl.set(null, this);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		AppleCoreAPI.accessor = this;
+		AppleCoreAPI.mutator = this;
 	}
 
+	/*
+	 * IAppleCoreAccessor implementation
+	 */
 	@Override
 	public boolean isFood(ItemStack food)
 	{
@@ -119,7 +115,11 @@ public enum AppleCoreAccessorImpl implements IAppleCoreAccessor
 		return event.starveTickPeriod;
 	}
 
-	public static void setExhaustion(EntityPlayer player, float exhaustion)
+	/*
+	 * IAppleCoreMutator implementation
+	 */
+	@Override
+	public void setExhaustion(EntityPlayer player, float exhaustion)
 	{
 		try
 		{
@@ -130,10 +130,38 @@ public enum AppleCoreAccessorImpl implements IAppleCoreAccessor
 		}
 	}
 
+	@Override
+	public void setHunger(EntityPlayer player, int hunger)
+	{
+		try
+		{
+			foodLevel.setInt(player.getFoodStats(), hunger);
+		}
+		catch (Exception e)
+		{
+		}
+	}
+
+	@Override
+	public void setSaturation(EntityPlayer player, float saturation)
+	{
+		try
+		{
+			foodSaturationLevel.setFloat(player.getFoodStats(), saturation);
+		}
+		catch (Exception e)
+		{
+		}
+	}
+
 	// reflection
+	static final Field foodLevel = ReflectionHelper.findField(FoodStats.class, "foodLevel", "field_75127_a", "a");
+	static final Field foodSaturationLevel = ReflectionHelper.findField(FoodStats.class, "foodSaturationLevel", "field_75125_b", "b");
 	static final Field foodExhaustion = ReflectionHelper.findField(FoodStats.class, "foodExhaustionLevel", "field_75126_c", "c");
 	static
 	{
+		foodLevel.setAccessible(true);
+		foodSaturationLevel.setAccessible(true);
 		foodExhaustion.setAccessible(true);
 	}
 }

@@ -45,7 +45,7 @@ public abstract class StarvationEvent extends Event
 	/**
 	 * Fired every time the starve tick period is retrieved to allow control over its value.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAccessor}.<br>
+	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #starveTickPeriod} contains the number of ticks between starvation damage being done.<br>
 	 * <br>

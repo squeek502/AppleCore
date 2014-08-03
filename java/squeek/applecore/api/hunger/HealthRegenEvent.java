@@ -44,7 +44,7 @@ public abstract class HealthRegenEvent extends Event
 	/**
 	 * Fired every time the regen tick period is retrieved to allow control over its value.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAccessor}.<br>
+	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #regenTickPeriod} contains the number of ticks between each regen.<br>
 	 * <br>

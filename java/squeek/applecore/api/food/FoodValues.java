@@ -2,7 +2,7 @@ package squeek.applecore.api.food;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import squeek.applecore.api.AppleCoreAccessor;
+import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreAccessor;
 
 /**
@@ -45,7 +45,7 @@ public class FoodValues
 	 */
 	public static FoodValues getUnmodified(ItemStack itemStack)
 	{
-		return AppleCoreAccessor.get().getUnmodifiedFoodValues(itemStack);
+		return AppleCoreAPI.accessor.getUnmodifiedFoodValues(itemStack);
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class FoodValues
 	 */
 	public static FoodValues get(ItemStack itemStack)
 	{
-		return AppleCoreAccessor.get().getFoodValues(itemStack);
+		return AppleCoreAPI.accessor.getFoodValues(itemStack);
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class FoodValues
 	 */
 	public static FoodValues get(ItemStack itemStack, EntityPlayer player)
 	{
-		return AppleCoreAccessor.get().getFoodValuesForPlayer(itemStack, player);
+		return AppleCoreAPI.accessor.getFoodValuesForPlayer(itemStack, player);
 	}
 
 	@Override

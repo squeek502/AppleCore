@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import squeek.applecore.api.AppleCoreAccessor;
+import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.food.FoodEvent;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.hunger.ExhaustionEvent;
@@ -23,7 +23,7 @@ public class Hooks
 {
 	public static FoodValues onFoodStatsAdded(FoodStats foodStats, ItemFood itemFood, ItemStack itemStack, EntityPlayer player)
 	{
-		return AppleCoreAccessor.get().getFoodValuesForPlayer(itemStack, player);
+		return AppleCoreAPI.accessor.getFoodValuesForPlayer(itemStack, player);
 	}
 
 	public static void onPostFoodStatsAdded(FoodStats foodStats, ItemFood itemFood, ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded, EntityPlayer player)
@@ -45,7 +45,7 @@ public class Hooks
 		ItemStack itemStack = getFoodFromBlock(block);
 
 		if (itemStack != null)
-			return AppleCoreAccessor.get().getFoodValuesForPlayer(itemStack, player);
+			return AppleCoreAPI.accessor.getFoodValuesForPlayer(itemStack, player);
 		else
 			return null;
 	}
@@ -69,7 +69,7 @@ public class Hooks
 
 	public static float fireExhaustionTickEvent(EntityPlayer player, float foodExhaustionLevel)
 	{
-		return AppleCoreAccessor.get().getMaxExhaustion(player);
+		return AppleCoreAPI.accessor.getMaxExhaustion(player);
 	}
 
 	public static ExhaustionEvent.Exhausted fireExhaustionMaxEvent(EntityPlayer player, float maxExhaustionLevel, float foodExhaustionLevel)
@@ -88,7 +88,7 @@ public class Hooks
 
 	public static int fireRegenTickEvent(EntityPlayer player)
 	{
-		return AppleCoreAccessor.get().getHealthRegenTickPeriod(player);
+		return AppleCoreAPI.accessor.getHealthRegenTickPeriod(player);
 	}
 
 	public static HealthRegenEvent.Regen fireRegenEvent(EntityPlayer player)
@@ -107,7 +107,7 @@ public class Hooks
 
 	public static int fireStarvationTickEvent(EntityPlayer player)
 	{
-		return AppleCoreAccessor.get().getStarveDamageTickPeriod(player);
+		return AppleCoreAPI.accessor.getStarveDamageTickPeriod(player);
 	}
 
 	public static StarvationEvent.Starve fireStarveEvent(EntityPlayer player)

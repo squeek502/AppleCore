@@ -4,7 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.common.MinecraftForge;
-import squeek.applecore.api.AppleCoreAccessor;
+import squeek.applecore.api.AppleCoreAPI;
 import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
 
@@ -46,7 +46,7 @@ public abstract class ExhaustionEvent extends Event
 	/**
 	 * Fired every time max exhaustion level is retrieved to allow control over its value.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAccessor}.<br>
+	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #maxExhaustionLevel} contains the exhaustion level that will trigger a hunger/saturation decrement.<br>
 	 * <br>
