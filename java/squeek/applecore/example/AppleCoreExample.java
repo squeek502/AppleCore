@@ -13,7 +13,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = ModInfo.MODID + "Example", version = ModInfo.VERSION, dependencies = "")
+@Mod(modid = ModInfo.MODID + "Example", version = ModInfo.VERSION, dependencies = "required-after:AppleCore")
 public class AppleCoreExample
 {
 	public static final Logger Log = LogManager.getLogger(ModInfo.MODID + "Example");
@@ -28,6 +28,9 @@ public class AppleCoreExample
 		boolean otherDependantModsExist = false;
 		for (ModContainer mod : Loader.instance().getActiveModList())
 		{
+			if (mod.getMod() == this)
+				continue;
+
 			for (ArtifactVersion dependency : mod.getRequirements())
 			{
 				if (dependency.getLabel().equals(ModInfo.MODID))
