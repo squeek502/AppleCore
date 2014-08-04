@@ -4,15 +4,7 @@ API:
 
 Core/ASM:
   Plant growth modification:
-   [ ] BlockPamFlower
-   [ ] BlockPamSapling
-   [ ] BlockPamFruit
-   [ ] mods.natura.blocks.crops.NetherBerryBush
    [ ] mods.natura.blocks.trees.SaguaroBlock
-   [ ] mods.natura.blocks.trees.CropBlock
-   [ ] mods.natura.blocks.trees.BerryBush
-   [ ] mods.natura.blocks.crops.Glowshroom
-   [ ] mods.natura.blocks.crops.HerbBlock
 
 Test/Sample Implementations:
 
@@ -25,6 +17,14 @@ Project Log/Notes:
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [-] mods.natura.blocks.crops.HerbBlock @cancelled (2014-08-03 19:57) @project(Core/ASM)
+ [x] mods.natura.blocks.crops.Glowshroom @done (2014-08-03 19:56) @project(Core/ASM)
+ [x] mods.natura.blocks.crops.NetherBerryBush @done (2014-08-03 19:52) @project(Core/ASM)
+ [x] mods.natura.blocks.crops.CropBlock @done (2014-08-03 19:50) @project(Core/ASM)
+ [x] mods.natura.blocks.crops.BerryBush @done (2014-08-03 19:45) @project(Core/ASM)
+ [x] BlockPamSapling @done (2014-08-03 19:36) @project(Core/ASM)
+ [x] BlockPamFruit @done (2014-08-03 19:29) @project(Core/ASM)
+ [-] BlockPamFlower @started(2014-08-03 19:05) @cancelled (2014-08-03 19:12) @wasted(0:07) @project(Core/ASM)
  [x] Add support for showing more-than-normal player-specific food values in the tooltip overlay @done (2014-08-03 18:55) @project(General)
  [x] Move HUD/tooltip stuff from TSoL to AppleCore @done (2014-08-03 17:37) @project(General)
  [x] Document PlantGrowthEvents @started(2014-07-29 22:19) @done (2014-07-29 22:22) @lasted(0:03) @project(API)

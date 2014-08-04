@@ -21,7 +21,13 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		"net.minecraft.block.BlockMushroom",
 		"net.minecraft.block.BlockNetherWart",
 		"net.minecraft.block.BlockSapling",
-		"net.minecraft.block.BlockStem"
+		"net.minecraft.block.BlockStem",
+		"com.pam.harvestcraft.BlockPamFruit",
+		"com.pam.harvestcraft.BlockPamSapling",
+		"mods.natura.blocks.crops.BerryBush",
+		"mods.natura.blocks.crops.NetherBerryBush",
+		"mods.natura.blocks.crops.CropBlock",
+		"mods.natura.blocks.crops.Glowshroom"
 		};
 	}
 
@@ -56,6 +62,16 @@ public class ModulePlantGrowth implements IClassTransformerModule
 			hookBlockSapling(classNode, methodNode, isObfuscated);
 		else if (transformedName.equals("net.minecraft.block.BlockStem"))
 			hookBlockStem(classNode, methodNode, isObfuscated);
+		else if (transformedName.equals("com.pam.harvestcraft.BlockPamFruit"))
+			hookBlockPamFruit(classNode, methodNode, isObfuscated);
+		else if (transformedName.equals("com.pam.harvestcraft.BlockPamSapling"))
+			hookBlockPamSapling(classNode, methodNode, isObfuscated);
+		else if (transformedName.equals("mods.natura.blocks.crops.BerryBush") || transformedName.equals("mods.natura.blocks.crops.NetherBerryBush"))
+			hookBlockNaturaBerryBush(classNode, methodNode, isObfuscated);
+		else if (transformedName.equals("mods.natura.blocks.crops.CropBlock"))
+			hookNaturaCropBlock(classNode, methodNode, isObfuscated);
+		else if (transformedName.equals("mods.natura.blocks.crops.Glowshroom"))
+			hookBlockMushroom(classNode, methodNode, isObfuscated);
 		else
 			return basicClass;
 
@@ -149,6 +165,9 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		method.instructions.insert(ifJumpInsn, ifAllowedLabel);
 
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
+
+		fixPrecedingIfsToNotSkipInjectedInstructions(method, ifFailedLabel);
+		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
 	private void hookBlockNetherWart(ClassNode classNode, MethodNode method, boolean isObfuscated)
@@ -178,6 +197,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ifStartPoint, ifFailedLabel);
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
+
+		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
 	private void hookBlockStem(ClassNode classNode, MethodNode method, boolean isObfuscated)
@@ -200,6 +221,88 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		method.instructions.insert(randomIf, ifAllowedLabel);
 
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
+
+		// need to change the GOTO so that it doesn't skip our added fireEvent call
+		LabelNode newGotoLabel = new LabelNode();
+		JumpInsnNode gotoInsn = (JumpInsnNode) ASMHelper.findNextInstructionOfType(randomIf, GOTO);
+		gotoInsn.label = newGotoLabel;
+
+		method.instructions.insertBefore(ifFailedLabel, newGotoLabel);
+		fixPrecedingIfsToNotSkipInjectedInstructions(method, ifFailedLabel);
+		injectOnGrowthEventBefore(method, ifFailedLabel);
+	}
+
+	private void hookBlockPamFruit(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	{
+		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
+
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IFNE);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ALOAD);
+
+		LabelNode ifFailedLabel = ifJumpInsn.label;
+		LabelNode ifAllowedLabel = new LabelNode();
+		method.instructions.insert(ifJumpInsn, ifAllowedLabel);
+
+		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
+		injectOnGrowthEventBefore(method, ifFailedLabel);
+	}
+
+	private void hookBlockPamSapling(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	{
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findLastInstructionOfType(method, IFNE);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ALOAD);
+		ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifStartPoint, ALOAD);
+
+		LabelNode ifFailedLabel = ifJumpInsn.label;
+		LabelNode ifAllowedLabel = new LabelNode();
+		method.instructions.insert(ifJumpInsn, ifAllowedLabel);
+
+		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ifStartPoint, ifFailedLabel);
+		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
+		injectOnGrowthEventBefore(method, ifFailedLabel);
+	}
+
+	private void hookBlockNaturaBerryBush(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	{
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IFNE);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ALOAD);
+		if (!classNode.name.endsWith("NetherBerryBush"))
+			ifJumpInsn = (JumpInsnNode) ASMHelper.findNextInstructionOfType(ifJumpInsn, IF_ICMPLT);
+
+		LabelNode ifFailedLabel = ifJumpInsn.label;
+		LabelNode ifAllowedLabel = new LabelNode();
+		method.instructions.insert(ifJumpInsn, ifAllowedLabel);
+
+		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ifStartPoint, ifFailedLabel);
+		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
+
+		fixPrecedingIfsToNotSkipInjectedInstructions(method, ifFailedLabel);
+		injectOnGrowthEventBefore(method, ifFailedLabel);
+	}
+
+	private void hookNaturaCropBlock(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	{
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IF_ICMPLT);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ILOAD);
+
+		LabelNode endLabel = ASMHelper.findEndLabel(method);
+		LabelNode ifFailedLabel = ifJumpInsn.label;
+		LabelNode ifAllowedLabel = new LabelNode();
+		method.instructions.insert(ifJumpInsn, ifAllowedLabel);
+
+		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ifStartPoint, endLabel);
+		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
+
+		ifStartPoint = ASMHelper.findNextInstructionOfType(ifJumpInsn, LDC).getPrevious();
+		ifJumpInsn = (JumpInsnNode) ASMHelper.findNextInstructionOfType(ifStartPoint, IFNE);
+
+		ifFailedLabel = ifJumpInsn.label;
+		ifAllowedLabel = new LabelNode();
+		method.instructions.insert(ifJumpInsn, ifAllowedLabel);
+
+		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
+
+		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
 	private int fireAllowGrowthEventAndStoreResultBefore(MethodNode method, AbstractInsnNode injectPoint, LabelNode endLabel)
@@ -270,5 +373,22 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireOnGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;III)V"));
 
 		method.instructions.insertBefore(injectPoint, toInject);
+	}
+
+	private void fixPrecedingIfsToNotSkipInjectedInstructions(MethodNode method, LabelNode labelJumpedTo)
+	{
+		LabelNode beforeOnGrowthEvent = new LabelNode();
+		method.instructions.insertBefore(labelJumpedTo, beforeOnGrowthEvent);
+
+		AbstractInsnNode curInsn = labelJumpedTo.getPrevious();
+		while (curInsn != null)
+		{
+			boolean isJump = curInsn instanceof JumpInsnNode;
+			if (isJump && ((JumpInsnNode) curInsn).label == labelJumpedTo)
+				((JumpInsnNode) curInsn).label = beforeOnGrowthEvent;
+			else if (isJump)
+				break;
+			curInsn = curInsn.getPrevious();
+		}
 	}
 }
