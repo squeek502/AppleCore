@@ -242,7 +242,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowedLabel));
 		toInject.add(new VarInsnNode(ALOAD, resultIndex));
 		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DEFAULT", Type.getDescriptor(Event.Result.class)));
-		toInject.add(new JumpInsnNode(IF_ACMPNE, ifAllowedLabel));
+		toInject.add(new JumpInsnNode(IF_ACMPNE, ifFailedLabel));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}
