@@ -11,12 +11,15 @@ public class FoodValuesModifier
 	public void getFoodValues(FoodEvent.GetFoodValues event)
 	{
 		if (event.food.getItem() == Items.apple)
-			event.foodValues = new FoodValues(20, 1f);
+			event.foodValues = new FoodValues(5, 1f);
 	}
 
 	@SubscribeEvent
 	public void getPlayerSpecificFoodValues(FoodEvent.GetPlayerFoodValues event)
 	{
-		event.foodValues = new FoodValues((20 - event.player.getFoodStats().getFoodLevel()) / 8, 1);
+		if (event.food.getItem() == Items.apple)
+			event.foodValues = new FoodValues(19, 1f);
+		else
+			event.foodValues = new FoodValues((20 - event.player.getFoodStats().getFoodLevel()) / 8, 1);
 	}
 }

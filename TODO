@@ -1,5 +1,4 @@
 General:
- [ ] Add support for showing more-than-normal player-specific food values in the tooltip overlay
 
 API:
 
@@ -26,6 +25,7 @@ Project Log/Notes:
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:
+ [x] Add support for showing more-than-normal player-specific food values in the tooltip overlay @done (2014-08-03 18:55) @project(General)
  [x] Move HUD/tooltip stuff from TSoL to AppleCore @done (2014-08-03 17:37) @project(General)
  [x] Document PlantGrowthEvents @started(2014-07-29 22:19) @done (2014-07-29 22:22) @lasted(0:03) @project(API)
  [x] Implement event-driven growth ticks @done (2014-07-29 22:19) @project(API)

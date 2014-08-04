@@ -152,8 +152,11 @@ public class TooltipOverlayHandler
 					if (defaultFoodValues.equals(modifiedFoodValues) && defaultFoodValues.hunger == 0 && defaultFoodValues.saturationModifier == 0)
 						return;
 
-					int barsNeeded = (int) Math.ceil(Math.abs(defaultFoodValues.hunger) / 2f);
-					int saturationBarsNeeded = (int) Math.max(1, Math.ceil(Math.abs(defaultFoodValues.getSaturationIncrement()) / 2f));
+					int biggestHunger = Math.max(defaultFoodValues.hunger, modifiedFoodValues.hunger);
+					float biggestSaturationIncrement = Math.max(defaultFoodValues.getSaturationIncrement(), modifiedFoodValues.getSaturationIncrement());
+
+					int barsNeeded = (int) Math.ceil(Math.abs(biggestHunger) / 2f);
+					int saturationBarsNeeded = (int) Math.max(1, Math.ceil(Math.abs(biggestSaturationIncrement) / 2f));
 					boolean saturationOverflow = saturationBarsNeeded > 10;
 					String saturationText = saturationOverflow ? ((defaultFoodValues.saturationModifier < 0 ? -1 : 1) * saturationBarsNeeded) + "x " : null;
 					if (saturationOverflow)
@@ -196,6 +199,8 @@ public class TooltipOverlayHandler
 
 						if (modifiedFoodValues.hunger < 0)
 							gui.drawTexturedModalRect(x, y, 34, 27, 9, 9);
+						else if (modifiedFoodValues.hunger > defaultFoodValues.hunger && defaultFoodValues.hunger <= i)
+							gui.drawTexturedModalRect(x, y, 133, 27, 9, 9);
 						else if (modifiedFoodValues.hunger > i + 1 || defaultFoodValues.hunger == modifiedFoodValues.hunger)
 							gui.drawTexturedModalRect(x, y, 16, 27, 9, 9);
 						else if (modifiedFoodValues.hunger == i + 1)
