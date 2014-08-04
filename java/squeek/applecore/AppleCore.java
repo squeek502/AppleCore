@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import squeek.applecore.api_impl.AppleCoreAccessorMutatorImpl;
 import squeek.applecore.asm.TransformerModuleHandler;
 import squeek.applecore.client.DebugInfoHandler;
+import squeek.applecore.client.HUDOverlayHandler;
+import squeek.applecore.client.TooltipOverlayHandler;
 import squeek.applecore.network.SyncHandler;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -13,6 +15,7 @@ import cpw.mods.fml.common.DummyModContainer;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.Side;
 
@@ -30,15 +33,24 @@ public class AppleCore extends DummyModContainer implements IFMLLoadingPlugin
 	// use Subscribe here instead of SubscribeEvent because this container
 	// will not be parsed by the FMLEventBus, only the default EventBus
 	@Subscribe
-	public void init(FMLInitializationEvent event)
+	public void preInit(FMLPreInitializationEvent event)
 	{
 		// force intitialization of the singleton
 		AppleCoreAccessorMutatorImpl.values();
+
+		ModConfig.init(event.getSuggestedConfigurationFile());
+	}
+
+	@Subscribe
+	public void init(FMLInitializationEvent event)
+	{
 		SyncHandler.init();
 
 		if (event.getSide() == Side.CLIENT)
 		{
 			DebugInfoHandler.init();
+			HUDOverlayHandler.init();
+			TooltipOverlayHandler.init();
 		}
 	}
 

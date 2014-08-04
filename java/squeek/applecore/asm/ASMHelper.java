@@ -181,6 +181,18 @@ public class ASMHelper
 		return clone;
 	}
 
+	public static LocalVariableNode findLocalVariableOfMethod(MethodNode method, String varName, String varDesc)
+	{
+		for (LocalVariableNode localVar : method.localVariables)
+		{
+			if (localVar.name.equals(varName) && localVar.desc.equals(varDesc))
+			{
+				return localVar;
+			}
+		}
+		return null;
+	}
+
 	private static Printer printer = new Textifier();
 	private static TraceMethodVisitor methodprinter = new TraceMethodVisitor(printer);
 

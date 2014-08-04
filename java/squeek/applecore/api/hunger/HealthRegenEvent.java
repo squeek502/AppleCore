@@ -63,7 +63,7 @@ public abstract class HealthRegenEvent extends Event
 	}
 
 	/**
-	 * Fired once the time since last regen reaches regenTickPeriod (see {@link GetRegenTickPeriod}),
+	 * Fired once the ticks since last regen reaches regenTickPeriod (see {@link GetRegenTickPeriod}),
 	 * in order to control how regen affects health/exhaustion.
 	 * 
 	 * This event is fired in {@link FoodStats#onUpdate}.<br>

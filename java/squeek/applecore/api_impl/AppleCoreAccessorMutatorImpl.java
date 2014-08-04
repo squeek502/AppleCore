@@ -154,14 +154,42 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		}
 	}
 
+	@Override
+	public void setHealthRegenTickCounter(EntityPlayer player, int tickCounter)
+	{
+		try
+		{
+			foodTimer.setInt(player.getFoodStats(), tickCounter);
+		}
+		catch (Exception e)
+		{
+		}
+	}
+
+	@Override
+	public void setStarveDamageTickCounter(EntityPlayer player, int tickCounter)
+	{
+		try
+		{
+			starveTimer.setInt(player.getFoodStats(), tickCounter);
+		}
+		catch (Exception e)
+		{
+		}
+	}
+
 	// reflection
 	static final Field foodLevel = ReflectionHelper.findField(FoodStats.class, "foodLevel", "field_75127_a", "a");
 	static final Field foodSaturationLevel = ReflectionHelper.findField(FoodStats.class, "foodSaturationLevel", "field_75125_b", "b");
 	static final Field foodExhaustion = ReflectionHelper.findField(FoodStats.class, "foodExhaustionLevel", "field_75126_c", "c");
+	static final Field foodTimer = ReflectionHelper.findField(FoodStats.class, "foodTimer", "field_75123_d", "d");
+	static final Field starveTimer = ReflectionHelper.findField(FoodStats.class, "starveTimer");
 	static
 	{
 		foodLevel.setAccessible(true);
 		foodSaturationLevel.setAccessible(true);
 		foodExhaustion.setAccessible(true);
+		foodTimer.setAccessible(true);
+		starveTimer.setAccessible(true);
 	}
 }
