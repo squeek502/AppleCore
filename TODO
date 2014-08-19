@@ -5,6 +5,8 @@ API:
 Core/ASM:
   Plant growth modification:
    [ ] mods.natura.blocks.trees.SaguaroBlock
+   [ ] com.mark719.magicalcrops.crops.MagicalCrops
+   [ ] com.mark719.magicalcrops.crops.BlockMagicalCropsIridium
 
 Test/Sample Implementations:
 

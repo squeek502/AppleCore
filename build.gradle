@@ -65,9 +65,15 @@ task apiArtifact(type: Jar, dependsOn: compileJava) {
 	classifier = 'api'
 }
 
+task sourcesArtifact(type: Jar, dependsOn: compileJava) {
+	from project.buildDir.getPath()+"/sources/java"
+	classifier = 'sources'
+}
+
 artifacts {
 	archives deobfArtifact
 	archives apiArtifact
+	archives sourcesArtifact
 }
 
 processResources {
@@ -95,7 +101,7 @@ task processSourceMainJava(type:Copy) {
 
 task removeExampleAndReferenceSources(type:Delete) {
 	delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/example"
-	delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/reference"
+	delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/asm/reference"
 }
 
 task removeExampleAndReferenceResources(type:Delete) {
