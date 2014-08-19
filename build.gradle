@@ -59,7 +59,7 @@ task deobfArtifact(type: Jar) {
 }
 
 task apiArtifact(type: Jar, dependsOn: compileJava) {
-	from(sourceSets.main.java) {
+	from(project.buildDir.getPath()+"/sources/java") {
 		include "squeek/applecore/api/**"
 	}
 	classifier = 'api'
