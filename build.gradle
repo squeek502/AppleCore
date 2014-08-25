@@ -48,7 +48,7 @@ dependencies {
 jar {
 	manifest {
 		attributes 'FMLCorePlugin': 'squeek.applecore.AppleCore'
-		attributes 'FMLCorePluginContainsFMLMod': 'false'
+		attributes 'FMLCorePluginContainsFMLMod': 'true'
 	}
 }
 
