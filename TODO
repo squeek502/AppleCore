@@ -16,6 +16,8 @@ Project Log/Notes:
   DummyModContainers can listen for events, but they need to use @Subscribe instead of @SubscribeEvent @date(2014-07-27 18:47)
   An incorrect method signature in an INVOKE instruction can cause an ArrayIndexOutOfBoundsException in Frame.merge @date(2014-07-28 16:59)
   Using the label past the return as the end label of a newly added local variable in ASM can sometimes cause an ArrayIndexOutOfBoundException in obfuscated environments. Why? Who knows. @date(2014-08-03 02:05)
+  Without a FMLModContainer class (@Mod annotated class), the mod will not automatically get added as a resource pack @date(14-08-24 20:46)
+  Couldn't find a way to add the mod as a resource pack in a dev environment, because the source directory of a coremod is basically unknown (it'll either give you the dummy jar or null) @date(14-08-24 22:28)
 
 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
 Archive:

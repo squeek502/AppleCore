@@ -1,19 +1,20 @@
 package squeek.applecore;
 
+import java.io.InputStream;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import squeek.applecore.api_impl.AppleCoreAccessorMutatorImpl;
 import squeek.applecore.asm.TransformerModuleHandler;
+import squeek.applecore.asm.helpers.ObfHelper;
 import squeek.applecore.client.DebugInfoHandler;
 import squeek.applecore.client.HUDOverlayHandler;
 import squeek.applecore.client.TooltipOverlayHandler;
 import squeek.applecore.network.SyncHandler;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
-import cpw.mods.fml.common.DummyModContainer;
-import cpw.mods.fml.common.LoadController;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.MetadataCollection;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
@@ -21,27 +22,27 @@ import cpw.mods.fml.relauncher.Side;
 
 @IFMLLoadingPlugin.SortingIndex(-100)
 @IFMLLoadingPlugin.MCVersion("1.7.10")
-public class AppleCore extends DummyModContainer implements IFMLLoadingPlugin
+@Mod(modid = ModInfo.MODID, version = ModInfo.VERSION)
+public class AppleCore implements IFMLLoadingPlugin
 {
 	public static Logger Log = LogManager.getLogger(ModInfo.MODID);
 
-	public AppleCore()
-	{
-		super(MetadataCollection.from(MetadataCollection.class.getResourceAsStream("/applecore.info"), ModInfo.MODID).getMetadataForId(ModInfo.MODID, null));
-	}
-
-	// use Subscribe here instead of SubscribeEvent because this container
-	// will not be parsed by the FMLEventBus, only the default EventBus
-	@Subscribe
+	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		// force intitialization of the singleton
+		// too lazy to figure out a real solution for this (@Mod enforces mcmod.info filename)
+		// this will at least allow the metadata to populate the mod listing, though
+		InputStream is = MetadataCollection.class.getResourceAsStream("/applecore.info");
+		MetadataCollection metadataCollection = MetadataCollection.from(is, ModInfo.MODID);
+		Loader.instance().activeModContainer().bindMetadata(metadataCollection);
+
+		// force initialization of the singleton
 		AppleCoreAccessorMutatorImpl.values();
 
 		ModConfig.init(event.getSuggestedConfigurationFile());
 	}
 
-	@Subscribe
+	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
 		SyncHandler.init();
@@ -55,13 +56,6 @@ public class AppleCore extends DummyModContainer implements IFMLLoadingPlugin
 	}
 
 	@Override
-	public boolean registerBus(EventBus bus, LoadController controller)
-	{
-		bus.register(this);
-		return true;
-	}
-
-	@Override
 	public String[] getASMTransformerClass()
 	{
 		return new String[]{TransformerModuleHandler.class.getName()};
@@ -70,7 +64,7 @@ public class AppleCore extends DummyModContainer implements IFMLLoadingPlugin
 	@Override
 	public String getModContainerClass()
 	{
-		return AppleCore.class.getName();
+		return null;
 	}
 
 	@Override
@@ -82,6 +76,7 @@ public class AppleCore extends DummyModContainer implements IFMLLoadingPlugin
 	@Override
 	public void injectData(Map<String, Object> data)
 	{
+		ObfHelper.obfuscated = (Boolean) data.get("runtimeDeobfuscationEnabled");
 	}
 
 	@Override

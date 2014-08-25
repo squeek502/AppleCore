@@ -1,28 +1,14 @@
 package squeek.applecore.asm.helpers;
 
-import java.io.IOException;
 import java.util.HashMap;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
 public class ObfHelper
 {
+	// initialized in AppleCore.injectData
 	public static boolean obfuscated = false;
 	private static HashMap<String, String> classNameToObfClassNameCache = new HashMap<String, String>();
 	private static HashMap<String, String> obfClassNameToClassNameCache = new HashMap<String, String>();
-
-	static
-	{
-		boolean obf = true;
-		try
-		{
-			obf = ((LaunchClassLoader) ObfHelper.class.getClassLoader()).getClassBytes("net.minecraft.world.World") == null;
-		}
-		catch (IOException iox)
-		{
-		}
-		obfuscated = obf;
-	}
 
 	private static void cacheObfClassMapping(String obfClassName, String className)
 	{
