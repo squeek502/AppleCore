@@ -39,28 +39,24 @@ public class FoodStatsModifications extends FoodStats
 		}
 	}
 
-	// hook injected into method
+	// hooks injected into method
 	@Override
 	public void func_151686_a(ItemFood p_151686_1_, ItemStack p_151686_2_)
 	{
-		FoodValues modifiedFoodValues;
-		if ((modifiedFoodValues = Hooks.onFoodStatsAdded(this, p_151686_1_, p_151686_2_, this.player)) != null)
-		{
-			int prevFoodLevel = this.foodLevel;
-			float prevSaturationLevel = this.foodSaturationLevel;
+		// added lines
+		FoodValues modifiedFoodValues = Hooks.onFoodStatsAdded(this, p_151686_1_, p_151686_2_, this.player);
+		int prevFoodLevel = this.foodLevel;
+		float prevSaturationLevel = this.foodSaturationLevel;
 
-			this.addStats(modifiedFoodValues.hunger, modifiedFoodValues.saturationModifier);
+		// this is a default line that has been altered to use the modified food values
+		this.addStats(modifiedFoodValues.hunger, modifiedFoodValues.saturationModifier);
 
-			Hooks.onPostFoodStatsAdded(this, p_151686_1_, p_151686_2_, modifiedFoodValues, this.foodLevel - prevFoodLevel, this.foodSaturationLevel - prevSaturationLevel, this.player);
-			return;
-		}
-
-		// default code
+		// added lines
+		Hooks.onPostFoodStatsAdded(this, p_151686_1_, p_151686_2_, modifiedFoodValues, this.foodLevel - prevFoodLevel, this.foodSaturationLevel - prevSaturationLevel, this.player);
 	}
 
 	// heavily modified method
 	@Override
-	@SuppressWarnings("unused")
 	public void onUpdate(EntityPlayer player)
 	{
 		EnumDifficulty enumdifficulty = player.worldObj.difficultySetting;

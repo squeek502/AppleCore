@@ -1,4 +1,4 @@
-package squeek.applecore.asm;
+package squeek.applecore.asm.helpers;
 
 import org.objectweb.asm.ClassWriter;
 

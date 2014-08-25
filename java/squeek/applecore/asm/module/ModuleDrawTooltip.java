@@ -11,9 +11,9 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import squeek.applecore.AppleCore;
-import squeek.applecore.asm.ASMHelper;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
+import squeek.applecore.asm.helpers.ASMHelper;
 
 public class ModuleDrawTooltip implements IClassTransformerModule
 {

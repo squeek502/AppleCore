@@ -3,10 +3,11 @@ package squeek.applecore.asm.module;
 import static org.objectweb.asm.Opcodes.*;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.api.food.FoodValues;
-import squeek.applecore.asm.ASMHelper;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.applecore.asm.ObfHelper;
+import squeek.applecore.asm.helpers.ASMHelper;
+import squeek.applecore.asm.helpers.InsnComparator;
+import squeek.applecore.asm.helpers.ObfHelper;
 import org.objectweb.asm.Type;
 
 public class ModuleBlockFood implements IClassTransformerModule
@@ -47,33 +48,18 @@ public class ModuleBlockFood implements IClassTransformerModule
 		Hooks.onPostBlockFoodEaten(this, modifiedFoodValues, prevFoodLevel, prevSaturationLevel, p_150036_5_);
 		*/
 
-		AbstractInsnNode deleteStartPoint = ASMHelper.findFirstInstructionOfType(method, IFEQ);
-		LabelNode ifEndLabel = null;
+		AbstractInsnNode ifCanEat = ASMHelper.findFirstInstructionWithOpcode(method, IFEQ);
 
-		if (deleteStartPoint == null)
+		if (ifCanEat == null)
 			throw new RuntimeException("IFEQ instruction not found in " + classNode.name + "." + method.name);
-		else
-		{
-			ifEndLabel = ((JumpInsnNode) deleteStartPoint).label;
-		}
 
-		deleteStartPoint = ASMHelper.findNextInstruction(deleteStartPoint);
+		LabelNode ifEndLabel = ((JumpInsnNode) ifCanEat).label;
 
-		if (deleteStartPoint == null)
-			throw new RuntimeException("Unexpected instruction pattern found in " + classNode.name + "." + method.name);
-
-		AbstractInsnNode targetNode = ASMHelper.findNextInstructionOfType(deleteStartPoint, INVOKEVIRTUAL);
-		while (targetNode != null && !((MethodInsnNode) targetNode).owner.equals(ObfHelper.getInternalClassName("net.minecraft.util.FoodStats")))
-		{
-			targetNode = ASMHelper.findNextInstructionOfType(targetNode, INVOKEVIRTUAL);
-		}
-
-		if (targetNode == null)
-			throw new RuntimeException("FoodStats.addStats invoke instruction not found in " + classNode.name + "." + method.name);
-
-		ASMHelper.removeFromInsnListUntil(method.instructions, deleteStartPoint, targetNode);
-
+		/*
+		 * Modify food values
+		 */
 		InsnList toInject = new InsnList();
+		AbstractInsnNode targetNode = ASMHelper.findNextInstruction(ifCanEat);
 
 		// create modifiedFoodValues variable
 		LabelNode modifiedFoodValuesStart = new LabelNode();
@@ -115,18 +101,33 @@ public class ModuleBlockFood implements IClassTransformerModule
 		toInject.add(new VarInsnNode(FSTORE, prevSaturationLevel.index));
 		toInject.add(prevSaturationLevelStart);
 
-		// p_150036_5_.getFoodStats().addStats(modifiedFoodValues.hunger, modifiedFoodValues.saturationModifier);
-		toInject.add(new VarInsnNode(ALOAD, 5));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;"));
-		toInject.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
-		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodValues.class), "hunger", "I"));
-		toInject.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
-		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodValues.class), "saturationModifier", "F"));
-		// targetNode is the INVOKEVIRTUAL addStats(IF)V instruction
-
 		method.instructions.insertBefore(targetNode, toInject);
-		
-		AbstractInsnNode targetNodeAfter = ASMHelper.findNextInstruction(targetNode);
+
+		/*
+		 * Replace 2/0.1F with the modified values
+		 */
+		InsnList hungerNeedle = new InsnList();
+		hungerNeedle.add(new InsnNode(ICONST_2));
+
+		InsnList hungerReplacement = new InsnList();
+		hungerReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
+		hungerReplacement.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodValues.class), "hunger", "I"));
+
+		InsnList saturationNeedle = new InsnList();
+		saturationNeedle.add(new LdcInsnNode(0.1f));
+
+		InsnList saturationReplacement = new InsnList();
+		saturationReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
+		saturationReplacement.add(new FieldInsnNode(GETFIELD, Type.getInternalName(FoodValues.class), "saturationModifier", "F"));
+
+		ASMHelper.findAndReplace(method.instructions, hungerNeedle, hungerReplacement, targetNode);
+		ASMHelper.findAndReplace(method.instructions, saturationNeedle, saturationReplacement, targetNode);
+
+		/*
+		 * onPostBlockFoodEaten
+		 */
+		AbstractInsnNode targetNodeAfter = ASMHelper.find(targetNode, new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), InsnComparator.WILDCARD, "(III)I"));
+		targetNodeAfter = ASMHelper.findPreviousLabelOrLineNumber(targetNodeAfter).getNext();
 		InsnList toInjectAfter = new InsnList();
 
 		// Hooks.onPostBlockFoodEaten(this, modifiedFoodValues, prevFoodLevel, prevSaturationLevel, p_150036_5_);

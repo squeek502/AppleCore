@@ -3,9 +3,9 @@ package squeek.applecore.asm.module;
 import static org.objectweb.asm.Opcodes.*;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-import squeek.applecore.asm.ASMHelper;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
+import squeek.applecore.asm.helpers.ASMHelper;
 import cpw.mods.fml.common.eventhandler.Event;
 
 public class ModulePlantGrowth implements IClassTransformerModule
@@ -80,8 +80,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 	private void hookBlockCrops(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IF_ICMPLT);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ALOAD);
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
 
 		LabelNode endLabel = ASMHelper.findEndLabel(method);
 		LabelNode ifFailedLabel = ifJumpInsn.label;
@@ -91,8 +91,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ifStartPoint, endLabel);
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
 
-		ifStartPoint = ASMHelper.findNextInstructionOfType(ifJumpInsn, LDC).getPrevious();
-		ifJumpInsn = (JumpInsnNode) ASMHelper.findNextInstructionOfType(ifStartPoint, IFNE);
+		ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber((ASMHelper.findNextInstructionWithOpcode(ifJumpInsn, LDC))).getNext();
+		ifJumpInsn = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(ifStartPoint, IFNE);
 
 		ifFailedLabel = ifJumpInsn.label;
 		ifAllowedLabel = new LabelNode();
@@ -105,14 +105,14 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 	private void hookBlockReed(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IF_ICMPGE);
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPGE);
 		LabelNode ifDeniedLabel = ifJumpInsn.label;
 
 		injectNotDeniedCheckBefore(method, ifJumpInsn.getNext(), ifDeniedLabel);
 
 		// need to change the GOTO so that it doesn't skip our added fireEvent call
 		LabelNode newGotoLabel = new LabelNode();
-		JumpInsnNode gotoInsn = (JumpInsnNode) ASMHelper.findNextInstructionOfType(ifJumpInsn, GOTO);
+		JumpInsnNode gotoInsn = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(ifJumpInsn, GOTO);
 		gotoInsn.label = newGotoLabel;
 
 		method.instructions.insertBefore(ifDeniedLabel, newGotoLabel);
@@ -122,14 +122,14 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	// TODO: same as hookBlockReed, should they use a shared method?
 	private void hookBlockCactus(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IF_ICMPGE);
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPGE);
 		LabelNode ifDeniedLabel = ifJumpInsn.label;
 
 		injectNotDeniedCheckBefore(method, ifJumpInsn.getNext(), ifDeniedLabel);
 
 		// need to change the GOTO so that it doesn't skip our added fireEvent call
 		LabelNode newGotoLabel = new LabelNode();
-		JumpInsnNode gotoInsn = (JumpInsnNode) ASMHelper.findNextInstructionOfType(ifJumpInsn, GOTO);
+		JumpInsnNode gotoInsn = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(ifJumpInsn, GOTO);
 		gotoInsn.label = newGotoLabel;
 
 		method.instructions.insertBefore(ifDeniedLabel, newGotoLabel);
@@ -141,9 +141,9 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
 		// get second IFNE
-		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IFNE);
-		ifJumpInsn = (JumpInsnNode) ASMHelper.findNextInstructionOfType(ifJumpInsn, IFNE);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ALOAD);
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IFNE);
+		ifJumpInsn = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(ifJumpInsn, IFNE);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
 
 		LabelNode ifFailedLabel = ifJumpInsn.label;
 		LabelNode ifAllowedLabel = new LabelNode();
@@ -157,8 +157,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
-		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IFNE);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ALOAD);
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IFNE);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
 
 		LabelNode ifFailedLabel = ifJumpInsn.label;
 		LabelNode ifAllowedLabel = new LabelNode();
@@ -174,8 +174,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
-		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IFNE);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ALOAD);
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IFNE);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
 
 		LabelNode ifFailedLabel = ifJumpInsn.label;
 		LabelNode ifAllowedLabel = new LabelNode();
@@ -187,9 +187,9 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 	private void hookBlockSapling(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		JumpInsnNode lightValueIf = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IF_ICMPLT);
-		JumpInsnNode randomIf = (JumpInsnNode) ASMHelper.findNextInstructionOfType(lightValueIf, IFNE);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(lightValueIf, ALOAD);
+		JumpInsnNode lightValueIf = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
+		JumpInsnNode randomIf = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(lightValueIf, IFNE);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(lightValueIf).getNext();
 
 		LabelNode ifFailedLabel = lightValueIf.label;
 		LabelNode ifAllowedLabel = new LabelNode();
@@ -203,8 +203,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 	private void hookBlockStem(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		JumpInsnNode lightValueIf = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IF_ICMPLT);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(lightValueIf, ALOAD);
+		JumpInsnNode lightValueIf = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
+		AbstractInsnNode ifStartPoint = ASMHelper.getOrFindInstructionOfType(lightValueIf, AbstractInsnNode.LINE, true).getNext();
 
 		LabelNode ifFailedLabel = lightValueIf.label;
 		LabelNode ifAllowedLabel = new LabelNode();
@@ -213,8 +213,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ifStartPoint, ASMHelper.findEndLabel(method));
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
 
-		JumpInsnNode randomIf = (JumpInsnNode) ASMHelper.findNextInstructionOfType(lightValueIf, IFNE);
-		ifStartPoint = ASMHelper.findPreviousInstructionOfType(randomIf, ALOAD);
+		JumpInsnNode randomIf = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(lightValueIf, IFNE);
+		ifStartPoint = ASMHelper.getOrFindInstructionOfType(randomIf, AbstractInsnNode.LINE, true).getNext();
 
 		ifFailedLabel = randomIf.label;
 		ifAllowedLabel = new LabelNode();
@@ -224,7 +224,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		// need to change the GOTO so that it doesn't skip our added fireEvent call
 		LabelNode newGotoLabel = new LabelNode();
-		JumpInsnNode gotoInsn = (JumpInsnNode) ASMHelper.findNextInstructionOfType(randomIf, GOTO);
+		JumpInsnNode gotoInsn = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(randomIf, GOTO);
 		gotoInsn.label = newGotoLabel;
 
 		method.instructions.insertBefore(ifFailedLabel, newGotoLabel);
@@ -236,8 +236,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
-		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IFNE);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ALOAD);
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IFNE);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
 
 		LabelNode ifFailedLabel = ifJumpInsn.label;
 		LabelNode ifAllowedLabel = new LabelNode();
@@ -249,9 +249,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 	private void hookBlockPamSapling(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findLastInstructionOfType(method, IFNE);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ALOAD);
-		ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifStartPoint, ALOAD);
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findLastInstructionWithOpcode(method, IFNE);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
 
 		LabelNode ifFailedLabel = ifJumpInsn.label;
 		LabelNode ifAllowedLabel = new LabelNode();
@@ -264,10 +263,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 	private void hookBlockNaturaBerryBush(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IFNE);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ALOAD);
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IFNE);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
 		if (!classNode.name.endsWith("NetherBerryBush"))
-			ifJumpInsn = (JumpInsnNode) ASMHelper.findNextInstructionOfType(ifJumpInsn, IF_ICMPLT);
+			ifJumpInsn = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(ifJumpInsn, IF_ICMPLT);
 
 		LabelNode ifFailedLabel = ifJumpInsn.label;
 		LabelNode ifAllowedLabel = new LabelNode();
@@ -282,8 +281,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 	private void hookNaturaCropBlock(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionOfType(method, IF_ICMPLT);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionOfType(ifJumpInsn, ILOAD);
+		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
 
 		LabelNode endLabel = ASMHelper.findEndLabel(method);
 		LabelNode ifFailedLabel = ifJumpInsn.label;
@@ -293,8 +292,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ifStartPoint, endLabel);
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
 
-		ifStartPoint = ASMHelper.findNextInstructionOfType(ifJumpInsn, LDC).getPrevious();
-		ifJumpInsn = (JumpInsnNode) ASMHelper.findNextInstructionOfType(ifStartPoint, IFNE);
+		ifStartPoint = ASMHelper.findNextInstructionWithOpcode(ifJumpInsn, LDC).getPrevious();
+		ifJumpInsn = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(ifStartPoint, IFNE);
 
 		ifFailedLabel = ifJumpInsn.label;
 		ifAllowedLabel = new LabelNode();

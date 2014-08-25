@@ -7,9 +7,9 @@ import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import org.objectweb.asm.tree.*;
-import squeek.applecore.asm.ASMHelper;
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.applecore.asm.ObfHelper;
+import squeek.applecore.asm.helpers.ASMHelper;
+import squeek.applecore.asm.helpers.ObfHelper;
 
 public class ModuleFoodEatingSpeed implements IClassTransformerModule
 {
@@ -25,6 +25,9 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
 	{
+		if (ASMHelper.isCauldron())
+			return basicClass;
+
 		boolean isObfuscated = !name.equals(transformedName);
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
@@ -63,17 +66,17 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 
 	private void patchRenderItemInFirstPerson(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionOfType(method, INVOKEVIRTUAL);
+		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionWithOpcode(method, INVOKEVIRTUAL);
 		while (targetNode != null && !(((MethodInsnNode) targetNode).name.equals(isObfuscated ? "n" : "getMaxItemUseDuration")
 				&& ((MethodInsnNode) targetNode).desc.equals("()I")
 				&& ((MethodInsnNode) targetNode).owner.equals(ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"))))
 		{
-			targetNode = ASMHelper.findNextInstructionOfType(targetNode, INVOKEVIRTUAL);
+			targetNode = ASMHelper.findNextInstructionWithOpcode(targetNode, INVOKEVIRTUAL);
 		}
 		if (targetNode == null)
 			throw new RuntimeException("ItemRenderer.renderItemInFirstPerson: INVOKEVIRTUAL getMaxItemUseDuration instruction not found");
 
-		MethodInsnNode getItemInUseCountNode = (MethodInsnNode) ASMHelper.findPreviousInstructionOfType(targetNode, INVOKEVIRTUAL);
+		MethodInsnNode getItemInUseCountNode = (MethodInsnNode) ASMHelper.findPreviousInstructionWithOpcode(targetNode, INVOKEVIRTUAL);
 		if (getItemInUseCountNode == null)
 			throw new RuntimeException("ItemRenderer.renderItemInFirstPerson: INVOKEVIRTUAL getItemInUseCount instruction not found");
 
@@ -91,7 +94,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 
 	private void patchGetItemInUseDuration(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		AbstractInsnNode deletionPoint = ASMHelper.findFirstInstructionOfType(method, GETFIELD);
+		AbstractInsnNode deletionPoint = ASMHelper.findFirstInstructionWithOpcode(method, GETFIELD);
 		if (deletionPoint == null)
 			throw new RuntimeException("EntityPlayer.getItemInUseDuration: GETFIELD instruction not found");
 
@@ -106,10 +109,10 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 
 	private void patchSetItemInUse(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionOfType(method, PUTFIELD);
+		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionWithOpcode(method, PUTFIELD);
 		while (targetNode != null && !((FieldInsnNode) targetNode).name.equals(isObfuscated ? "g" : "itemInUseCount"))
 		{
-			targetNode = ASMHelper.findNextInstructionOfType(targetNode, PUTFIELD);
+			targetNode = ASMHelper.findNextInstructionWithOpcode(targetNode, PUTFIELD);
 		}
 
 		if (targetNode == null)

@@ -8,7 +8,6 @@ import squeek.applecore.asm.Hooks;
 
 public class BlockCakeModifications extends BlockCake
 {
-	@SuppressWarnings("unused")
 	private void func_150036_b(World p_150036_1_, int p_150036_2_, int p_150036_3_, int p_150036_4_, EntityPlayer p_150036_5_)
 	{
 		if (p_150036_5_.canEat(false))

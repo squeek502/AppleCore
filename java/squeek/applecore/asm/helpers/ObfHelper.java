@@ -1,4 +1,4 @@
-package squeek.applecore.asm;
+package squeek.applecore.asm.helpers;
 
 import java.io.IOException;
 import java.util.HashMap;

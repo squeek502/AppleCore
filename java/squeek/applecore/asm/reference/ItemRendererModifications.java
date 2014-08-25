@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 public class ItemRendererModifications
 {
 	// changed itemstack.getMaxItemUseDuration() to entityclientplayermp.itemInUseMaxDuration
-	@SuppressWarnings({"null", "unused"})
+	@SuppressWarnings({"null"})
 	public void renderItemInFirstPerson(float p_78440_1_)
 	{
 		// dummies to avoid compilation errors
