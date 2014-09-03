@@ -56,6 +56,7 @@ public class FoodStatsModifications extends FoodStats
 	}
 
 	// heavily modified method
+	@SuppressWarnings("unused")
 	@Override
 	public void onUpdate(EntityPlayer player)
 	{
