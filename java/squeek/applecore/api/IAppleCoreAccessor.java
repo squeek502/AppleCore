@@ -7,7 +7,7 @@ import squeek.applecore.api.food.FoodValues;
 public interface IAppleCoreAccessor
 {
 	/**
-	 * Check whether or not the given ItemStack is a food.
+	 * Check whether or not the given ItemStack is an edible food.
 	 * 
 	 * Any ItemStack that gives a return of true in
 	 * this method will also return valid FoodValues from

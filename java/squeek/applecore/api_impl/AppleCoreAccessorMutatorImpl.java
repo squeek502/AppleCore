@@ -3,6 +3,7 @@ package squeek.applecore.api_impl;
 import java.lang.reflect.Field;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
@@ -33,7 +34,13 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	@Override
 	public boolean isFood(ItemStack food)
 	{
-		return getUnmodifiedFoodValues(food) != null;
+		return isEdible(food) && getUnmodifiedFoodValues(food) != null;
+	}
+
+	private boolean isEdible(ItemStack food)
+	{
+		EnumAction useAction = food.getItem().getItemUseAction(food);
+		return useAction == EnumAction.eat || useAction == EnumAction.drink;
 	}
 
 	@Override
