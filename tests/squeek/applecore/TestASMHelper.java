@@ -50,9 +50,9 @@ public class TestASMHelper
 		haystack.add(new LineNumberNode(10, new LabelNode()));
 
 		InsnList needle = new InsnList();
-		haystack.add(new LineNumberNode(1, new LabelNode()));
+		needle.add(new LineNumberNode(1, new LabelNode()));
 		needle.add(new VarInsnNode(ALOAD, 0));
-		haystack.add(new LineNumberNode(2, new LabelNode()));
+		needle.add(new LineNumberNode(2, new LabelNode()));
 
 		// line number/label inequality
 		assertTrue(ASMHelper.patternMatches(needle, haystack.getFirst()));
