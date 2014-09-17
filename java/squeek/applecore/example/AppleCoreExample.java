@@ -1,5 +1,6 @@
 package squeek.applecore.example;
 
+import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,6 +11,8 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.relauncher.Side;
 
@@ -20,6 +23,15 @@ public class AppleCoreExample
 
 	@Instance(ModInfo.MODID + "Example")
 	public static AppleCoreExample instance;
+
+	public static Item testFood;
+
+	@EventHandler
+	public void preInit(FMLPreInitializationEvent event)
+	{
+		testFood = new ItemNonStandardFood().setUnlocalizedName("testNonStandardFood");
+		GameRegistry.registerItem(testFood, "testNonStandardFood");
+	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event)

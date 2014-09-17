@@ -13,6 +13,7 @@ import squeek.applecore.api.IAppleCoreAccessor;
 import squeek.applecore.api.IAppleCoreMutator;
 import squeek.applecore.api.food.FoodEvent;
 import squeek.applecore.api.food.FoodValues;
+import squeek.applecore.api.food.IEdible;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
@@ -46,7 +47,9 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	@Override
 	public FoodValues getUnmodifiedFoodValues(ItemStack food)
 	{
-		if (food.getItem() instanceof ItemFood)
+		if (food.getItem() instanceof IEdible)
+			return ((IEdible) food.getItem()).getFoodValues(food);
+		else if (food.getItem() instanceof ItemFood)
 			return getItemFoodValues((ItemFood) food.getItem(), food);
 		else if (food.getItem() == Items.cake)
 			return new FoodValues(2, 0.1f);

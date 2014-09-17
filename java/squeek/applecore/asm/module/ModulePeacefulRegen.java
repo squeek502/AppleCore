@@ -3,7 +3,6 @@ package squeek.applecore.asm.module;
 import static org.objectweb.asm.Opcodes.*;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-import squeek.applecore.AppleCore;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
