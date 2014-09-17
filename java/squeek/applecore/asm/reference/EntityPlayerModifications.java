@@ -1,8 +1,11 @@
 package squeek.applecore.asm.reference;
 
+import squeek.applecore.api.hunger.HealthRegenEvent;
+import squeek.applecore.asm.Hooks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import com.mojang.authlib.GameProfile;
@@ -30,7 +33,7 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 			this.itemInUseCount = p_71008_2_;
 			// added:
 			this.itemInUseMaxDuration = p_71008_2_;
-			
+
 			// ...
 		}
 	}
@@ -41,6 +44,30 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 	public int getItemInUseDuration()
 	{
 		return this.isUsingItem() ? this.itemInUseMaxDuration - this.itemInUseCount : 0;
+	}
+
+	// add hook for peaceful health regen
+	@Override
+	public void onLivingUpdate()
+	{
+		if (this.flyToggleTimer > 0)
+		{
+			--this.flyToggleTimer;
+		}
+
+		// modified
+		if (this.worldObj.difficultySetting == EnumDifficulty.PEACEFUL && this.getHealth() < this.getMaxHealth() && this.worldObj.getGameRules().getGameRuleBooleanValue("naturalRegeneration") && this.ticksExisted % 20 * 12 == 0)
+		{
+			// added event and if statement
+			HealthRegenEvent.PeacefulRegen peacefulRegenEvent = Hooks.firePeacefulRegenEvent(this);
+			if (!peacefulRegenEvent.isCanceled())
+			{
+				// modified from this.heal(1.0F);
+				this.heal(peacefulRegenEvent.deltaHealth);
+			}
+		}
+
+		// ...
 	}
 
 	/*

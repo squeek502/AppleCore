@@ -26,4 +26,10 @@ public class HealthRegenModifier
 		event.deltaExhaustion = 5f;
 	}
 
+	@SubscribeEvent
+	public void onPeacefulRegen(HealthRegenEvent.PeacefulRegen event)
+	{
+		event.deltaHealth = 0f;
+	}
+
 }

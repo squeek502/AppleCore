@@ -98,6 +98,13 @@ public class Hooks
 		return event;
 	}
 
+	public static HealthRegenEvent.PeacefulRegen firePeacefulRegenEvent(EntityPlayer player)
+	{
+		HealthRegenEvent.PeacefulRegen event = new HealthRegenEvent.PeacefulRegen(player);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event;
+	}
+
 	public static Result fireAllowStarvation(EntityPlayer player)
 	{
 		StarvationEvent.AllowStarvation event = new StarvationEvent.AllowStarvation(player);

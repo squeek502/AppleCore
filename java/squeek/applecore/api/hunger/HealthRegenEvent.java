@@ -87,4 +87,30 @@ public abstract class HealthRegenEvent extends Event
 			super(player);
 		}
 	}
+
+	/**
+	 * Fired every second for each player while in Peaceful difficulty,
+	 * in order to control how much health to passively regenerate.
+	 * 
+	 * This event is fired in {@link EntityPlayer#onLivingUpdate}.<br>
+	 * <br>
+	 * This event is never fired if the game rule "naturalRegeneration" is false.<br>
+	 * <br>
+	 * {@link #deltaHealth} contains the delta to be applied to health.<br>
+	 * <br>
+	 * This event is {@link Cancelable}.<br>
+	 * If this event is canceled, it will skip healing the player.<br>
+	 * <br>
+	 * This event does not have a {@link Result}. {@link HasResult}<br>
+	 */
+	@Cancelable
+	public static class PeacefulRegen extends HealthRegenEvent
+	{
+		public float deltaHealth = 1f;
+
+		public PeacefulRegen(EntityPlayer player)
+		{
+			super(player);
+		}
+	}
 }
