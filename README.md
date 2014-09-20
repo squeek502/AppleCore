@@ -3,21 +3,19 @@
 
 An API for modifying the food and hunger mechanics of Minecraft
 
-### Usage
-
-* [Building against AppleCore](https://github.com/squeek502/AppleCore/wiki/Building-against-AppleCore)
-* [Using the AppleCore API](https://github.com/squeek502/AppleCore/wiki/Using-the-AppleCore-API)
-* [Integrating food items with AppleCore](https://github.com/squeek502/AppleCore/wiki/Integrating-food-items-with-AppleCore)
+### Using AppleCore
+* [[Building against AppleCore]]
+* [[AppleCore features]]
+* [[Using the AppleCore API]]
+* [[Integrating food items with AppleCore]]
 
 #### Mods that use AppleCore
-
 * [Hunger Overhaul](https://github.com/progwml6/HungerOverhaul) - *Extensive tweaks to hunger and related mechanics*
 * [The Spice of Life](https://github.com/squeek502/SpiceOfLife/tree/1.7.10) - *Encourages dietary variery through diminishing returns*
 * [Hunger In Peace](https://github.com/squeek502/HungerInPeace) - *Normal hunger and health regen in peaceful*
 
 ---
 
-### Building
-
+### Building AppleCore
 1. Clone the repository
 2. Open a command line and execute ```gradlew build```
