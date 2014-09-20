@@ -54,7 +54,6 @@ jar {
 
 task deobfArtifact(type: Jar) {
 	from sourceSets.main.output
-	from project.buildDir.getPath()+"/sources/java"
 	manifest = jar.manifest
 	classifier = 'deobf'
 }
