@@ -3,15 +3,19 @@
 
 An API for modifying the food and hunger mechanics of Minecraft
 
+### Usage
+
+* [Building against AppleCore](https://github.com/squeek502/AppleCore/wiki/Building-against-AppleCore)
+* [Using the AppleCore API](https://github.com/squeek502/AppleCore/wiki/Using-the-AppleCore-API)
+* [Integrating food items with AppleCore](https://github.com/squeek502/AppleCore/wiki/Integrating-food-items-with-AppleCore)
+
+#### Mods that use AppleCore
+
+* [Hunger In Peace](https://github.com/squeek502/HungerInPeace) - Normal hunger and health regen in peaceful (written as an example use case of the AppleCore API)
+* [Hunger Overhaul](https://github.com/progwml6/HungerOverhaul) - Complete reworking of hunger and related mechanics
+* [The Spice of Life](https://github.com/squeek502/SpiceOfLife/tree/1.7.10) - Encourages dietary variery through diminishing returns
+
 ### Building
 
 1. Clone the repository
 2. Open a command line and execute ```gradlew build```
-
-### Usage
-
-* [Building against AppleCore](https://github.com/squeek502/AppleCore/wiki/Building-against-AppleCore)
-* [Integrating food items with AppleCore](https://github.com/squeek502/AppleCore/wiki/Integrating-food-items-with-AppleCore)
-* See the ['api' package](java/squeek/applecore/api); most things are handled by Forge events
-* See the ['example' package](java/squeek/applecore/example), which implements a Forge mod that uses the AppleCore API to make various test modifications
-* Use the [Maven repository](http://www.ryanliptak.com/maven) to automatically include AppleCore in your build environment or grab the API artifact from [drone.io](https://drone.io/github.com/squeek502/AppleCore/files)
