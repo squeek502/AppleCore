@@ -256,6 +256,8 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, foodStatsPlayerField, ObfHelper.getDescriptor("net.minecraft.entity.player.EntityPlayer")));
 		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "onPostFoodStatsAdded", "(Lnet/minecraft/util/FoodStats;Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;Lsqueek/applecore/api/food/FoodValues;IFLnet/minecraft/entity/player/EntityPlayer;)V"));
+
+		method.instructions.insertBefore(targetNode, toInject);
 	}
 
 	private void hookFoodStatsAddition(ClassNode classNode, MethodNode method, boolean isObfuscated)
