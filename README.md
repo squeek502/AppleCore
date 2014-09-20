@@ -4,10 +4,10 @@
 An API for modifying the food and hunger mechanics of Minecraft
 
 ### Using AppleCore
-* [[Building against AppleCore]]
-* [[AppleCore features]]
-* [[Using the AppleCore API]]
-* [[Integrating food items with AppleCore]]
+* [Building against AppleCore](https://github.com/squeek502/AppleCore/wiki/Building-against-AppleCore)
+* [AppleCore features](https://github.com/squeek502/AppleCore/wiki/AppleCore-features)
+* [Using the AppleCore API](https://github.com/squeek502/AppleCore/wiki/Using-the-AppleCore-API)
+* [Integrating food items with AppleCore](https://github.com/squeek502/AppleCore/wiki/Integrating-food-items-with-AppleCore)
 
 #### Mods that use AppleCore
 * [Hunger Overhaul](https://github.com/progwml6/HungerOverhaul) - *Extensive tweaks to hunger and related mechanics*
