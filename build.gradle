@@ -118,7 +118,11 @@ afterEvaluate { project ->
 	}
 }
 
-if (System.getenv("MAVEN_URL")) {
+ext.mavenUrl = project.hasProperty('mavenUrl') ? mavenUrl : System.getenv("MAVEN_URL")
+ext.mavenUser = project.hasProperty('mavenUser') ? mavenUser : System.getenv("MAVEN_USER")
+ext.mavenPass = project.hasProperty('mavenPass') ? mavenPass : System.getenv("MAVEN_PASS")
+
+if (mavenUrl && !project.hasProperty('nopublish')) {
 	apply plugin: 'maven'
 
 	configurations {
@@ -135,8 +139,8 @@ if (System.getenv("MAVEN_URL")) {
 			pom.project {
 				url = "https://github.com/squeek502/" + modId
 			}
-			repository(url: System.getenv("MAVEN_URL")) {
-				authentication(userName: System.getenv("MAVEN_USER"), password: System.getenv("MAVEN_PASS"))
+			repository(url: mavenUrl) {
+				authentication(userName: mavenUser, password: mavenPass)
 			}
 		}
 	}
