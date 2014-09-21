@@ -1,6 +1,7 @@
 General:
 
 API:
+ [ ] Add a way for mods to be able to integrate their plant growth with AppleCore
 
 Core/ASM:
   Plant growth modification:
