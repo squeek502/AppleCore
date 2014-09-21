@@ -30,7 +30,10 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 			if (methodNode != null)
 			{
 				addPeacefulRegenHook(classNode, methodNode, isObfuscated);
-				return ASMHelper.writeClassToBytes(classNode);
+				if (!ASMHelper.isCauldron())
+					return ASMHelper.writeClassToBytes(classNode);
+				else
+					return ASMHelper.writeClassToBytesNoDeobfSkipFrames(classNode);
 			}
 			else
 				throw new RuntimeException("EntityPlayer: onLivingUpdate method not found");

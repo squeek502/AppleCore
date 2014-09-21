@@ -55,6 +55,13 @@ public class ASMHelper
 		return writer.toByteArray();
 	}
 
+	public static byte[] writeClassToBytesNoDeobfSkipFrames(ClassNode classNode)
+	{
+		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		classNode.accept(writer);
+		return writer.toByteArray();
+	}
+
 	public static boolean isLabelOrLineNumber(AbstractInsnNode insn)
 	{
 		return insn.getType() == AbstractInsnNode.LABEL || insn.getType() == AbstractInsnNode.LINE;
