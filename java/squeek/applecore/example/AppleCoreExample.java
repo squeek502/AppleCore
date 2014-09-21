@@ -25,12 +25,16 @@ public class AppleCoreExample
 	public static AppleCoreExample instance;
 
 	public static Item testFood;
+	public static Item testMetadataFood;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		testFood = new ItemNonStandardFood().setUnlocalizedName("testNonStandardFood");
 		GameRegistry.registerItem(testFood, "testNonStandardFood");
+
+		testMetadataFood = new ItemMetadataFood(new int[] {1, 10}, new float[] {2f, 0.1f}).setUnlocalizedName("testMetadataFood");
+		GameRegistry.registerItem(testMetadataFood, "testMetadataFood");
 	}
 
 	@EventHandler
