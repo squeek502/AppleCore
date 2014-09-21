@@ -5,8 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.objectweb.asm.Opcodes.*;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
@@ -15,34 +13,35 @@ import squeek.applecore.asm.helpers.InsnComparator;
 
 public class TestASMHelper
 {
-	public InsnList haystack;
-
-	@Before
-	public void setUp() throws Exception
-	{
-		haystack = new InsnList();
-		populateHaystack(haystack);
-	}
-
-	@After
-	public void tearDown()
-	{
-		haystack = null;
-	}
 
 	@Test
-	public void testInsnMatching()
+	public void instructionMatchingMustMatchExactly()
 	{
 		assertTrue(ASMHelper.instructionsMatch(new InsnNode(RETURN), new InsnNode(RETURN)));
-
 		assertTrue(ASMHelper.instructionsMatch(new VarInsnNode(ALOAD, 0), new VarInsnNode(ALOAD, 0)));
-		assertTrue(ASMHelper.instructionsMatch(new VarInsnNode(ALOAD, 0), new VarInsnNode(ALOAD, InsnComparator.INT_WILDCARD)));
 		assertFalse(ASMHelper.instructionsMatch(new VarInsnNode(ILOAD, 0), new VarInsnNode(ALOAD, 0)));
 		assertFalse(ASMHelper.instructionsMatch(new VarInsnNode(ALOAD, 0), new VarInsnNode(ALOAD, 1)));
+		assertTrue(ASMHelper.instructionsMatch(new LdcInsnNode("test"), new LdcInsnNode("test")));
+		assertFalse(ASMHelper.instructionsMatch(new LdcInsnNode("test"), new LdcInsnNode("test-diff")));
 	}
 
 	@Test
-	public void testPatternMatching()
+	public void instructionMatchingHasWildcardSupport()
+	{
+		assertTrue(ASMHelper.instructionsMatch(new VarInsnNode(ALOAD, 0), new VarInsnNode(ALOAD, InsnComparator.INT_WILDCARD)));
+		assertTrue(ASMHelper.instructionsMatch(new LdcInsnNode("test"), new LdcInsnNode(InsnComparator.WILDCARD)));
+	}
+
+	@Test
+	public void lineNumberAndLabelInstructionsAlwaysMatch()
+	{
+		assertTrue(ASMHelper.instructionsMatch(new LabelNode(), new LabelNode()));
+		assertTrue(ASMHelper.instructionsMatch(new LineNumberNode(0, new LabelNode()), new LineNumberNode(0, new LabelNode())));
+		assertTrue(ASMHelper.instructionsMatch(new LineNumberNode(0, new LabelNode()), new LineNumberNode(100, new LabelNode())));
+	}
+
+	@Test
+	public void patternMatchingIgnoresLabelsAndLineNumbers()
 	{
 		InsnList haystack = new InsnList();
 		haystack.add(new LabelNode());
@@ -52,26 +51,44 @@ public class TestASMHelper
 		InsnList needle = new InsnList();
 		needle.add(new LineNumberNode(1, new LabelNode()));
 		needle.add(new VarInsnNode(ALOAD, 0));
+		needle.add(new LabelNode());
 		needle.add(new LineNumberNode(2, new LabelNode()));
+		needle.add(new LabelNode());
 
-		// line number/label inequality
-		assertTrue(ASMHelper.patternMatches(needle, haystack.getFirst()));
-
-		// needle longer than haystack
-		needle.add(new VarInsnNode(ALOAD, 1));
-		assertFalse(ASMHelper.patternMatches(needle, haystack.getFirst()));
-
-		// haystack longer than needle
-		haystack.add(new VarInsnNode(ALOAD, 1));
-		haystack.add(new VarInsnNode(ALOAD, 1));
 		assertTrue(ASMHelper.patternMatches(needle, haystack.getFirst()));
 	}
 
 	@Test
-	public void testFind()
+	public void patternNeedlesCanNotBeLargerThanTheHaystack()
+	{
+		InsnList haystack = new InsnList();
+		haystack.add(new VarInsnNode(ALOAD, 0));
+
+		InsnList needle = new InsnList();
+		needle.add(new VarInsnNode(ALOAD, 0));
+		needle.add(new VarInsnNode(ALOAD, 1));
+
+		assertFalse(ASMHelper.patternMatches(needle, haystack.getFirst()));
+	}
+
+	@Test
+	public void patternNeedlesCanBeSmallerThanTheHaystack()
+	{
+		InsnList haystack = new InsnList();
+		haystack.add(new VarInsnNode(ALOAD, 0));
+		haystack.add(new VarInsnNode(ALOAD, 1));
+
+		InsnList needle = new InsnList();
+		needle.add(new VarInsnNode(ALOAD, 0));
+
+		assertTrue(ASMHelper.patternMatches(needle, haystack.getFirst()));
+	}
+
+	@Test
+	public void findReturnsTheStartOfTheNeedleFoundInTheHaystack()
 	{
 		InsnList needle = new InsnList();
-		assertNull(ASMHelper.find(haystack, needle));
+		InsnList haystack = populateTestHaystack(new InsnList());
 
 		needle.add(new VarInsnNode(ALOAD, 0));
 		assertEquals(haystack.get(2), ASMHelper.find(haystack, needle));
@@ -84,25 +101,40 @@ public class TestASMHelper
 
 		needle.add(new VarInsnNode(ALOAD, 0));
 		assertEquals(haystack.get(2), ASMHelper.find(haystack, needle));
+	}
+
+	@Test
+	public void findReturnsNullWhenNeedleIsNotFoundOrEmpty()
+	{
+		InsnList needle = new InsnList();
+		InsnList haystack = populateTestHaystack(new InsnList());
+
+		assertNull(ASMHelper.find(haystack, needle));
+
+		needle.add(new VarInsnNode(ALOAD, 0));
+		needle.add(new FieldInsnNode(GETFIELD, InsnComparator.WILDCARD, "foodLevel", "I"));
+		needle.add(new VarInsnNode(ISTORE, 3));
+		needle.add(new VarInsnNode(ALOAD, 0));
 
 		assertNull(ASMHelper.find(haystack.get(3), needle));
 	}
 
 	@Test
-	public void testFindAndReplace()
+	public void findAndReplaceReturnsTheInstructionAfterTheReplacement()
 	{
 		InsnList needle = new InsnList();
+		InsnList haystack = populateTestHaystack(new InsnList());
+		InsnList replacement = new InsnList();
+
 		needle.add(new VarInsnNode(ALOAD, 0));
 		needle.add(new FieldInsnNode(GETFIELD, InsnComparator.WILDCARD, "foodLevel", "I"));
 		needle.add(new VarInsnNode(ISTORE, 3));
 		needle.add(new VarInsnNode(ALOAD, 0));
 
-		InsnList replacement = new InsnList();
-
 		AbstractInsnNode afterReplacement = ASMHelper.findAndReplace(haystack, needle, replacement);
 		assertEquals(haystack.get(2), afterReplacement);
 
-		populateHaystack(haystack);
+		populateTestHaystack(haystack);
 		replacement.add(new VarInsnNode(ALOAD, 0));
 
 		afterReplacement = ASMHelper.findAndReplace(haystack, needle, replacement);
@@ -113,13 +145,27 @@ public class TestASMHelper
 	}
 
 	@Test
-	public void testFindAndReplaceAll()
+	public void findAndReplaceReturnsNullWhenNothingIsReplaced()
 	{
 		InsnList needle = new InsnList();
+		InsnList haystack = populateTestHaystack(new InsnList());
+		InsnList replacement = new InsnList();
+
+		needle.add(new FieldInsnNode(GETFIELD, "bogusClassInternalName", "bogusMethodName", "bogus"));
+
+		AbstractInsnNode afterReplacement = ASMHelper.findAndReplace(haystack, needle, replacement);
+		assertEquals(null, afterReplacement);
+	}
+
+	@Test
+	public void findAndReplaceAllReturnsNumberOfReplacementsMade()
+	{
+		InsnList needle = new InsnList();
+		InsnList haystack = populateTestHaystack(new InsnList());
+		InsnList replacement = new InsnList();
+
 		needle.add(new VarInsnNode(ALOAD, InsnComparator.INT_WILDCARD));
 		needle.add(new FieldInsnNode(GETFIELD, InsnComparator.WILDCARD, InsnComparator.WILDCARD, InsnComparator.WILDCARD));
-
-		InsnList replacement = new InsnList();
 
 		int numReplaced = ASMHelper.findAndReplaceAll(haystack, needle, replacement);
 		assertEquals(6, numReplaced);
@@ -128,7 +174,7 @@ public class TestASMHelper
 		assertEquals(0, numReplaced);
 	}
 
-	public void populateHaystack(InsnList haystack)
+	public InsnList populateTestHaystack(InsnList haystack)
 	{
 		haystack.clear();
 		LabelNode l0 = new LabelNode();
@@ -198,6 +244,8 @@ public class TestASMHelper
 		haystack.add(new InsnNode(RETURN));
 		LabelNode l6 = new LabelNode();
 		haystack.add(l6);
+		
+		return haystack;
 	}
 
 }
