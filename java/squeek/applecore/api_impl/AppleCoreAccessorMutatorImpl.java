@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
@@ -40,6 +41,10 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 
 	private boolean isEdible(ItemStack food)
 	{
+		// assume Block-based foods are edible
+		if (food.getItem() instanceof ItemBlock)
+			return true;
+
 		EnumAction useAction = food.getItem().getItemUseAction(food);
 		return useAction == EnumAction.eat || useAction == EnumAction.drink;
 	}
