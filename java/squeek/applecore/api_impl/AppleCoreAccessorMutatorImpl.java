@@ -42,7 +42,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	private boolean isEdible(ItemStack food)
 	{
 		// assume Block-based foods are edible
-		if (food.getItem() instanceof ItemBlock)
+		if (food.getItem() == Items.cake || food.getItem() instanceof ItemBlock)
 			return true;
 
 		EnumAction useAction = food.getItem().getItemUseAction(food);
