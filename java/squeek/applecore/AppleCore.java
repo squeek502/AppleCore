@@ -45,6 +45,8 @@ public class AppleCore implements IFMLLoadingPlugin
 		AppleCoreAccessorMutatorImpl.values();
 
 		ModConfig.init(event.getSuggestedConfigurationFile());
+
+		FMLInterModComms.sendRuntimeMessage(ModInfo.MODID, "VersionChecker", "addVersionCheck", "http://www.ryanliptak.com/minecraft/versionchecker/squeek502/AppleCore");
 	}
 
 	@EventHandler
@@ -58,12 +60,6 @@ public class AppleCore implements IFMLLoadingPlugin
 			HUDOverlayHandler.init();
 			TooltipOverlayHandler.init();
 		}
-	}
-
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event)
-	{
-		FMLInterModComms.sendRuntimeMessage(ModInfo.MODID, "VersionChecker", "addVersionCheck", "http://www.ryanliptak.com/minecraft/versionchecker/squeek502/AppleCore");
 	}
 
 	@EventHandler
