@@ -5,6 +5,7 @@ import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.IClassTransformerModule;
@@ -94,17 +95,20 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 
 	private void patchGetItemInUseDuration(ClassNode classNode, MethodNode method, boolean isObfuscated)
 	{
-		AbstractInsnNode deletionPoint = ASMHelper.findFirstInstructionWithOpcode(method, GETFIELD);
-		if (deletionPoint == null)
-			throw new RuntimeException("EntityPlayer.getItemInUseDuration: GETFIELD instruction not found");
+		InsnList needle = new InsnList();
+		needle.add(new VarInsnNode(ALOAD, 0));
+		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "f" : "itemInUse", ObfHelper.getDescriptor("net.minecraft.item.ItemStack")));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), isObfuscated ? "d_" : "getMaxItemUseDuration", "()I"));
 
-		AbstractInsnNode targetNode = deletionPoint.getNext().getNext();
-		if (targetNode == null)
-			throw new RuntimeException("EntityPlayer.getItemInUseDuration: Encountered unexpected instruction pattern");
+		InsnList replacement = new InsnList();
+		replacement.add(new VarInsnNode(ALOAD, 0));
+		replacement.add(new VarInsnNode(ALOAD, 0));
+		replacement.add(new FieldInsnNode(GETFIELD, classNode.name.replace('.', '/'), "itemInUseMaxDuration", "I"));
+		replacement.add(new MethodInsnNode(INVOKESTATIC, "squeek/applecore/asm/Hooks", "getItemInUseMaxDuration", "(Lnet/minecraft/entity/player/EntityPlayer;I)I"));
 
-		ASMHelper.removeFromInsnListUntil(method.instructions, deletionPoint, targetNode);
-
-		method.instructions.insertBefore(targetNode, new FieldInsnNode(GETFIELD, classNode.name.replace('.', '/'), "itemInUseMaxDuration", "I"));
+		int numReplacementsMade = ASMHelper.findAndReplaceAll(method.instructions, needle, replacement);
+		if (numReplacementsMade == 0)
+			throw new RuntimeException("EntityPlayer.getItemInUseDuration: no replacements made");
 	}
 
 	private void patchSetItemInUse(ClassNode classNode, MethodNode method, boolean isObfuscated)

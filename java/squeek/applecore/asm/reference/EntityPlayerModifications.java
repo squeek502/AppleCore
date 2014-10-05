@@ -38,12 +38,12 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 		}
 	}
 
-	// changed this.itemInUse.getMaxItemUseDuration() to this.itemInUseMaxDuration
+	// changed this.itemInUse.getMaxItemUseDuration() to Hooks.getItemInUseMaxDuration()
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getItemInUseDuration()
 	{
-		return this.isUsingItem() ? this.itemInUseMaxDuration - this.itemInUseCount : 0;
+		return this.isUsingItem() ? Hooks.getItemInUseMaxDuration(this, itemInUseMaxDuration) - this.itemInUseCount : 0;
 	}
 
 	// add hook for peaceful health regen

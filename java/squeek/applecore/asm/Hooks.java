@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockCake;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
@@ -29,6 +30,15 @@ public class Hooks
 	public static void onPostFoodStatsAdded(FoodStats foodStats, ItemFood itemFood, ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded, EntityPlayer player)
 	{
 		MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemStack, foodValues, hungerAdded, saturationAdded));
+	}
+	
+	public static int getItemInUseMaxDuration(EntityPlayer player, int savedMaxDuration)
+	{
+		EnumAction useAction = player.getItemInUse().getItemUseAction();
+		if (useAction == EnumAction.eat || useAction == EnumAction.drink)
+			return savedMaxDuration;
+		else
+			return player.getItemInUse().getMaxItemUseDuration();
 	}
 
 	// should this be moved elsewhere?
