@@ -1,0 +1,4 @@
+[submodule "ASMHelper"]
+	path = ASMHelper
+	url = git@github.com:squeek502/ASMHelper.git
+	branch = master

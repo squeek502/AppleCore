@@ -5,9 +5,9 @@ import org.objectweb.asm.tree.*;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.applecore.asm.helpers.ASMHelper;
-import squeek.applecore.asm.helpers.InsnComparator;
-import squeek.applecore.asm.helpers.ObfHelper;
+import squeek.asmhelper.ASMHelper;
+import squeek.asmhelper.InsnComparator;
+import squeek.asmhelper.ObfHelper;
 import org.objectweb.asm.Type;
 
 public class ModuleBlockFood implements IClassTransformerModule

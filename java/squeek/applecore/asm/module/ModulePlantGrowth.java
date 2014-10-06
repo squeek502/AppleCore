@@ -5,7 +5,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.applecore.asm.helpers.ASMHelper;
+import squeek.asmhelper.ASMHelper;
 import cpw.mods.fml.common.eventhandler.Event;
 
 public class ModulePlantGrowth implements IClassTransformerModule

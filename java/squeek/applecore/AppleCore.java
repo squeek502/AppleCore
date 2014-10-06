@@ -6,12 +6,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import squeek.applecore.api_impl.AppleCoreAccessorMutatorImpl;
 import squeek.applecore.asm.TransformerModuleHandler;
-import squeek.applecore.asm.helpers.ObfHelper;
 import squeek.applecore.client.DebugInfoHandler;
 import squeek.applecore.client.HUDOverlayHandler;
 import squeek.applecore.client.TooltipOverlayHandler;
 import squeek.applecore.commands.Commands;
 import squeek.applecore.network.SyncHandler;
+import squeek.asmhelper.ObfHelper;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.Mod;
@@ -88,7 +88,7 @@ public class AppleCore implements IFMLLoadingPlugin
 	@Override
 	public void injectData(Map<String, Object> data)
 	{
-		ObfHelper.obfuscated = (Boolean) data.get("runtimeDeobfuscationEnabled");
+		ObfHelper.setObfuscated((Boolean) data.get("runtimeDeobfuscationEnabled"));
 	}
 
 	@Override

@@ -9,8 +9,8 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.applecore.asm.helpers.ASMHelper;
-import squeek.applecore.asm.helpers.ObfHelper;
+import squeek.asmhelper.ASMHelper;
+import squeek.asmhelper.ObfHelper;
 
 public class ModuleFoodEatingSpeed implements IClassTransformerModule
 {
