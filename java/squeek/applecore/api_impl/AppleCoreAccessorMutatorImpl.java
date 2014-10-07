@@ -41,6 +41,9 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 
 	private boolean isEdible(ItemStack food)
 	{
+		if (food == null || food.getItem() == null)
+			return false;
+
 		// assume Block-based foods are edible
 		if (food.getItem() == Items.cake || food.getItem() instanceof ItemBlock)
 			return true;
@@ -52,14 +55,16 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	@Override
 	public FoodValues getUnmodifiedFoodValues(ItemStack food)
 	{
-		if (food.getItem() instanceof IEdible)
-			return ((IEdible) food.getItem()).getFoodValues(food);
-		else if (food.getItem() instanceof ItemFood)
-			return getItemFoodValues((ItemFood) food.getItem(), food);
-		else if (food.getItem() == Items.cake)
-			return new FoodValues(2, 0.1f);
-		else
-			return null;
+		if (food != null && food.getItem() != null)
+		{
+			if (food.getItem() instanceof IEdible)
+				return ((IEdible) food.getItem()).getFoodValues(food);
+			else if (food.getItem() instanceof ItemFood)
+				return getItemFoodValues((ItemFood) food.getItem(), food);
+			else if (food.getItem() == Items.cake)
+				return new FoodValues(2, 0.1f);
+		}
+		return null;
 	}
 
 	private FoodValues getItemFoodValues(ItemFood itemFood, ItemStack itemStack)
