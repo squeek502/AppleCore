@@ -98,7 +98,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 0));
 		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "f" : "itemInUse", ObfHelper.getDescriptor("net.minecraft.item.ItemStack")));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), isObfuscated ? "d_" : "getMaxItemUseDuration", "()I"));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), isObfuscated ? "n" : "getMaxItemUseDuration", "()I"));
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
