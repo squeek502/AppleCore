@@ -77,8 +77,10 @@ public class TooltipOverlayHandler
 		}
 		catch (Exception e)
 		{
-			AppleCore.Log.error("Unable to integrate the food values tooltip overlay with Tinkers Construct: ");
-			e.printStackTrace();
+			// NewContainerGui only exists in early 1.7.10 versions of TiC
+			// Keeping the reflection but removing the error printing will
+			// maintain compatibility with those versions while removing the
+			// confusing/misleading errors in logs when using recent versions
 		}
 
 		try
