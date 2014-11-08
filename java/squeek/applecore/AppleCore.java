@@ -26,7 +26,7 @@ import cpw.mods.fml.relauncher.Side;
 @IFMLLoadingPlugin.SortingIndex(-100)
 @IFMLLoadingPlugin.MCVersion("1.7.10")
 @IFMLLoadingPlugin.TransformerExclusions("squeek.applecore.asm")
-@Mod(modid = ModInfo.MODID, version = ModInfo.VERSION)
+@Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, acceptableRemoteVersions="*")
 public class AppleCore implements IFMLLoadingPlugin
 {
 	public static Logger Log = LogManager.getLogger(ModInfo.MODID);
