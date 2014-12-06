@@ -25,6 +25,18 @@ public class ItemNonStandardFood extends Item implements IEdible
 		return new FoodValues(1, 1f);
 	}
 
+	// This needs to be abstracted into an Optional method,
+	// otherwise the ItemFoodProxy reference will cause problems
+	@Optional.Method(modid = "AppleCore")
+	public void onEatenCompatibility(ItemStack itemStack, EntityPlayer player)
+	{
+		// one possible compatible method
+		player.getFoodStats().func_151686_a(new ItemFoodProxy(this), itemStack);
+
+		// another possible compatible method:
+		// new ItemFoodProxy(this).onEaten(itemStack, player);
+	}
+
 	@Override
 	public ItemStack onEaten(ItemStack itemStack, World world, EntityPlayer player)
 	{
@@ -32,11 +44,7 @@ public class ItemNonStandardFood extends Item implements IEdible
 
 		if (Loader.isModLoaded("AppleCore"))
 		{
-			// one possible compatible method
-			player.getFoodStats().func_151686_a(new ItemFoodProxy(this), itemStack);
-
-			// another possible compatible method:
-			// new ItemFoodProxy(this).onEaten(itemStack, player);
+			onEatenCompatibility(itemStack, player);
 		}
 		else
 		{
