@@ -40,6 +40,11 @@ public class ModConfig
 	private static final String SHOW_FOOD_EXHAUSTION_OVERLAY_COMMENT =
 			"If true, shows your food exhaustion as a progress bar behind the hunger bars";
 
+	public static boolean SHOW_FOOD_DEBUG_INFO = true;
+	private static final String SHOW_FOOD_DEBUG_INFO_NAME = "show.food.stats.in.debug.overlay";
+	private static final String SHOW_FOOD_DEBUG_INFO_COMMENT =
+			"If true, adds a line that shows your hunger, saturation, and exhaustion level in the F3 debug overlay";
+
 	public static void init(File file)
 	{
 		config = new Configuration(file);
@@ -55,6 +60,7 @@ public class ModConfig
 		SHOW_SATURATION_OVERLAY = config.get(CATEGORY_CLIENT, SHOW_SATURATION_OVERLAY_NAME, true, SHOW_SATURATION_OVERLAY_COMMENT).getBoolean(true);
 		SHOW_FOOD_VALUES_OVERLAY = config.get(CATEGORY_CLIENT, SHOW_FOOD_VALUES_OVERLAY_NAME, true, SHOW_FOOD_VALUES_OVERLAY_COMMENT).getBoolean(true);
 		SHOW_FOOD_EXHAUSTION_OVERLAY = config.get(CATEGORY_CLIENT, SHOW_FOOD_EXHAUSTION_OVERLAY_NAME, true, SHOW_FOOD_EXHAUSTION_OVERLAY_COMMENT).getBoolean(true);
+		SHOW_FOOD_DEBUG_INFO = config.get(CATEGORY_CLIENT, SHOW_FOOD_DEBUG_INFO_NAME, true, SHOW_FOOD_DEBUG_INFO_COMMENT).getBoolean(true);
 
 		save();
 	}

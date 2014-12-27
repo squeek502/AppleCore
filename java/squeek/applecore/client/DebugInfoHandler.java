@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
+import squeek.applecore.ModConfig;
 import squeek.applecore.api.AppleCoreAPI;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -26,6 +27,9 @@ public class DebugInfoHandler
 	public void onTextRender(RenderGameOverlayEvent.Text textEvent)
 	{
 		if (textEvent.type != RenderGameOverlayEvent.ElementType.TEXT)
+			return;
+
+		if (!ModConfig.SHOW_FOOD_DEBUG_INFO)
 			return;
 
 		Minecraft mc = Minecraft.getMinecraft();
