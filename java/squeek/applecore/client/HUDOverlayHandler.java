@@ -44,7 +44,7 @@ public class HUDOverlayHandler
 		if (event.type != RenderGameOverlayEvent.ElementType.FOOD)
 			return;
 
-		if (!ModConfig.SHOW_FOOD_EXHAUSTION_OVERLAY)
+		if (!ModConfig.SHOW_FOOD_EXHAUSTION_UNDERLAY)
 			return;
 
 		Minecraft mc = Minecraft.getMinecraft();
