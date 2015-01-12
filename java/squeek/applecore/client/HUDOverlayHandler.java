@@ -17,6 +17,7 @@ import squeek.applecore.ModInfo;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.food.FoodValues;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
@@ -38,9 +39,12 @@ public class HUDOverlayHandler
 		MinecraftForge.EVENT_BUS.register(hudOverlayHandler);
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority=EventPriority.LOW)
 	public void onPreRender(RenderGameOverlayEvent.Pre event)
 	{
+		if (event.isCanceled())
+			return;
+
 		if (event.type != RenderGameOverlayEvent.ElementType.FOOD)
 			return;
 
@@ -58,9 +62,12 @@ public class HUDOverlayHandler
 		drawExhaustionOverlay(AppleCoreAPI.accessor.getExhaustion(player), mc, left, top, 1f);
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority=EventPriority.LOW)
 	public void onRender(RenderGameOverlayEvent.Post event)
 	{
+		if (event.isCanceled())
+			return;
+
 		if (event.type != RenderGameOverlayEvent.ElementType.FOOD)
 			return;
 
