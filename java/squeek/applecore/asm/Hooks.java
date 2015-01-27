@@ -17,7 +17,6 @@ import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
-import squeek.applecore.api.plants.PlantGrowthEvent;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 
 public class Hooks
@@ -31,7 +30,7 @@ public class Hooks
 	{
 		MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemStack, foodValues, hungerAdded, saturationAdded));
 	}
-	
+
 	public static int getItemInUseMaxDuration(EntityPlayer player, int savedMaxDuration)
 	{
 		EnumAction useAction = player.getItemInUse().getItemUseAction();
@@ -143,15 +142,12 @@ public class Hooks
 
 	public static Result fireAllowPlantGrowthEvent(Block block, World world, int x, int y, int z, Random random)
 	{
-		PlantGrowthEvent.AllowGrowthTick event = new PlantGrowthEvent.AllowGrowthTick(block, world, x, y, z, random);
-		MinecraftForge.EVENT_BUS.post(event);
-		return event.getResult();
+		return AppleCoreAPI.dispatcher.validatePlantGrowth(block, world, x, y, z, random);
 	}
 
 	public static void fireOnGrowthEvent(Block block, World world, int x, int y, int z)
 	{
-		PlantGrowthEvent.GrowthTick event = new PlantGrowthEvent.GrowthTick(block, world, x, y, z);
-		MinecraftForge.EVENT_BUS.post(event);
+		AppleCoreAPI.dispatcher.announcePlantGrowth(block, world, x, y, z);
 	}
 
 	public static int toolTipX, toolTipY, toolTipW, toolTipH;

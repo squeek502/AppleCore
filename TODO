@@ -1,7 +1,6 @@
 General:
 
 API:
- [ ] Add a way for mods to be able to integrate their plant growth with AppleCore
 
 Core/ASM:
   Plant growth modification:
@@ -68,3 +67,4 @@ Archive:
  [x] Implement event-driven starvation @done (2014-07-24 01:38) @project(API)
  [x] Implement event-driven configurable health regen @done (2014-07-24 01:38) @project(API)
  [x] Implement event-driven configurable exhaustion @done (2014-07-24 01:38) @project(API)
+ [x] Add a way for mods to be able to integrate their plant growth with AppleCore @done (15-01-27 14:50) @project(API)

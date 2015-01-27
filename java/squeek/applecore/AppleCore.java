@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import squeek.applecore.api_impl.AppleCoreAccessorMutatorImpl;
+import squeek.applecore.api_impl.AppleCoreDispatcherImpl;
 import squeek.applecore.asm.TransformerModuleHandler;
 import squeek.applecore.client.DebugInfoHandler;
 import squeek.applecore.client.HUDOverlayHandler;
@@ -40,8 +41,9 @@ public class AppleCore implements IFMLLoadingPlugin
 		MetadataCollection metadataCollection = MetadataCollection.from(is, ModInfo.MODID);
 		Loader.instance().activeModContainer().bindMetadata(metadataCollection);
 
-		// force initialization of the singleton
+		// force initialization of the singletons
 		AppleCoreAccessorMutatorImpl.values();
+		AppleCoreDispatcherImpl.values();
 
 		ModConfig.init(event.getSuggestedConfigurationFile());
 

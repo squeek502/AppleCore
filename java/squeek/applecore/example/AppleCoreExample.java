@@ -1,5 +1,6 @@
 package squeek.applecore.example;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
@@ -26,6 +27,7 @@ public class AppleCoreExample
 
 	public static Item testFood;
 	public static Item testMetadataFood;
+	public static Block testBlockCrops;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
@@ -33,8 +35,11 @@ public class AppleCoreExample
 		testFood = new ItemNonStandardFood().setUnlocalizedName("testNonStandardFood");
 		GameRegistry.registerItem(testFood, "testNonStandardFood");
 
-		testMetadataFood = new ItemMetadataFood(new int[] {1, 10}, new float[] {2f, 0.1f}).setUnlocalizedName("testMetadataFood");
+		testMetadataFood = new ItemMetadataFood(new int[]{1, 10}, new float[]{2f, 0.1f}).setUnlocalizedName("testMetadataFood");
 		GameRegistry.registerItem(testMetadataFood, "testMetadataFood");
+
+		testBlockCrops = new BlockCropsExample();
+		GameRegistry.registerBlock(testBlockCrops, "testBlockCrops");
 	}
 
 	@EventHandler
