@@ -190,7 +190,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IFNE);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
+		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousInstructionWithOpcode(ifJumpInsn, IF_ICMPGE).getNext();
 
 		LabelNode ifFailedLabel = ifJumpInsn.label;
 		LabelNode ifAllowedLabel = new LabelNode();
