@@ -71,7 +71,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, 5));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "onBlockFoodEaten", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/food/FoodValues;"));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "onBlockFoodEaten", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/food/FoodValues;", false));
 		toInject.add(new VarInsnNode(ASTORE, modifiedFoodValues.index));
 		toInject.add(modifiedFoodValuesStart);
 
@@ -83,8 +83,8 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// int prevFoodLevel = p_150036_5_.getFoodStats().getFoodLevel();
 		toInject.add(new VarInsnNode(ALOAD, 5));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), isObfuscated ? "a" : "getFoodLevel", "()I"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), isObfuscated ? "a" : "getFoodLevel", "()I", false));
 		toInject.add(new VarInsnNode(ISTORE, prevFoodLevel.index));
 		toInject.add(prevFoodLevelStart);
 
@@ -96,8 +96,8 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// float prevSaturationLevel = p_150036_5_.getFoodStats().getSaturationLevel();
 		toInject.add(new VarInsnNode(ALOAD, 5));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), isObfuscated ? "e" : "getSaturationLevel", "()F"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "bQ" : "getFoodStats", isObfuscated ? "()Lzr;" : "()Lnet/minecraft/util/FoodStats;", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), isObfuscated ? "e" : "getSaturationLevel", "()F", false));
 		toInject.add(new VarInsnNode(FSTORE, prevSaturationLevel.index));
 		toInject.add(prevSaturationLevelStart);
 
@@ -126,7 +126,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		/*
 		 * onPostBlockFoodEaten
 		 */
-		AbstractInsnNode targetNodeAfter = ASMHelper.find(targetNode, new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), InsnComparator.WILDCARD, "(III)I"));
+		AbstractInsnNode targetNodeAfter = ASMHelper.find(targetNode, new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), InsnComparator.WILDCARD, "(III)I", false));
 		targetNodeAfter = ASMHelper.findPreviousLabelOrLineNumber(targetNodeAfter).getNext();
 		InsnList toInjectAfter = new InsnList();
 
@@ -136,7 +136,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		toInjectAfter.add(new VarInsnNode(ILOAD, prevFoodLevel.index));
 		toInjectAfter.add(new VarInsnNode(FLOAD, prevSaturationLevel.index));
 		toInjectAfter.add(new VarInsnNode(ALOAD, 5));
-		toInjectAfter.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "onPostBlockFoodEaten", "(Lnet/minecraft/block/Block;Lsqueek/applecore/api/food/FoodValues;IFLnet/minecraft/entity/player/EntityPlayer;)V"));
+		toInjectAfter.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "onPostBlockFoodEaten", "(Lnet/minecraft/block/Block;Lsqueek/applecore/api/food/FoodValues;IFLnet/minecraft/entity/player/EntityPlayer;)V", false));
 
 		method.instructions.insertBefore(targetNodeAfter, toInjectAfter);
 	}

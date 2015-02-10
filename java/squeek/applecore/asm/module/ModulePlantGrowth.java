@@ -347,7 +347,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		needle.add(new VarInsnNode(ILOAD, 2)); // x
 		needle.add(new VarInsnNode(ILOAD, 3)); // y
 		needle.add(new VarInsnNode(ILOAD, 4)); // z
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "" : "getBlockMetadata", "(III)I"));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "" : "getBlockMetadata", "(III)I", false));
 		needle.add(new VarInsnNode(ISTORE, InsnComparator.INT_WILDCARD));
 
 		InsnList foundInsns = ASMHelper.findAndGetFoundInsnList(method.instructions.getFirst(), needle);
@@ -388,7 +388,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 2)); // x
 		toInject.add(new VarInsnNode(ILOAD, 3)); // y
 		toInject.add(new VarInsnNode(ILOAD, 4)); // z
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "e" : "getBlockMetadata", "(III)I"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "e" : "getBlockMetadata", "(III)I", false));
 		toInject.add(new VarInsnNode(ISTORE, previousMetadata.index));
 		toInject.add(previousMetadataStart);
 
@@ -424,7 +424,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		insnList.add(new VarInsnNode(ILOAD, 3));
 		insnList.add(new VarInsnNode(ILOAD, 4));
 		insnList.add(new VarInsnNode(ALOAD, 5));
-		insnList.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireAllowPlantGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		insnList.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireAllowPlantGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)Lcpw/mods/fml/common/eventhandler/Event$Result;", false));
 	}
 
 	private void injectAllowedOrDefaultCheckBefore(MethodNode method, AbstractInsnNode injectPoint, int resultIndex, LabelNode ifAllowedLabel, LabelNode ifFailedLabel)
@@ -462,7 +462,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 3));
 		toInject.add(new VarInsnNode(ILOAD, 4));
 		toInject.add(new VarInsnNode(ILOAD, previousMetadataVarIndex));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireOnGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V"));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireOnGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}
@@ -476,7 +476,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 2));
 		toInject.add(new VarInsnNode(ILOAD, 3));
 		toInject.add(new VarInsnNode(ILOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireOnGrowthWithoutMetadataChangeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;III)V"));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireOnGrowthWithoutMetadataChangeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;III)V", false));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}

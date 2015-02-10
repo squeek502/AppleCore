@@ -98,13 +98,13 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 0));
 		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "f" : "itemInUse", ObfHelper.getDescriptor("net.minecraft.item.ItemStack")));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), isObfuscated ? "n" : "getMaxItemUseDuration", "()I"));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), isObfuscated ? "n" : "getMaxItemUseDuration", "()I", false));
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new FieldInsnNode(GETFIELD, classNode.name.replace('.', '/'), "itemInUseMaxDuration", "I"));
-		replacement.add(new MethodInsnNode(INVOKESTATIC, "squeek/applecore/asm/Hooks", "getItemInUseMaxDuration", "(Lnet/minecraft/entity/player/EntityPlayer;I)I"));
+		replacement.add(new MethodInsnNode(INVOKESTATIC, "squeek/applecore/asm/Hooks", "getItemInUseMaxDuration", "(Lnet/minecraft/entity/player/EntityPlayer;I)I", false));
 
 		int numReplacementsMade = ASMHelper.findAndReplaceAll(method.instructions, needle, replacement);
 		if (numReplacementsMade == 0)

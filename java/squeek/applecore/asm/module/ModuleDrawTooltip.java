@@ -111,7 +111,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, y.index));
 		toInject.add(new VarInsnNode(ILOAD, w.index));
 		toInject.add(new VarInsnNode(ILOAD, h.index));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc, false));
 
 		method.instructions.insert(targetNode, toInject);
 	}
@@ -159,7 +159,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, y.index));
 		toInject.add(new VarInsnNode(ILOAD, w.index));
 		toInject.add(new VarInsnNode(ILOAD, h.index));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc, false));
 
 		method.instructions.insert(targetNode, toInject);
 	}
@@ -179,7 +179,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 1));	// y
 		toInject.add(new VarInsnNode(ILOAD, 2));	// w
 		toInject.add(new VarInsnNode(ILOAD, 3));	// h
-		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc, false));
 
 		method.instructions.insertBefore(targetNode, toInject);
 	}
