@@ -7,6 +7,9 @@ import squeek.applecore.asm.module.*;
 
 public class TransformerModuleHandler implements IClassTransformer
 {
+	public static final String WILDCARD = "*";
+	public static final String[] ALL_CLASSES = new String[] { WILDCARD };
+
 	private static final List<IClassTransformerModule> transformerModules = new ArrayList<IClassTransformerModule>();
 	static
 	{
@@ -16,6 +19,7 @@ public class TransformerModuleHandler implements IClassTransformer
 		registerTransformerModule(new ModuleBlockFood());
 		registerTransformerModule(new ModuleDrawTooltip());
 		registerTransformerModule(new ModulePeacefulRegen());
+		registerTransformerModule(new ModulePlantFertilization());
 	}
 
 	public static void registerTransformerModule(IClassTransformerModule transformerModule)
@@ -30,7 +34,7 @@ public class TransformerModuleHandler implements IClassTransformer
 		{
 			for (String classToTransform : transformerModule.getClassesToTransform())
 			{
-				if (classToTransform.equals(transformedName))
+				if (classToTransform.equals(WILDCARD) || classToTransform.equals(transformedName))
 				{
 					basicClass = transformerModule.transform(name, transformedName, basicClass);
 				}

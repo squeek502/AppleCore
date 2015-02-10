@@ -3,6 +3,7 @@ package squeek.applecore.asm;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCake;
+import net.minecraft.block.IGrowable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
@@ -17,6 +18,7 @@ import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
+import squeek.applecore.api.plants.FertilizationEvent;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 
 public class Hooks
@@ -153,6 +155,26 @@ public class Hooks
 	public static void fireOnGrowthWithoutMetadataChangeEvent(Block block, World world, int x, int y, int z)
 	{
 		AppleCoreAPI.dispatcher.announcePlantGrowthWithoutMetadataChange(block, world, x, y, z);
+	}
+
+	public static Result fireFertilizeEvent(IGrowable growable, World world, int x, int y, int z, Random random, int metadata)
+	{
+		FertilizationEvent.Fertilize event = new FertilizationEvent.Fertilize(growable, world, x, y, z, random, metadata);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.getResult();
+	}
+
+	public static Result fireCanFertilizeEvent(IGrowable growable, World world, int x, int y, int z, Random random)
+	{
+		FertilizationEvent.CanFertilize event = new FertilizationEvent.CanFertilize(growable, world, x, y, z, random);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.getResult();
+	}
+
+	public static void fireFertilizedEvent(IGrowable growable, World world, int x, int y, int z, int previousMetadata)
+	{
+		FertilizationEvent.Fertilized event = new FertilizationEvent.Fertilized(growable, world, x, y, z, previousMetadata);
+		MinecraftForge.EVENT_BUS.post(event);
 	}
 
 	public static int toolTipX, toolTipY, toolTipW, toolTipH;
