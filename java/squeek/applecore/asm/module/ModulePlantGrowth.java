@@ -347,7 +347,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		needle.add(new VarInsnNode(ILOAD, 2)); // x
 		needle.add(new VarInsnNode(ILOAD, 3)); // y
 		needle.add(new VarInsnNode(ILOAD, 4)); // z
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "" : "getBlockMetadata", "(III)I", false));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "e" : "getBlockMetadata", "(III)I", false));
 		needle.add(new VarInsnNode(ISTORE, InsnComparator.INT_WILDCARD));
 
 		InsnList foundInsns = ASMHelper.findAndGetFoundInsnList(method.instructions.getFirst(), needle);
