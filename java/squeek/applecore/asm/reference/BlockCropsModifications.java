@@ -18,6 +18,8 @@ public class BlockCropsModifications extends BlockCrops
 		if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && p_149674_1_.getBlockLightValue(p_149674_2_, p_149674_3_ + 1, p_149674_4_) >= 9))
 		{
 			int l = p_149674_1_.getBlockMetadata(p_149674_2_, p_149674_3_, p_149674_4_);
+			// added var
+			int previousMetadata = l;
 
 			if (l < 7)
 			{
@@ -29,7 +31,7 @@ public class BlockCropsModifications extends BlockCrops
 					++l;
 					p_149674_1_.setBlockMetadataWithNotify(p_149674_2_, p_149674_3_, p_149674_4_, l, 2);
 					// added line
-					Hooks.fireOnGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_);
+					Hooks.fireOnGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, previousMetadata);
 				}
 			}
 		}

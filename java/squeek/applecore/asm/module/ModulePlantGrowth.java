@@ -6,10 +6,14 @@ import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.ASMHelper;
+import squeek.asmhelper.InsnComparator;
+import squeek.asmhelper.ObfHelper;
 import cpw.mods.fml.common.eventhandler.Event;
 
 public class ModulePlantGrowth implements IClassTransformerModule
 {
+	private static final boolean isObfuscated = ObfHelper.isObfuscated();
+
 	@Override
 	public String[] getClassesToTransform()
 	{
@@ -34,8 +38,6 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
 	{
-		boolean isObfuscated = !name.equals(transformedName);
-
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
 		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "updateTick", isObfuscated ? "(Lahb;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
@@ -47,38 +49,38 @@ public class ModulePlantGrowth implements IClassTransformerModule
 			throw new RuntimeException(classNode.name + ": updateTick method not found");
 
 		if (transformedName.equals("net.minecraft.block.BlockCrops"))
-			hookBlockCrops(classNode, methodNode, isObfuscated);
+			hookBlockCrops(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockReed"))
-			hookBlockReed(classNode, methodNode, isObfuscated);
+			hookBlockReed(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockCactus"))
-			hookBlockCactus(classNode, methodNode, isObfuscated);
+			hookBlockCactus(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockCocoa"))
-			hookBlockCocoa(classNode, methodNode, isObfuscated);
+			hookBlockCocoa(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockMushroom"))
-			hookBlockMushroom(classNode, methodNode, isObfuscated);
+			hookBlockMushroom(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockNetherWart"))
-			hookBlockNetherWart(classNode, methodNode, isObfuscated);
+			hookBlockNetherWart(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockSapling"))
-			hookBlockSapling(classNode, methodNode, isObfuscated);
+			hookBlockSapling(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockStem"))
-			hookBlockStem(classNode, methodNode, isObfuscated);
+			hookBlockStem(classNode, methodNode);
 		else if (transformedName.equals("com.pam.harvestcraft.BlockPamFruit"))
-			hookBlockPamFruit(classNode, methodNode, isObfuscated);
+			hookBlockPamFruit(classNode, methodNode);
 		else if (transformedName.equals("com.pam.harvestcraft.BlockPamSapling"))
-			hookBlockPamSapling(classNode, methodNode, isObfuscated);
+			hookBlockPamSapling(classNode, methodNode);
 		else if (transformedName.equals("mods.natura.blocks.crops.BerryBush") || transformedName.equals("mods.natura.blocks.crops.NetherBerryBush"))
-			hookBlockNaturaBerryBush(classNode, methodNode, isObfuscated);
+			hookBlockNaturaBerryBush(classNode, methodNode);
 		else if (transformedName.equals("mods.natura.blocks.crops.CropBlock"))
-			hookNaturaCropBlock(classNode, methodNode, isObfuscated);
+			hookNaturaCropBlock(classNode, methodNode);
 		else if (transformedName.equals("mods.natura.blocks.crops.Glowshroom"))
-			hookBlockMushroom(classNode, methodNode, isObfuscated);
+			hookBlockMushroom(classNode, methodNode);
 		else
 			return basicClass;
 
 		return ASMHelper.writeClassToBytes(classNode);
 	}
 
-	private void hookBlockCrops(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockCrops(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
@@ -100,15 +102,21 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
 
-		injectOnGrowthEventBefore(method, ifFailedLabel);
+		LocalVariableNode metadataVar = findStoredMetadataLocalVariable(method);
+		int previousMetadataIndex = storeMetadataInNewVariable(method, metadataVar);
+
+		injectOnGrowthEventBefore(method, ifFailedLabel, previousMetadataIndex);
 	}
 
-	private void hookBlockReed(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockReed(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPGE);
 		LabelNode ifDeniedLabel = ifJumpInsn.label;
 
 		injectNotDeniedCheckBefore(method, ifJumpInsn.getNext(), ifDeniedLabel);
+
+		LocalVariableNode metadataVar = findStoredMetadataLocalVariable(method);
+		int previousMetadataIndex = metadataVar.index;
 
 		// need to change the GOTO so that it doesn't skip our added fireEvent call
 		LabelNode newGotoLabel = new LabelNode();
@@ -116,16 +124,19 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		gotoInsn.label = newGotoLabel;
 
 		method.instructions.insertBefore(ifDeniedLabel, newGotoLabel);
-		injectOnGrowthEventBefore(method, ifDeniedLabel);
+		injectOnGrowthEventBefore(method, ifDeniedLabel, previousMetadataIndex);
 	}
 
 	// TODO: same as hookBlockReed, should they use a shared method?
-	private void hookBlockCactus(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockCactus(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPGE);
 		LabelNode ifDeniedLabel = ifJumpInsn.label;
 
 		injectNotDeniedCheckBefore(method, ifJumpInsn.getNext(), ifDeniedLabel);
+
+		LocalVariableNode metadataVar = findStoredMetadataLocalVariable(method);
+		int previousMetadataIndex = metadataVar.index;
 
 		// need to change the GOTO so that it doesn't skip our added fireEvent call
 		LabelNode newGotoLabel = new LabelNode();
@@ -133,10 +144,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		gotoInsn.label = newGotoLabel;
 
 		method.instructions.insertBefore(ifDeniedLabel, newGotoLabel);
-		injectOnGrowthEventBefore(method, ifDeniedLabel);
+		injectOnGrowthEventBefore(method, ifDeniedLabel, previousMetadataIndex);
 	}
 
-	private void hookBlockCocoa(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockCocoa(ClassNode classNode, MethodNode method)
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
@@ -150,10 +161,14 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		method.instructions.insert(ifJumpInsn, ifAllowedLabel);
 
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
-		injectOnGrowthEventBefore(method, ifFailedLabel);
+
+		LocalVariableNode metadataVar = findStoredMetadataLocalVariable(method);
+		int previousMetadataIndex = metadataVar.index;
+
+		injectOnGrowthEventBefore(method, ifFailedLabel, previousMetadataIndex);
 	}
 
-	private void hookBlockMushroom(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockMushroom(ClassNode classNode, MethodNode method)
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
@@ -167,10 +182,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
 
 		fixPrecedingIfsToNotSkipInjectedInstructions(method, ifFailedLabel);
-		injectOnGrowthEventBefore(method, ifFailedLabel);
+		injectOnGrowthWithoutMetadataChangeEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockNetherWart(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockNetherWart(ClassNode classNode, MethodNode method)
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
@@ -182,10 +197,14 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		method.instructions.insert(ifJumpInsn, ifAllowedLabel);
 
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
-		injectOnGrowthEventBefore(method, ifFailedLabel);
+
+		LocalVariableNode metadataVar = findStoredMetadataLocalVariable(method);
+		int previousMetadataIndex = storeMetadataInNewVariable(method, metadataVar);
+
+		injectOnGrowthEventBefore(method, ifFailedLabel, previousMetadataIndex);
 	}
 
-	private void hookBlockSapling(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockSapling(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode lightValueIf = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		JumpInsnNode randomIf = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(lightValueIf, IFNE);
@@ -198,10 +217,12 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ifStartPoint, ifFailedLabel);
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
 
-		injectOnGrowthEventBefore(method, ifFailedLabel);
+		int previousMetadataIndex = getMetadataAndStoreInNewVariableBefore(method, ifAllowedLabel.getNext(), ifFailedLabel);
+
+		injectOnGrowthEventBefore(method, ifFailedLabel, previousMetadataIndex);
 	}
 
-	private void hookBlockStem(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockStem(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode lightValueIf = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		AbstractInsnNode ifStartPoint = ASMHelper.getOrFindInstructionOfType(lightValueIf, AbstractInsnNode.LINE, true).getNext();
@@ -222,6 +243,9 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
 
+		LocalVariableNode metadataVar = findStoredMetadataLocalVariable(method);
+		int previousMetadataIndex = storeMetadataInNewVariable(method, metadataVar);
+
 		// need to change the GOTO so that it doesn't skip our added fireEvent call
 		LabelNode newGotoLabel = new LabelNode();
 		JumpInsnNode gotoInsn = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(randomIf, GOTO);
@@ -229,10 +253,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		method.instructions.insertBefore(ifFailedLabel, newGotoLabel);
 		fixPrecedingIfsToNotSkipInjectedInstructions(method, ifFailedLabel);
-		injectOnGrowthEventBefore(method, ifFailedLabel);
+		injectOnGrowthEventBefore(method, ifFailedLabel, previousMetadataIndex);
 	}
 
-	private void hookBlockPamFruit(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockPamFruit(ClassNode classNode, MethodNode method)
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
@@ -244,10 +268,14 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		method.instructions.insert(ifJumpInsn, ifAllowedLabel);
 
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
-		injectOnGrowthEventBefore(method, ifFailedLabel);
+
+		LocalVariableNode metadataVar = findStoredMetadataLocalVariable(method);
+		int previousMetadataIndex = storeMetadataInNewVariable(method, metadataVar);
+
+		injectOnGrowthEventBefore(method, ifFailedLabel, previousMetadataIndex);
 	}
 
-	private void hookBlockPamSapling(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockPamSapling(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findLastInstructionWithOpcode(method, IFNE);
 		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
@@ -258,10 +286,12 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ifStartPoint, ifFailedLabel);
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
-		injectOnGrowthEventBefore(method, ifFailedLabel);
+
+		int previousMetadataIndex = getMetadataAndStoreInNewVariableBefore(method, ifAllowedLabel.getNext(), ifFailedLabel);
+		injectOnGrowthEventBefore(method, ifFailedLabel, previousMetadataIndex);
 	}
 
-	private void hookBlockNaturaBerryBush(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockNaturaBerryBush(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IFNE);
 		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
@@ -275,11 +305,14 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ifStartPoint, ifFailedLabel);
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
 
+		LocalVariableNode metadataVar = findStoredMetadataLocalVariable(method);
+		int previousMetadataIndex = metadataVar.index;
+
 		fixPrecedingIfsToNotSkipInjectedInstructions(method, ifFailedLabel);
-		injectOnGrowthEventBefore(method, ifFailedLabel);
+		injectOnGrowthEventBefore(method, ifFailedLabel, previousMetadataIndex);
 	}
 
-	private void hookNaturaCropBlock(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookNaturaCropBlock(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
@@ -301,7 +334,66 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		injectAllowedOrDefaultCheckBefore(method, ifStartPoint, resultIndex, ifAllowedLabel, ifFailedLabel);
 
-		injectOnGrowthEventBefore(method, ifFailedLabel);
+		LocalVariableNode metadataVar = findStoredMetadataLocalVariable(method);
+		int previousMetadataIndex = storeMetadataInNewVariable(method, metadataVar);
+
+		injectOnGrowthEventBefore(method, ifFailedLabel, previousMetadataIndex);
+	}
+
+	private LocalVariableNode findStoredMetadataLocalVariable(MethodNode method)
+	{
+		InsnList needle = new InsnList();
+		needle.add(new VarInsnNode(ALOAD, 1)); // world
+		needle.add(new VarInsnNode(ILOAD, 2)); // x
+		needle.add(new VarInsnNode(ILOAD, 3)); // y
+		needle.add(new VarInsnNode(ILOAD, 4)); // z
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "" : "getBlockMetadata", "(III)I"));
+		needle.add(new VarInsnNode(ISTORE, InsnComparator.INT_WILDCARD));
+
+		InsnList foundInsns = ASMHelper.findAndGetFoundInsnList(method.instructions.getFirst(), needle);
+		VarInsnNode insnISTORE = (VarInsnNode) foundInsns.getLast();
+		for (LocalVariableNode localVar : method.localVariables)
+		{
+			if (localVar.index == insnISTORE.var)
+				return localVar;
+		}
+		return null;
+	}
+
+	private int storeMetadataInNewVariable(MethodNode method, LocalVariableNode metadataVar)
+	{
+		LabelNode previousMetadataStart = new LabelNode();
+		LocalVariableNode previousMetadata = new LocalVariableNode("previousMetadata", "I", null, previousMetadataStart, metadataVar.end, method.maxLocals);
+		method.maxLocals += 1;
+		method.localVariables.add(previousMetadata);
+
+		InsnList toInject = new InsnList();
+		toInject.add(new VarInsnNode(ILOAD, metadataVar.index));
+		toInject.add(new VarInsnNode(ISTORE, previousMetadata.index));
+		toInject.add(previousMetadataStart);
+		method.instructions.insert(metadataVar.start, toInject);
+
+		return previousMetadata.index;
+	}
+
+	private int getMetadataAndStoreInNewVariableBefore(MethodNode method, AbstractInsnNode injectPoint, LabelNode endLabel)
+	{
+		LabelNode previousMetadataStart = new LabelNode();
+		LocalVariableNode previousMetadata = new LocalVariableNode("previousMetadata", "I", null, previousMetadataStart, endLabel, method.maxLocals);
+		method.maxLocals += 1;
+		method.localVariables.add(previousMetadata);
+
+		InsnList toInject = new InsnList();
+		toInject.add(new VarInsnNode(ALOAD, 1)); // world
+		toInject.add(new VarInsnNode(ILOAD, 2)); // x
+		toInject.add(new VarInsnNode(ILOAD, 3)); // y
+		toInject.add(new VarInsnNode(ILOAD, 4)); // z
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "e" : "getBlockMetadata", "(III)I"));
+		toInject.add(new VarInsnNode(ISTORE, previousMetadata.index));
+		toInject.add(previousMetadataStart);
+
+		method.instructions.insertBefore(injectPoint, toInject);
+		return previousMetadata.index;
 	}
 
 	private int fireAllowGrowthEventAndStoreResultBefore(MethodNode method, AbstractInsnNode injectPoint, LabelNode endLabel)
@@ -360,7 +452,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		method.instructions.insertBefore(injectPoint, toInject);
 	}
 
-	private void injectOnGrowthEventBefore(MethodNode method, AbstractInsnNode injectPoint)
+	private void injectOnGrowthEventBefore(MethodNode method, AbstractInsnNode injectPoint, int previousMetadataVarIndex)
 	{
 		InsnList toInject = new InsnList();
 
@@ -369,7 +461,22 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 2));
 		toInject.add(new VarInsnNode(ILOAD, 3));
 		toInject.add(new VarInsnNode(ILOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireOnGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;III)V"));
+		toInject.add(new VarInsnNode(ILOAD, previousMetadataVarIndex));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireOnGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V"));
+
+		method.instructions.insertBefore(injectPoint, toInject);
+	}
+
+	private void injectOnGrowthWithoutMetadataChangeEventBefore(MethodNode method, AbstractInsnNode injectPoint)
+	{
+		InsnList toInject = new InsnList();
+
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new VarInsnNode(ALOAD, 1));
+		toInject.add(new VarInsnNode(ILOAD, 2));
+		toInject.add(new VarInsnNode(ILOAD, 3));
+		toInject.add(new VarInsnNode(ILOAD, 4));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireOnGrowthWithoutMetadataChangeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;III)V"));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}

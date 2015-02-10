@@ -145,9 +145,14 @@ public class Hooks
 		return AppleCoreAPI.dispatcher.validatePlantGrowth(block, world, x, y, z, random);
 	}
 
-	public static void fireOnGrowthEvent(Block block, World world, int x, int y, int z)
+	public static void fireOnGrowthEvent(Block block, World world, int x, int y, int z, int previousMetadata)
 	{
-		AppleCoreAPI.dispatcher.announcePlantGrowth(block, world, x, y, z);
+		AppleCoreAPI.dispatcher.announcePlantGrowth(block, world, x, y, z, previousMetadata);
+	}
+
+	public static void fireOnGrowthWithoutMetadataChangeEvent(Block block, World world, int x, int y, int z)
+	{
+		AppleCoreAPI.dispatcher.announcePlantGrowthWithoutMetadataChange(block, world, x, y, z);
 	}
 
 	public static int toolTipX, toolTipY, toolTipW, toolTipH;

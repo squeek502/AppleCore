@@ -27,9 +27,22 @@ public enum AppleCoreDispatcherImpl implements IAppleCoreDispatcher
 	}
 
 	@Override
+	public void announcePlantGrowth(Block block, World world, int x, int y, int z, int previousMetadata)
+	{
+		PlantGrowthEvent.GrowthTick event = new PlantGrowthEvent.GrowthTick(block, world, x, y, z, previousMetadata);
+		MinecraftForge.EVENT_BUS.post(event);
+	}
+
+	@Override
+	public void announcePlantGrowthWithoutMetadataChange(Block block, World world, int x, int y, int z)
+	{
+		announcePlantGrowth(block, world, x, y, z, world.getBlockMetadata(x, y, z));
+	}
+
+	@Override
+	@Deprecated
 	public void announcePlantGrowth(Block block, World world, int x, int y, int z)
 	{
-		PlantGrowthEvent.GrowthTick event = new PlantGrowthEvent.GrowthTick(block, world, x, y, z);
-		MinecraftForge.EVENT_BUS.post(event);
+		announcePlantGrowth(block, world, x, y, z, Math.max(0, world.getBlockMetadata(x, y, z) - 1));
 	}
 }

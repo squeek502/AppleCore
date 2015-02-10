@@ -26,13 +26,15 @@ public class BlockStemModifications extends BlockStem
 			if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && p_149674_5_.nextInt((int) (25.0F / f) + 1) == 0))
 			{
 				int l = p_149674_1_.getBlockMetadata(p_149674_2_, p_149674_3_, p_149674_4_);
+				// added var
+				int previousMetadata = l;
 
 				if (l < 7)
 				{
 					++l;
 					p_149674_1_.setBlockMetadataWithNotify(p_149674_2_, p_149674_3_, p_149674_4_, l, 2);
 					// added line
-					Hooks.fireOnGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_);
+					Hooks.fireOnGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, previousMetadata);
 				}
 				else
 				{

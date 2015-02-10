@@ -62,6 +62,9 @@ public class BlockMushroomModifications extends BlockMushroom
 			{
 				p_149674_1_.setBlock(i1, j1, k1, this, 0, 2);
 			}
+
+			// added line
+			Hooks.fireOnGrowthWithoutMetadataChangeEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_);
 		}
 	}
 }

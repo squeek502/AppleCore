@@ -57,14 +57,21 @@ public class PlantGrowthEvent extends Event
 		public final int x;
 		public final int y;
 		public final int z;
+		public final int previousMetadata;
 
-		public GrowthTick(Block block, World world, int x, int y, int z)
+		public GrowthTick(Block block, World world, int x, int y, int z, int previousMetadata)
 		{
 			this.block = block;
 			this.world = world;
 			this.x = x;
 			this.y = y;
 			this.z = z;
+			this.previousMetadata = previousMetadata;
+		}
+
+		public GrowthTick(Block block, World world, int x, int y, int z)
+		{
+			this(block, world, x, y, z, world.getBlockMetadata(x, y, z));
 		}
 	}
 }

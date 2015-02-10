@@ -20,9 +20,9 @@ public class BlockCropsExample extends BlockCrops
 
 	// abstract the AppleCoreAPI reference into an Optional.Method so that AppleCore is not a hard dependency
 	@Optional.Method(modid = "AppleCore")
-	public void announceAppleCoreGrowthTick(World world, int x, int y, int z)
+	public void announceAppleCoreGrowthTick(World world, int x, int y, int z, int previousMetadata)
 	{
-		AppleCoreAPI.dispatcher.announcePlantGrowth(this, world, x, y, z);
+		AppleCoreAPI.dispatcher.announcePlantGrowth(this, world, x, y, z, previousMetadata);
 	}
 
 	/**
@@ -55,6 +55,7 @@ public class BlockCropsExample extends BlockCrops
 		if (allowGrowthResult == Event.Result.ALLOW || (allowGrowthResult == Event.Result.DEFAULT && world.getBlockLightValue(x, y + 1, z) >= 9))
 		{
 			int meta = world.getBlockMetadata(x, y, z);
+			int previousMetadata = meta;
 
 			if (meta < 7)
 			{
@@ -69,7 +70,7 @@ public class BlockCropsExample extends BlockCrops
 					// *After* the actual growth occurs, we simply let everyone know that it happened
 					if (Loader.isModLoaded("AppleCore"))
 					{
-						announceAppleCoreGrowthTick(world, x, y, z);
+						announceAppleCoreGrowthTick(world, x, y, z, previousMetadata);
 					}
 				}
 			}
