@@ -9,32 +9,26 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 public class FertilizationModifier
 {
 	@SubscribeEvent
-	public void canFertlize(FertilizationEvent.CanFertilize event)
-	{
-		if (event.growable instanceof BlockCocoa)
-			// disable cocoa fertilization completely
-			event.setResult(Result.DENY);
-		else if (event.growable instanceof BlockStem)
-			// melon/pumpkin can always be fertilized
-			event.setResult(Result.ALLOW);
-		else
-			// normal fertilization conditions for everything else
-			event.setResult(Result.DEFAULT);
-	}
-
-	@SubscribeEvent
 	public void onFertilize(FertilizationEvent.Fertilize event)
 	{
+		// disable cocoa fertilization completely
+		if (event.block instanceof BlockCocoa)
+		{
+			AppleCoreExample.Log.info(event.block + " fertilization denied");
+			event.setResult(Result.DENY);
+		}
 		// custom fertilization effect for stems
-		if (event.growable instanceof BlockStem)
+		else if (event.block instanceof BlockStem)
 		{
 			// randomize the meta
-			event.world.setBlockMetadataWithNotify(event.x, event.y, event.z, event.random.nextInt(15), 1);
+			AppleCoreExample.Log.info("randomizing meta of " + event.block + " using custom fertilization handling");
+			event.world.setBlockMetadataWithNotify(event.x, event.y, event.z, event.random.nextInt(7), 1);
+			// mark as handled
 			event.setResult(Result.ALLOW);
 		}
 		else
 		{
-			AppleCoreExample.Log.info(event.growable + " is about to be fertilized (current meta: " + event.metadata + ")");
+			AppleCoreExample.Log.info(event.block + " is about to be fertilized (current meta: " + event.metadata + ")");
 		}
 	}
 
@@ -42,6 +36,6 @@ public class FertilizationModifier
 	public void onFertilized(FertilizationEvent.Fertilized event)
 	{
 		int currentMetadata = event.world.getBlockMetadata(event.x, event.y, event.z);
-		AppleCoreExample.Log.info(event.growable + " was fertilized from meta " + event.previousMetadata + " to " + currentMetadata);
+		AppleCoreExample.Log.info(event.block + " was fertilized from meta " + event.previousMetadata + " to " + currentMetadata);
 	}
 }

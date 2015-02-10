@@ -1,13 +1,20 @@
 package squeek.applecore.asm.reference;
 
 import java.util.Random;
+import net.minecraft.block.Block;
 import net.minecraft.block.IGrowable;
+import net.minecraft.block.material.Material;
 import net.minecraft.world.World;
 import squeek.applecore.asm.Hooks;
 import cpw.mods.fml.common.eventhandler.Event;
 
-public class IGrowableModifications implements IGrowable
+public class IGrowableModifications extends Block implements IGrowable
 {
+	protected IGrowableModifications(Material p_i45394_1_)
+	{
+		super(p_i45394_1_);
+	}
+
 	// is not fully grown
 	// untouched
 	@Override
@@ -20,14 +27,6 @@ public class IGrowableModifications implements IGrowable
 	@Override
 	public boolean func_149852_a(World p_149852_1_, Random p_149852_2_, int p_149852_3_, int p_149852_4_, int p_149852_5_)
 	{
-		// added at start
-		Event.Result canFertilizeResult = Hooks.fireCanFertilizeEvent(this, p_149852_1_, p_149852_3_, p_149852_4_, p_149852_5_, p_149852_2_);
-		if (canFertilizeResult == Event.Result.DENY)
-			return false;
-		else if (canFertilizeResult == Event.Result.ALLOW)
-			return true;
-
-		// default implementation
 		return true;
 	}
 

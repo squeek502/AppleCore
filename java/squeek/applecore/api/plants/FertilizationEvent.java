@@ -1,6 +1,7 @@
 package squeek.applecore.api.plants;
 
 import java.util.Random;
+import net.minecraft.block.Block;
 import net.minecraft.block.IGrowable;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.eventhandler.Cancelable;
@@ -9,40 +10,7 @@ import cpw.mods.fml.common.eventhandler.Event;
 public class FertilizationEvent extends Event
 {
 	/**
-	 * Fired to determine whether or not fertilization is allowed for the {@link IGrowable}.
-	 * 
-	 * This event is fired in all {@link IGrowable#func_149852_a} implementations.<br>
-	 * <br>
-	 * This event is not {@link Cancelable}.<br>
-	 * <br>
-	 * This event uses the {@link Result}. {@link HasResult}<br>
-	 * {@link Result#DEFAULT} will use the vanilla conditionals.
-	 * {@link Result#ALLOW} will allow fertilization without condition.
-	 * {@link Result#DENY} will deny fertilization without condition.
-	 */
-	@HasResult
-	public static class CanFertilize extends FertilizationEvent
-	{
-		public final IGrowable growable;
-		public final World world;
-		public final int x;
-		public final int y;
-		public final int z;
-		public final Random random;
-
-		public CanFertilize(IGrowable growable, World world, int x, int y, int z, Random random)
-		{
-			this.growable = growable;
-			this.world = world;
-			this.x = x;
-			this.y = y;
-			this.z = z;
-			this.random = random;
-		}
-	}
-
-	/**
-	 * Fired when an IGrowable is about to be fertilized.
+	 * Fired when a block is about to be fertilized.
 	 * 
 	 * This event is fired in all {@link IGrowable#func_149853_b} implementations.<br>
 	 * <br>
@@ -56,7 +24,7 @@ public class FertilizationEvent extends Event
 	@HasResult
 	public static class Fertilize extends FertilizationEvent
 	{
-		public final IGrowable growable;
+		public final Block block;
 		public final World world;
 		public final int x;
 		public final int y;
@@ -64,9 +32,9 @@ public class FertilizationEvent extends Event
 		public final Random random;
 		public final int metadata;
 
-		public Fertilize(IGrowable growable, World world, int x, int y, int z, Random random, int metadata)
+		public Fertilize(Block block, World world, int x, int y, int z, Random random, int metadata)
 		{
-			this.growable = growable;
+			this.block = block;
 			this.world = world;
 			this.x = x;
 			this.y = y;
@@ -77,7 +45,7 @@ public class FertilizationEvent extends Event
 	}
 
 	/**
-	 * Fired after an IGrowable is fertilized.
+	 * Fired after a block is fertilized.
 	 * 
 	 * This event is fired in all {@link IGrowable#func_149853_b} implementations.<br>
 	 * <br>
@@ -87,16 +55,16 @@ public class FertilizationEvent extends Event
 	 */
 	public static class Fertilized extends FertilizationEvent
 	{
-		public final IGrowable growable;
+		public final Block block;
 		public final World world;
 		public final int x;
 		public final int y;
 		public final int z;
 		public final int previousMetadata;
 
-		public Fertilized(IGrowable growable, World world, int x, int y, int z, int previousMetadata)
+		public Fertilized(Block block, World world, int x, int y, int z, int previousMetadata)
 		{
-			this.growable = growable;
+			this.block = block;
 			this.world = world;
 			this.x = x;
 			this.y = y;
