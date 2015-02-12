@@ -17,6 +17,7 @@ import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
+import squeek.applecore.api.plants.FertilizationEvent;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 
 public class Hooks
@@ -153,6 +154,24 @@ public class Hooks
 	public static void fireOnGrowthWithoutMetadataChangeEvent(Block block, World world, int x, int y, int z)
 	{
 		AppleCoreAPI.dispatcher.announcePlantGrowthWithoutMetadataChange(block, world, x, y, z);
+	}
+
+	private static final Random fertilizeRandom = new Random();
+
+	public static Result fireFertilizeEvent(Block block, World world, int x, int y, int z, Random random, int metadata)
+	{
+		if (random == null)
+			random = fertilizeRandom;
+
+		FertilizationEvent.Fertilize event = new FertilizationEvent.Fertilize(block, world, x, y, z, random, metadata);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.getResult();
+	}
+
+	public static void fireFertilizedEvent(Block block, World world, int x, int y, int z, int previousMetadata)
+	{
+		FertilizationEvent.Fertilized event = new FertilizationEvent.Fertilized(block, world, x, y, z, previousMetadata);
+		MinecraftForge.EVENT_BUS.post(event);
 	}
 
 	public static int toolTipX, toolTipY, toolTipW, toolTipH;
