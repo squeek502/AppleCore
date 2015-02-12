@@ -1,10 +1,10 @@
 package squeek.applecore.asm.module;
 
 import static org.objectweb.asm.Opcodes.*;
+import java.util.HashMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-import squeek.applecore.AppleCore;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.applecore.asm.TransformerModuleHandler;
@@ -15,6 +15,62 @@ import cpw.mods.fml.common.eventhandler.Event;
 public class ModulePlantFertilization implements IClassTransformerModule
 {
 	private static final boolean isObfuscated = ObfHelper.isObfuscated();
+	private static final HashMap<String, FertilizeMethodInfo> customFertilizeMethods = new HashMap<String, FertilizeMethodInfo>();
+	static
+	{
+		customFertilizeMethods.put("com.pam.harvestcraft.BlockPamFruit", FertilizeMethodInfo.BLOCK_PAM_FRUIT);
+		customFertilizeMethods.put("com.pam.harvestcraft.BlockPamSapling", FertilizeMethodInfo.BLOCK_PAM_SAPLING);
+	}
+
+	public static enum FertilizeMethodInfo
+	{
+		IGROWABLE_BLOCK(isObfuscated ? "b" : "func_149853_b", ObfHelper.desc("(Lnet/minecraft/world/World;Ljava/util/Random;III)V"), 1, 3, 4, 5, 2),
+		BLOCK_PAM_FRUIT("fertilize", ObfHelper.desc("(Lnet/minecraft/world/World;III)V"), 1, 2, 3, 4, FertilizeMethodInfo.NULL_PARAM),
+		BLOCK_PAM_SAPLING("markOrGrowMarked", ObfHelper.desc("(Lnet/minecraft/world/World;IIILjava/util/Random;)V"), 1, 2, 3, 4, 5);
+
+		public static final int NULL_PARAM = -1;
+		public final String name;
+		public final String desc;
+		public final int worldIndex;
+		public final int xIndex;
+		public final int yIndex;
+		public final int zIndex;
+		public final int randomIndex;
+
+		FertilizeMethodInfo(String methodName, String methodDesc, int worldIndex, int xIndex, int yIndex, int zIndex, int randomIndex)
+		{
+			this.name = methodName;
+			this.desc = methodDesc;
+			this.worldIndex = worldIndex;
+			this.xIndex = xIndex;
+			this.yIndex = yIndex;
+			this.zIndex = zIndex;
+			this.randomIndex = randomIndex;
+		}
+
+		public InsnList getLoadCoordinatesInsns()
+		{
+			InsnList insnList = new InsnList();
+			insnList.add(new VarInsnNode(ILOAD, xIndex));
+			insnList.add(new VarInsnNode(ILOAD, yIndex));
+			insnList.add(new VarInsnNode(ILOAD, zIndex));
+			return insnList;
+		}
+
+		public InsnList getLoadWorldInsns()
+		{
+			InsnList insnList = new InsnList();
+			insnList.add(new VarInsnNode(ALOAD, worldIndex));
+			return insnList;
+		}
+
+		public InsnList getLoadRandomInsns()
+		{
+			InsnList insnList = new InsnList();
+			insnList.add(randomIndex != NULL_PARAM ? new VarInsnNode(ALOAD, randomIndex) : new InsnNode(ACONST_NULL));
+			return insnList;
+		}
+	}
 
 	@Override
 	public String[] getClassesToTransform()
@@ -28,23 +84,30 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		ClassReader classReader = new ClassReader(bytes);
 		if (ASMHelper.doesClassExtend(classReader, ObfHelper.getInternalClassName("net.minecraft.block.Block")) && ASMHelper.doesClassImplement(classReader, ObfHelper.getInternalClassName("net.minecraft.block.IGrowable")))
 		{
+			FertilizeMethodInfo methodInfo = FertilizeMethodInfo.IGROWABLE_BLOCK;
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
-			boolean didTransform = false;
-
-			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "b" : "func_149853_b", ObfHelper.desc("(Lnet/minecraft/world/World;Ljava/util/Random;III)V"));
+			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodInfo.name, methodInfo.desc);
 			if (method != null)
 			{
-				wrapFertilizeMethod(method);
-				didTransform = true;
-			}
-
-			if (didTransform)
+				wrapFertilizeMethod(method, methodInfo);
 				return ASMHelper.writeClassToBytes(classNode);
+			}
+		}
+		else if (customFertilizeMethods.containsKey(transformedName))
+		{
+			FertilizeMethodInfo methodInfo = customFertilizeMethods.get(transformedName);
+			ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
+			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodInfo.name, methodInfo.desc);
+			if (method != null)
+			{
+				wrapFertilizeMethod(method, methodInfo);
+				return ASMHelper.writeClassToBytes(classNode);
+			}
 		}
 		return bytes;
 	}
 
-	private void wrapFertilizeMethod(MethodNode method)
+	private void wrapFertilizeMethod(MethodNode method, FertilizeMethodInfo methodInfo)
 	{
 		LabelNode endLabel = ASMHelper.findEndLabel(method);
 
@@ -60,20 +123,16 @@ public class ModulePlantFertilization implements IClassTransformerModule
 
 		InsnList toInjectAtStart = new InsnList();
 		// get previous meta
-		toInjectAtStart.add(new VarInsnNode(ALOAD, 1));
-		toInjectAtStart.add(new VarInsnNode(ILOAD, 3));
-		toInjectAtStart.add(new VarInsnNode(ILOAD, 4));
-		toInjectAtStart.add(new VarInsnNode(ILOAD, 5));
+		toInjectAtStart.add(methodInfo.getLoadWorldInsns());
+		toInjectAtStart.add(methodInfo.getLoadCoordinatesInsns());
 		toInjectAtStart.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "e" : "getBlockMetadata", "(III)I", false));
 		toInjectAtStart.add(new VarInsnNode(ISTORE, previousMetadata.index));
 		toInjectAtStart.add(previousMetadataStart);
 		// fire event and get result
 		toInjectAtStart.add(new VarInsnNode(ALOAD, 0));
-		toInjectAtStart.add(new VarInsnNode(ALOAD, 1));
-		toInjectAtStart.add(new VarInsnNode(ILOAD, 3));
-		toInjectAtStart.add(new VarInsnNode(ILOAD, 4));
-		toInjectAtStart.add(new VarInsnNode(ILOAD, 5));
-		toInjectAtStart.add(new VarInsnNode(ALOAD, 2));
+		toInjectAtStart.add(methodInfo.getLoadWorldInsns());
+		toInjectAtStart.add(methodInfo.getLoadCoordinatesInsns());
+		toInjectAtStart.add(methodInfo.getLoadRandomInsns());
 		toInjectAtStart.add(new VarInsnNode(ILOAD, previousMetadata.index));
 		toInjectAtStart.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireFertilizeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;I)Lcpw/mods/fml/common/eventhandler/Event$Result;", false));
 		toInjectAtStart.add(new VarInsnNode(ASTORE, fertilizeResult.index));
@@ -97,10 +156,8 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		InsnList toInjectAtEnd = new InsnList();
 		toInjectAtEnd.add(ifNotDefault);
 		toInjectAtEnd.add(new VarInsnNode(ALOAD, 0));
-		toInjectAtEnd.add(new VarInsnNode(ALOAD, 1));
-		toInjectAtEnd.add(new VarInsnNode(ILOAD, 3));
-		toInjectAtEnd.add(new VarInsnNode(ILOAD, 4));
-		toInjectAtEnd.add(new VarInsnNode(ILOAD, 5));
+		toInjectAtEnd.add(methodInfo.getLoadWorldInsns());
+		toInjectAtEnd.add(methodInfo.getLoadCoordinatesInsns());
 		toInjectAtEnd.add(new VarInsnNode(ILOAD, previousMetadata.index));
 		toInjectAtEnd.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireFertilizedEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
 		method.instructions.insertBefore(ASMHelper.findPreviousInstruction(endLabel), toInjectAtEnd);

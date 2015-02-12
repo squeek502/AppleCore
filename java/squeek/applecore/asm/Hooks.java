@@ -156,8 +156,13 @@ public class Hooks
 		AppleCoreAPI.dispatcher.announcePlantGrowthWithoutMetadataChange(block, world, x, y, z);
 	}
 
+	private static final Random fertilizeRandom = new Random();
+
 	public static Result fireFertilizeEvent(Block block, World world, int x, int y, int z, Random random, int metadata)
 	{
+		if (random == null)
+			random = fertilizeRandom;
+
 		FertilizationEvent.Fertilize event = new FertilizationEvent.Fertilize(block, world, x, y, z, random, metadata);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getResult();
