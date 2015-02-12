@@ -1,14 +1,14 @@
 package squeek.applecore.asm.module;
 
 import static org.objectweb.asm.Opcodes.*;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.asmhelper.ASMHelper;
-import squeek.asmhelper.InsnComparator;
-import squeek.asmhelper.ObfHelper;
-import org.objectweb.asm.Type;
+import squeek.asmhelper.applecore.ASMHelper;
+import squeek.asmhelper.applecore.InsnComparator;
+import squeek.asmhelper.applecore.ObfHelper;
 
 public class ModuleBlockFood implements IClassTransformerModule
 {

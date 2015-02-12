@@ -12,7 +12,7 @@ import squeek.applecore.client.HUDOverlayHandler;
 import squeek.applecore.client.TooltipOverlayHandler;
 import squeek.applecore.commands.Commands;
 import squeek.applecore.network.SyncHandler;
-import squeek.asmhelper.ObfHelper;
+import squeek.asmhelper.applecore.ObfHelper;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.Mod;

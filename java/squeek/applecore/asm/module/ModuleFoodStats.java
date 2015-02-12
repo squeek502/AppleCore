@@ -9,8 +9,8 @@ import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.asmhelper.ASMHelper;
-import squeek.asmhelper.ObfHelper;
+import squeek.asmhelper.applecore.ASMHelper;
+import squeek.asmhelper.applecore.ObfHelper;
 import cpw.mods.fml.common.eventhandler.Event;
 
 public class ModuleFoodStats implements IClassTransformerModule

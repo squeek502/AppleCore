@@ -6,7 +6,7 @@ import org.objectweb.asm.tree.*;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.asmhelper.ASMHelper;
+import squeek.asmhelper.applecore.ASMHelper;
 
 public class ModulePeacefulRegen implements IClassTransformerModule
 {
