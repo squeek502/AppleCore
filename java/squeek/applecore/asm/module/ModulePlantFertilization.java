@@ -24,9 +24,9 @@ public class ModulePlantFertilization implements IClassTransformerModule
 
 	public static enum FertilizeMethodInfo
 	{
-		IGROWABLE_BLOCK(isObfuscated ? "b" : "func_149853_b", ObfHelper.desc("(Lnet/minecraft/world/World;Ljava/util/Random;III)V"), 1, 3, 4, 5, 2),
-		BLOCK_PAM_FRUIT("fertilize", ObfHelper.desc("(Lnet/minecraft/world/World;III)V"), 1, 2, 3, 4, FertilizeMethodInfo.NULL_PARAM),
-		BLOCK_PAM_SAPLING("markOrGrowMarked", ObfHelper.desc("(Lnet/minecraft/world/World;IIILjava/util/Random;)V"), 1, 2, 3, 4, 5);
+		IGROWABLE_BLOCK(isObfuscated ? "b" : "func_149853_b", "(Lnet/minecraft/world/World;Ljava/util/Random;III)V", 1, 3, 4, 5, 2),
+		BLOCK_PAM_FRUIT("fertilize", "(Lnet/minecraft/world/World;III)V", 1, 2, 3, 4, FertilizeMethodInfo.NULL_PARAM),
+		BLOCK_PAM_SAPLING("markOrGrowMarked", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V", 1, 2, 3, 4, 5);
 
 		public static final int NULL_PARAM = -1;
 		public final String name;
@@ -70,6 +70,12 @@ public class ModulePlantFertilization implements IClassTransformerModule
 			insnList.add(randomIndex != NULL_PARAM ? new VarInsnNode(ALOAD, randomIndex) : new InsnNode(ACONST_NULL));
 			return insnList;
 		}
+
+		@Override
+		public String toString()
+		{
+			return name + desc;
+		}
 	}
 
 	@Override
@@ -86,7 +92,9 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		{
 			FertilizeMethodInfo methodInfo = FertilizeMethodInfo.IGROWABLE_BLOCK;
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
-			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodInfo.name, methodInfo.desc);
+			// obfuscate the method descriptor here because FMLDeobfuscatingRemapper doesn't want to unmap
+			// when the FertilizeMethodInfo enum is initialized
+			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodInfo.name, ObfHelper.desc(methodInfo.desc));
 			if (method != null)
 			{
 				wrapFertilizeMethod(method, methodInfo);
@@ -107,6 +115,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		return bytes;
 	}
 
+	// TODO: Deal with super method calls
 	private void wrapFertilizeMethod(MethodNode method, FertilizeMethodInfo methodInfo)
 	{
 		LabelNode endLabel = ASMHelper.findEndLabel(method);
