@@ -14,7 +14,7 @@ import cpw.mods.fml.common.eventhandler.Event;
 
 public class ModulePlantFertilization implements IClassTransformerModule
 {
-	private static final boolean isObfuscated = ObfHelper.isObfuscated();
+	private static final boolean isObfuscatedEnvironment = ObfHelper.isObfuscated();
 	private static final HashMap<String, FertilizeMethodInfo> customFertilizeMethods = new HashMap<String, FertilizeMethodInfo>();
 	static
 	{
@@ -24,7 +24,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 
 	public static enum FertilizeMethodInfo
 	{
-		IGROWABLE_BLOCK(isObfuscated ? "b" : "func_149853_b", "(Lnet/minecraft/world/World;Ljava/util/Random;III)V", 1, 3, 4, 5, 2),
+		IGROWABLE_BLOCK("func_149853_b", "(Lnet/minecraft/world/World;Ljava/util/Random;III)V", 1, 3, 4, 5, 2),
 		BLOCK_PAM_FRUIT("fertilize", "(Lnet/minecraft/world/World;III)V", 1, 2, 3, 4, FertilizeMethodInfo.NULL_PARAM),
 		BLOCK_PAM_SAPLING("markOrGrowMarked", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V", 1, 2, 3, 4, 5);
 
@@ -92,9 +92,13 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		{
 			FertilizeMethodInfo methodInfo = FertilizeMethodInfo.IGROWABLE_BLOCK;
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
+			// necessary because mod classes do not reference obfuscated class/method names
+			boolean isClassObfuscated = !name.equals(transformedName);
+			String methodName = isClassObfuscated ? "b" : methodInfo.name;
+			String methodDesc = isClassObfuscated ? ObfHelper.desc(methodInfo.desc) : methodInfo.desc;
 			// obfuscate the method descriptor here because FMLDeobfuscatingRemapper doesn't want to unmap
 			// when the FertilizeMethodInfo enum is initialized
-			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodInfo.name, ObfHelper.desc(methodInfo.desc));
+			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodName, methodDesc);
 			if (method != null)
 			{
 				wrapFertilizeMethod(method, methodInfo);
@@ -103,14 +107,21 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		}
 		else if (customFertilizeMethods.containsKey(transformedName))
 		{
+			// overwrite global isObfuscated with local obfuscation status of the current class
+			// necessary because mod classes do not reference obfuscated class/method names
+			boolean isClassObfuscated = !name.equals(transformedName);
+			ObfHelper.setObfuscated(isClassObfuscated);
+
 			FertilizeMethodInfo methodInfo = customFertilizeMethods.get(transformedName);
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
 			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodInfo.name, methodInfo.desc);
 			if (method != null)
 			{
 				wrapFertilizeMethod(method, methodInfo);
+				ObfHelper.setObfuscated(isObfuscatedEnvironment);
 				return ASMHelper.writeClassToBytes(classNode);
 			}
+			ObfHelper.setObfuscated(isObfuscatedEnvironment);
 		}
 		return bytes;
 	}
@@ -134,7 +145,8 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		// get previous meta
 		toInjectAtStart.add(methodInfo.getLoadWorldInsns());
 		toInjectAtStart.add(methodInfo.getLoadCoordinatesInsns());
-		toInjectAtStart.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "e" : "getBlockMetadata", "(III)I", false));
+		String getBlockMetadataName = !isObfuscatedEnvironment ? "getBlockMetadata" : ObfHelper.isObfuscated() ? "e" : "func_72805_g";
+		toInjectAtStart.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), getBlockMetadataName, "(III)I", false));
 		toInjectAtStart.add(new VarInsnNode(ISTORE, previousMetadata.index));
 		toInjectAtStart.add(previousMetadataStart);
 		// fire event and get result

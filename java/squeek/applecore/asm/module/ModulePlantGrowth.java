@@ -12,7 +12,8 @@ import cpw.mods.fml.common.eventhandler.Event;
 
 public class ModulePlantGrowth implements IClassTransformerModule
 {
-	private static final boolean isObfuscated = ObfHelper.isObfuscated();
+	private static final boolean isObfuscatedEnvironment = ObfHelper.isObfuscated();
+	private static boolean isClassObfuscated = false;
 
 	@Override
 	public String[] getClassesToTransform()
@@ -38,12 +39,17 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
 	{
+		// overwrite global isObfuscated with local obfuscation status of the current class
+		// necessary because mod classes do not reference obfuscated class/method names
+		isClassObfuscated = !name.equals(transformedName);
+		ObfHelper.setObfuscated(isClassObfuscated);
+
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "updateTick", isObfuscated ? "(Lahb;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, isClassObfuscated ? "a" : "updateTick", isClassObfuscated ? "(Lahb;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 
 		if (methodNode == null)
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", isObfuscated ? "(Lahb;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", isClassObfuscated ? "(Lahb;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 
 		if (methodNode == null)
 			throw new RuntimeException(classNode.name + ": updateTick method not found");
@@ -75,7 +81,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		else if (transformedName.equals("mods.natura.blocks.crops.Glowshroom"))
 			hookBlockMushroom(classNode, methodNode);
 		else
-			return basicClass;
+			throw new RuntimeException("Unexpected class passed to transformer : " + transformedName);
+
+		// reset ObfHelper to original value
+		ObfHelper.setObfuscated(isObfuscatedEnvironment);
 
 		return ASMHelper.writeClassToBytes(classNode);
 	}
@@ -347,10 +356,13 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		needle.add(new VarInsnNode(ILOAD, 2)); // x
 		needle.add(new VarInsnNode(ILOAD, 3)); // y
 		needle.add(new VarInsnNode(ILOAD, 4)); // z
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "e" : "getBlockMetadata", "(III)I", false));
+		String getBlockMetadataName = !isObfuscatedEnvironment ? "getBlockMetadata" : isClassObfuscated ? "e" : "func_72805_g";
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), getBlockMetadataName, "(III)I", false));
 		needle.add(new VarInsnNode(ISTORE, InsnComparator.INT_WILDCARD));
 
 		InsnList foundInsns = ASMHelper.findAndGetFoundInsnList(method.instructions.getFirst(), needle);
+		if (foundInsns.getFirst() == null)
+			throw new RuntimeException("Could not find pattern:\n" + ASMHelper.getInsnListAsString(needle) + "\nin method instructions:\n" + ASMHelper.getInsnListAsString(method.instructions));
 		VarInsnNode insnISTORE = (VarInsnNode) foundInsns.getLast();
 		for (LocalVariableNode localVar : method.localVariables)
 		{
@@ -388,7 +400,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 2)); // x
 		toInject.add(new VarInsnNode(ILOAD, 3)); // y
 		toInject.add(new VarInsnNode(ILOAD, 4)); // z
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "e" : "getBlockMetadata", "(III)I", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscatedEnvironment ? "e" : "getBlockMetadata", "(III)I", false));
 		toInject.add(new VarInsnNode(ISTORE, previousMetadata.index));
 		toInject.add(previousMetadataStart);
 
