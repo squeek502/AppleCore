@@ -1,5 +1,6 @@
 package squeek.applecore.api.food;
 
+import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 
 /**

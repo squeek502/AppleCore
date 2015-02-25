@@ -1,5 +1,6 @@
 package squeek.applecore.api.food;
 
+import squeek.applecore.api.AppleCoreAPI;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
@@ -7,6 +8,7 @@ import net.minecraft.util.FoodStats;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
+import static cpw.mods.fml.common.eventhandler.Event.HasResult;
 
 /**
  * Base class for all FoodEvent events.<br>

@@ -6,6 +6,8 @@ import net.minecraft.block.IGrowable;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
+import static cpw.mods.fml.common.eventhandler.Event.Result;
+import static cpw.mods.fml.common.eventhandler.Event.HasResult;
 
 public class FertilizationEvent extends Event
 {

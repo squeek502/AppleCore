@@ -7,6 +7,8 @@ import net.minecraftforge.common.MinecraftForge;
 import squeek.applecore.api.AppleCoreAPI;
 import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
+import static cpw.mods.fml.common.eventhandler.Event.Result;
+import static cpw.mods.fml.common.eventhandler.Event.HasResult;
 
 /**
  * Base class for all ExhaustionEvent events.<br>

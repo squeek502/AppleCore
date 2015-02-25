@@ -5,11 +5,13 @@ import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
+import static cpw.mods.fml.common.eventhandler.Event.Result;
+import static cpw.mods.fml.common.eventhandler.Event.HasResult;
 
 public class PlantGrowthEvent extends Event
 {
 	/**
-	 * Fired each plant update tick to determine whether or not growth is allowed for the {@link #Block}.
+	 * Fired each plant update tick to determine whether or not growth is allowed for the {@link #block}.
 	 * 
 	 * This event is fired in various {@link Block#updateTick} overrides.<br>
 	 * <br>
