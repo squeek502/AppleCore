@@ -34,51 +34,49 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
 	{
-		boolean isObfuscated = !name.equals(transformedName);
-
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "updateTick", isObfuscated ? "(Lahb;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "updateTick","(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 
 		if (methodNode == null)
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", isObfuscated ? "(Lahb;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "func_149674_a", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 
 		if (methodNode == null)
 			throw new RuntimeException(classNode.name + ": updateTick method not found");
 
 		if (transformedName.equals("net.minecraft.block.BlockCrops"))
-			hookBlockCrops(classNode, methodNode, isObfuscated);
+			hookBlockCrops(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockReed"))
-			hookBlockReed(classNode, methodNode, isObfuscated);
+			hookBlockReed(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockCactus"))
-			hookBlockCactus(classNode, methodNode, isObfuscated);
+			hookBlockCactus(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockCocoa"))
-			hookBlockCocoa(classNode, methodNode, isObfuscated);
+			hookBlockCocoa(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockMushroom"))
-			hookBlockMushroom(classNode, methodNode, isObfuscated);
+			hookBlockMushroom(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockNetherWart"))
-			hookBlockNetherWart(classNode, methodNode, isObfuscated);
+			hookBlockNetherWart(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockSapling"))
-			hookBlockSapling(classNode, methodNode, isObfuscated);
+			hookBlockSapling(classNode, methodNode);
 		else if (transformedName.equals("net.minecraft.block.BlockStem"))
-			hookBlockStem(classNode, methodNode, isObfuscated);
+			hookBlockStem(classNode, methodNode);
 		else if (transformedName.equals("com.pam.harvestcraft.BlockPamFruit"))
-			hookBlockPamFruit(classNode, methodNode, isObfuscated);
+			hookBlockPamFruit(classNode, methodNode);
 		else if (transformedName.equals("com.pam.harvestcraft.BlockPamSapling"))
-			hookBlockPamSapling(classNode, methodNode, isObfuscated);
+			hookBlockPamSapling(classNode, methodNode);
 		else if (transformedName.equals("mods.natura.blocks.crops.BerryBush") || transformedName.equals("mods.natura.blocks.crops.NetherBerryBush"))
-			hookBlockNaturaBerryBush(classNode, methodNode, isObfuscated);
+			hookBlockNaturaBerryBush(classNode, methodNode);
 		else if (transformedName.equals("mods.natura.blocks.crops.CropBlock"))
-			hookNaturaCropBlock(classNode, methodNode, isObfuscated);
+			hookNaturaCropBlock(classNode, methodNode);
 		else if (transformedName.equals("mods.natura.blocks.crops.Glowshroom"))
-			hookBlockMushroom(classNode, methodNode, isObfuscated);
+			hookBlockMushroom(classNode, methodNode);
 		else
 			return basicClass;
 
 		return ASMHelper.writeClassToBytes(classNode);
 	}
 
-	private void hookBlockCrops(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockCrops(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
@@ -103,7 +101,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockReed(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockReed(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPGE);
 		LabelNode ifDeniedLabel = ifJumpInsn.label;
@@ -120,7 +118,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	}
 
 	// TODO: same as hookBlockReed, should they use a shared method?
-	private void hookBlockCactus(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockCactus(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPGE);
 		LabelNode ifDeniedLabel = ifJumpInsn.label;
@@ -136,7 +134,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifDeniedLabel);
 	}
 
-	private void hookBlockCocoa(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockCocoa(ClassNode classNode, MethodNode method)
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
@@ -153,7 +151,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockMushroom(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockMushroom(ClassNode classNode, MethodNode method)
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
@@ -170,7 +168,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockNetherWart(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockNetherWart(ClassNode classNode, MethodNode method)
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
@@ -185,7 +183,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockSapling(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockSapling(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode lightValueIf = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		JumpInsnNode randomIf = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(lightValueIf, IFNE);
@@ -201,7 +199,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockStem(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockStem(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode lightValueIf = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		AbstractInsnNode ifStartPoint = ASMHelper.getOrFindInstructionOfType(lightValueIf, AbstractInsnNode.LINE, true).getNext();
@@ -232,7 +230,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockPamFruit(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockPamFruit(ClassNode classNode, MethodNode method)
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
@@ -247,7 +245,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockPamSapling(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockPamSapling(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findLastInstructionWithOpcode(method, IFNE);
 		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
@@ -261,7 +259,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockNaturaBerryBush(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookBlockNaturaBerryBush(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IFNE);
 		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
@@ -279,7 +277,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookNaturaCropBlock(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookNaturaCropBlock(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();

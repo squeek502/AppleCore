@@ -22,6 +22,10 @@ import cpw.mods.fml.common.eventhandler.Event.Result;
 
 public class Hooks
 {
+	public static String getPotionParticleType(boolean flag) {
+		 return flag ? "mobSpellAmbient" : "mobSpell";
+	}
+	
 	public static FoodValues onFoodStatsAdded(FoodStats foodStats, ItemFood itemFood, ItemStack itemStack, EntityPlayer player)
 	{
 		return AppleCoreAPI.accessor.getFoodValuesForPlayer(itemStack, player);

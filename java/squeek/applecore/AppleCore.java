@@ -23,7 +23,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.Side;
 
-@IFMLLoadingPlugin.SortingIndex(-100)
+@IFMLLoadingPlugin.SortingIndex(1100)
 @IFMLLoadingPlugin.MCVersion("1.7.10")
 @IFMLLoadingPlugin.TransformerExclusions("squeek.applecore.asm")
 @Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, acceptableRemoteVersions="*")

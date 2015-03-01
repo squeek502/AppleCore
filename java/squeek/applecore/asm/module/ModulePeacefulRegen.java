@@ -22,14 +22,12 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 	{
 		if (transformedName.equals("net.minecraft.entity.player.EntityPlayer"))
 		{
-			boolean isObfuscated = !name.equals(transformedName);
-
 			ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "e" : "onLivingUpdate", "()V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_70636_d", "onLivingUpdate", "()V");
 			if (methodNode != null)
 			{
-				addPeacefulRegenHook(classNode, methodNode, isObfuscated);
+				addPeacefulRegenHook(classNode, methodNode);
 				if (!ASMHelper.isCauldron())
 					return ASMHelper.writeClassToBytes(classNode);
 				else
@@ -41,7 +39,7 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 		return basicClass;
 	}
 
-	public void addPeacefulRegenHook(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	public void addPeacefulRegenHook(ClassNode classNode, MethodNode method)
 	{
 		AbstractInsnNode relevantConditional = ASMHelper.find(method.instructions, new LdcInsnNode("naturalRegeneration"));
 		JumpInsnNode ifNode = (JumpInsnNode) ASMHelper.find(relevantConditional, new JumpInsnNode(IFEQ, new LabelNode()));

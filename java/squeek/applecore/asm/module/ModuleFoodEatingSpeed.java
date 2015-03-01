@@ -7,7 +7,12 @@ import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import org.objectweb.asm.tree.*;
+
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.ASMHelper;
 import squeek.asmhelper.ObfHelper;
@@ -28,35 +33,34 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	{
 		if (ASMHelper.isCauldron())
 			return basicClass;
-
-		boolean isObfuscated = !name.equals(transformedName);
+		
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
 		if (transformedName.equals("net.minecraft.entity.player.EntityPlayer"))
 		{
 			addItemInUseMaxDurationField(classNode);
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "setItemInUse", isObfuscated ? "(Ladd;I)V" : "(Lnet/minecraft/item/ItemStack;I)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_71008_a", "setItemInUse", "(Lnet/minecraft/item/ItemStack;I)V");
 			if (methodNode != null)
 			{
-				patchSetItemInUse(classNode, methodNode, isObfuscated);
+				patchSetItemInUse(classNode, methodNode);
 			}
 			else
 				throw new RuntimeException(classNode.name + ": setItemInUse method not found");
 
 			// this is client-only, so don't throw an error if it's not found
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "bz" : "getItemInUseDuration", "()I");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_71057_bx", "getItemInUseDuration", "()I");
 			if (methodNode != null)
 			{
-				patchGetItemInUseDuration(classNode, methodNode, isObfuscated);
+				patchGetItemInUseDuration(classNode, methodNode);
 			}
 		}
 		else if (transformedName.equals("net.minecraft.client.renderer.ItemRenderer"))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "renderItemInFirstPerson", "(F)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_78440_a", "renderItemInFirstPerson", "(F)V");
 			if (methodNode != null)
 			{
-				patchRenderItemInFirstPerson(classNode, methodNode, isObfuscated);
+				patchRenderItemInFirstPerson(classNode, methodNode);
 			}
 			else
 				throw new RuntimeException(classNode.name + ": setItemInUse method not found");
@@ -65,12 +69,20 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		return ASMHelper.writeClassToBytes(classNode);
 	}
 
-	private void patchRenderItemInFirstPerson(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void patchRenderItemInFirstPerson(ClassNode classNode, MethodNode method)
 	{
 		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionWithOpcode(method, INVOKEVIRTUAL);
-		while (targetNode != null && !(((MethodInsnNode) targetNode).name.equals(isObfuscated ? "n" : "getMaxItemUseDuration")
-				&& ((MethodInsnNode) targetNode).desc.equals("()I")
-				&& ((MethodInsnNode) targetNode).owner.equals(ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"))))
+		while (targetNode != null
+				&& !(
+						(
+							((MethodInsnNode) targetNode).name.equals("getMaxItemUseDuration")
+							|| 
+							((MethodInsnNode) targetNode).name.equals("func_77988_m")
+						)
+						&& ((MethodInsnNode) targetNode).desc.equals("()I")
+						&& ((MethodInsnNode) targetNode).owner.equals(ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"))
+					)
+				)
 		{
 			targetNode = ASMHelper.findNextInstructionWithOpcode(targetNode, INVOKEVIRTUAL);
 		}
@@ -93,12 +105,13 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		ASMHelper.removeFromInsnListUntil(method.instructions, targetNode, getFieldNode);
 	}
 
-	private void patchGetItemInUseDuration(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void patchGetItemInUseDuration(ClassNode classNode, MethodNode method)
 	{
+		boolean isObfuscated = method.name.startsWith("func_"); 
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 0));
-		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "f" : "itemInUse", ObfHelper.getDescriptor("net.minecraft.item.ItemStack")));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), isObfuscated ? "n" : "getMaxItemUseDuration", "()I"));
+		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "field_71074_e" : "itemInUse", ObfHelper.getDescriptor("net.minecraft.item.ItemStack")));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), isObfuscated ? "func_77988_m" : "getMaxItemUseDuration", "()I"));
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
@@ -111,10 +124,11 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 			throw new RuntimeException("EntityPlayer.getItemInUseDuration: no replacements made");
 	}
 
-	private void patchSetItemInUse(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void patchSetItemInUse(ClassNode classNode, MethodNode method)
 	{
+		boolean isObfuscated = method.name.startsWith("func_");
 		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionWithOpcode(method, PUTFIELD);
-		while (targetNode != null && !((FieldInsnNode) targetNode).name.equals(isObfuscated ? "g" : "itemInUseCount"))
+		while (targetNode != null && !((FieldInsnNode) targetNode).name.equals(isObfuscated ? "field_71072_f" : "itemInUseCount"))
 		{
 			targetNode = ASMHelper.findNextInstructionWithOpcode(targetNode, PUTFIELD);
 		}
