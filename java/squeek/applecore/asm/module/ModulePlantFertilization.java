@@ -10,7 +10,6 @@ import squeek.applecore.asm.IClassTransformerModule;
 import squeek.applecore.asm.TransformerModuleHandler;
 import squeek.asmhelper.applecore.ASMHelper;
 import squeek.asmhelper.applecore.ObfHelper;
-import cpw.mods.fml.common.eventhandler.Event;
 
 public class ModulePlantFertilization implements IClassTransformerModule
 {
@@ -137,7 +136,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		method.localVariables.add(previousMetadata);
 
 		LabelNode fertilizeResultStart = new LabelNode();
-		LocalVariableNode fertilizeResult = new LocalVariableNode("fertilizeResult", Type.getDescriptor(Event.Result.class), null, fertilizeResultStart, endLabel, method.maxLocals);
+		LocalVariableNode fertilizeResult = new LocalVariableNode("fertilizeResult", "Lcpw/mods/fml/common/eventhandler/Event$Result;", null, fertilizeResultStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(fertilizeResult);
 
@@ -160,7 +159,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		toInjectAtStart.add(fertilizeResultStart);
 		// check if its denied
 		toInjectAtStart.add(new VarInsnNode(ALOAD, fertilizeResult.index));
-		toInjectAtStart.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DENY", Type.getDescriptor(Event.Result.class)));
+		toInjectAtStart.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DENY", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		LabelNode ifNotDenied = new LabelNode();
 		toInjectAtStart.add(new JumpInsnNode(IF_ACMPNE, ifNotDenied));
 		toInjectAtStart.add(new LabelNode());
@@ -168,7 +167,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		toInjectAtStart.add(ifNotDenied);
 		// check if its default
 		toInjectAtStart.add(new VarInsnNode(ALOAD, fertilizeResult.index));
-		toInjectAtStart.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DEFAULT", Type.getDescriptor(Event.Result.class)));
+		toInjectAtStart.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		LabelNode ifNotDefault = new LabelNode();
 		toInjectAtStart.add(new JumpInsnNode(IF_ACMPNE, ifNotDefault));
 		toInjectAtStart.add(new LabelNode());

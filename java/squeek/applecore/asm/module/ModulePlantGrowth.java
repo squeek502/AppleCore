@@ -8,7 +8,6 @@ import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
 import squeek.asmhelper.applecore.InsnComparator;
 import squeek.asmhelper.applecore.ObfHelper;
-import cpw.mods.fml.common.eventhandler.Event;
 
 public class ModulePlantGrowth implements IClassTransformerModule
 {
@@ -412,7 +411,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		// create allowGrowthResult variable
 		LabelNode allowGrowthResultStart = new LabelNode();
-		LocalVariableNode allowGrowthResult = new LocalVariableNode("allowGrowthResult", Type.getDescriptor(Event.Result.class), null, allowGrowthResultStart, endLabel, method.maxLocals);
+		LocalVariableNode allowGrowthResult = new LocalVariableNode("allowGrowthResult", "Lcpw/mods/fml/common/eventhandler/Event$Result;", null, allowGrowthResultStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(allowGrowthResult);
 
@@ -444,10 +443,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 
 		toInject.add(new VarInsnNode(ALOAD, resultIndex));
-		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "ALLOW", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "ALLOW", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowedLabel));
 		toInject.add(new VarInsnNode(ALOAD, resultIndex));
-		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DEFAULT", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, ifFailedLabel));
 
 		method.instructions.insertBefore(injectPoint, toInject);
@@ -458,7 +457,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 
 		addFireGrowthEventInsnsToList(toInject);
-		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DENY", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DENY", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifDeniedLabel));
 
 		method.instructions.insertBefore(injectPoint, toInject);

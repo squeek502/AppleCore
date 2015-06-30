@@ -11,7 +11,6 @@ import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
 import squeek.asmhelper.applecore.ObfHelper;
-import cpw.mods.fml.common.eventhandler.Event;
 
 public class ModuleFoodStats implements IClassTransformerModule
 {
@@ -325,7 +324,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// create allowExhaustionResult variable
 		LabelNode allowExhaustionResultStart = new LabelNode();
-		LocalVariableNode allowExhaustionResult = new LocalVariableNode("allowExhaustionResult", Type.getDescriptor(Event.Result.class), null, allowExhaustionResultStart, endLabel, method.maxLocals);
+		LocalVariableNode allowExhaustionResult = new LocalVariableNode("allowExhaustionResult", "Lcpw/mods/fml/common/eventhandler/Event$Result;", null, allowExhaustionResultStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(allowExhaustionResult);
 
@@ -351,11 +350,11 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// if (allowExhaustionResult == Result.ALLOW || (allowExhaustionResult == Result.DEFAULT && this.foodExhaustionLevel >= maxExhaustion))
 		toInject.add(new VarInsnNode(ALOAD, allowExhaustionResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "ALLOW", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "ALLOW", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		LabelNode ifAllowed = new LabelNode();
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowed));
 		toInject.add(new VarInsnNode(ALOAD, allowExhaustionResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DEFAULT", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, foodExhaustionBlockEndLabel));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
@@ -459,7 +458,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// create allowRegenResult variable
 		LabelNode allowRegenResultStart = new LabelNode();
-		LocalVariableNode allowRegenResult = new LocalVariableNode("allowRegenResult", Type.getDescriptor(Event.Result.class), null, allowRegenResultStart, endLabel, method.maxLocals);
+		LocalVariableNode allowRegenResult = new LocalVariableNode("allowRegenResult", "Lcpw/mods/fml/common/eventhandler/Event$Result;", null, allowRegenResultStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(allowRegenResult);
 
@@ -471,11 +470,11 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().getGameRuleBooleanValue("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
 		toInject.add(new VarInsnNode(ALOAD, allowRegenResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "ALLOW", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "ALLOW", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		LabelNode ifAllowed = new LabelNode();
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowed));
 		toInject.add(new VarInsnNode(ALOAD, allowRegenResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DEFAULT", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		LabelNode elseStart = new LabelNode();
 		toInject.add(new JumpInsnNode(IF_ACMPNE, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 1));
@@ -609,12 +608,12 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// if (allowStarvationResult == Result.ALLOW || (allowStarvationResult == Result.DEFAULT && this.foodLevel <= 0))
 		toInject.add(new VarInsnNode(ALOAD, allowStarvationResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "ALLOW", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "ALLOW", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		LabelNode ifAllowed = new LabelNode();
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowed));
 		toInject.add(new VarInsnNode(ALOAD, allowStarvationResult.index));
 		LabelNode elseStart = new LabelNode();
-		toInject.add(new FieldInsnNode(GETSTATIC, Type.getInternalName(Event.Result.class), "DEFAULT", Type.getDescriptor(Event.Result.class)));
+		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
