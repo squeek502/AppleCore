@@ -1,5 +1,6 @@
 package squeek.applecore.asm;
 
+import java.lang.reflect.Method;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCake;
@@ -18,6 +19,7 @@ import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.api.plants.FertilizationEvent;
+import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 
 public class Hooks
@@ -158,14 +160,34 @@ public class Hooks
 
 	private static final Random fertilizeRandom = new Random();
 
-	public static Result fireFertilizeEvent(Block block, World world, int x, int y, int z, Random random, int metadata)
+	public static void fireAppleCoreFertilizeEvent(Block block, World world, int x, int y, int z, Random random)
 	{
 		if (random == null)
 			random = fertilizeRandom;
 
-		FertilizationEvent.Fertilize event = new FertilizationEvent.Fertilize(block, world, x, y, z, random, metadata);
+		int previousMetadata = world.getBlockMetadata(x, y, z);
+
+		FertilizationEvent.Fertilize event = new FertilizationEvent.Fertilize(block, world, x, y, z, random, previousMetadata);
 		MinecraftForge.EVENT_BUS.post(event);
-		return event.getResult();
+		Event.Result fertilizeResult = event.getResult();
+
+		if (fertilizeResult == Event.Result.DENY)
+			return;
+
+		if (fertilizeResult == Event.Result.DEFAULT)
+		{
+			try
+			{
+				Method renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", World.class, Random.class, int.class, int.class, int.class);
+				renamedFertilize.invoke(block, world, random, x, y, z);
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+
+		Hooks.fireFertilizedEvent(block, world, x, y, z, previousMetadata);
 	}
 
 	public static void fireFertilizedEvent(Block block, World world, int x, int y, int z, int previousMetadata)

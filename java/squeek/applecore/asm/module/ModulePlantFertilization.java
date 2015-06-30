@@ -3,7 +3,11 @@ package squeek.applecore.asm.module;
 import static org.objectweb.asm.Opcodes.*;
 import java.util.HashMap;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.Remapper;
+import org.objectweb.asm.commons.RemappingMethodAdapter;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
@@ -90,7 +94,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		if (ASMHelper.doesClassExtend(classReader, ObfHelper.getInternalClassName("net.minecraft.block.Block")) && ASMHelper.doesClassImplement(classReader, ObfHelper.getInternalClassName("net.minecraft.block.IGrowable")))
 		{
 			FertilizeMethodInfo methodInfo = FertilizeMethodInfo.IGROWABLE_BLOCK;
-			ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
+			ClassNode classNode = ASMHelper.readClassFromBytes(bytes, ClassReader.EXPAND_FRAMES);
 			// necessary because mod classes do not reference obfuscated class/method names
 			boolean isClassObfuscated = !name.equals(transformedName);
 			String methodName = isClassObfuscated ? "b" : methodInfo.name;
@@ -100,6 +104,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodName, methodDesc);
 			if (method != null)
 			{
+				copyAndRenameMethod(classNode, method, methodInfo);
 				wrapFertilizeMethod(method, methodInfo);
 				return ASMHelper.writeClassToBytes(classNode);
 			}
@@ -112,10 +117,11 @@ public class ModulePlantFertilization implements IClassTransformerModule
 			ObfHelper.setObfuscated(isClassObfuscated);
 
 			FertilizeMethodInfo methodInfo = customFertilizeMethods.get(transformedName);
-			ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
+			ClassNode classNode = ASMHelper.readClassFromBytes(bytes, ClassReader.EXPAND_FRAMES);
 			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodInfo.name, methodInfo.desc);
 			if (method != null)
 			{
+				copyAndRenameMethod(classNode, method, methodInfo);
 				wrapFertilizeMethod(method, methodInfo);
 				ObfHelper.setObfuscated(isObfuscatedEnvironment);
 				return ASMHelper.writeClassToBytes(classNode);
@@ -125,61 +131,23 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		return bytes;
 	}
 
-	// TODO: Deal with super method calls
+	private void copyAndRenameMethod(ClassNode classNode, MethodNode method, FertilizeMethodInfo methodInfo)
+	{
+		MethodVisitor methodCopyVisitor = classNode.visitMethod(method.access, "AppleCore_fertilize", method.desc, method.signature, method.exceptions.toArray(new String[method.exceptions.size()]));
+		method.accept(new RemappingMethodAdapter(method.access, method.desc, methodCopyVisitor, new Remapper() {}));
+	}
+
 	private void wrapFertilizeMethod(MethodNode method, FertilizeMethodInfo methodInfo)
 	{
-		LabelNode endLabel = ASMHelper.findEndLabel(method);
-
-		LabelNode previousMetadataStart = new LabelNode();
-		LocalVariableNode previousMetadata = new LocalVariableNode("previousMetadata", "I", null, previousMetadataStart, endLabel, method.maxLocals);
-		method.maxLocals += 1;
-		method.localVariables.add(previousMetadata);
-
-		LabelNode fertilizeResultStart = new LabelNode();
-		LocalVariableNode fertilizeResult = new LocalVariableNode("fertilizeResult", "Lcpw/mods/fml/common/eventhandler/Event$Result;", null, fertilizeResultStart, endLabel, method.maxLocals);
-		method.maxLocals += 1;
-		method.localVariables.add(fertilizeResult);
-
 		InsnList toInjectAtStart = new InsnList();
-		// get previous meta
-		toInjectAtStart.add(methodInfo.getLoadWorldInsns());
-		toInjectAtStart.add(methodInfo.getLoadCoordinatesInsns());
-		String getBlockMetadataName = !isObfuscatedEnvironment ? "getBlockMetadata" : ObfHelper.isObfuscated() ? "e" : "func_72805_g";
-		toInjectAtStart.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), getBlockMetadataName, "(III)I", false));
-		toInjectAtStart.add(new VarInsnNode(ISTORE, previousMetadata.index));
-		toInjectAtStart.add(previousMetadataStart);
-		// fire event and get result
+		// fire event
 		toInjectAtStart.add(new VarInsnNode(ALOAD, 0));
 		toInjectAtStart.add(methodInfo.getLoadWorldInsns());
 		toInjectAtStart.add(methodInfo.getLoadCoordinatesInsns());
 		toInjectAtStart.add(methodInfo.getLoadRandomInsns());
-		toInjectAtStart.add(new VarInsnNode(ILOAD, previousMetadata.index));
-		toInjectAtStart.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireFertilizeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;I)Lcpw/mods/fml/common/eventhandler/Event$Result;", false));
-		toInjectAtStart.add(new VarInsnNode(ASTORE, fertilizeResult.index));
-		toInjectAtStart.add(fertilizeResultStart);
-		// check if its denied
-		toInjectAtStart.add(new VarInsnNode(ALOAD, fertilizeResult.index));
-		toInjectAtStart.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DENY", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
-		LabelNode ifNotDenied = new LabelNode();
-		toInjectAtStart.add(new JumpInsnNode(IF_ACMPNE, ifNotDenied));
-		toInjectAtStart.add(new LabelNode());
+		toInjectAtStart.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireAppleCoreFertilizeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)V", false));
+		// just return, we're done here
 		toInjectAtStart.add(new InsnNode(RETURN));
-		toInjectAtStart.add(ifNotDenied);
-		// check if its default
-		toInjectAtStart.add(new VarInsnNode(ALOAD, fertilizeResult.index));
-		toInjectAtStart.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
-		LabelNode ifNotDefault = new LabelNode();
-		toInjectAtStart.add(new JumpInsnNode(IF_ACMPNE, ifNotDefault));
-		toInjectAtStart.add(new LabelNode());
 		method.instructions.insertBefore(ASMHelper.findFirstInstruction(method), toInjectAtStart);
-
-		InsnList toInjectAtEnd = new InsnList();
-		toInjectAtEnd.add(ifNotDefault);
-		toInjectAtEnd.add(new VarInsnNode(ALOAD, 0));
-		toInjectAtEnd.add(methodInfo.getLoadWorldInsns());
-		toInjectAtEnd.add(methodInfo.getLoadCoordinatesInsns());
-		toInjectAtEnd.add(new VarInsnNode(ILOAD, previousMetadata.index));
-		toInjectAtEnd.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireFertilizedEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
-		method.instructions.insertBefore(ASMHelper.findPreviousInstruction(endLabel), toInjectAtEnd);
 	}
 }

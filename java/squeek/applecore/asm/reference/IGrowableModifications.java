@@ -6,7 +6,6 @@ import net.minecraft.block.IGrowable;
 import net.minecraft.block.material.Material;
 import net.minecraft.world.World;
 import squeek.applecore.asm.Hooks;
-import cpw.mods.fml.common.eventhandler.Event;
 
 public class IGrowableModifications extends Block implements IGrowable
 {
@@ -29,26 +28,22 @@ public class IGrowableModifications extends Block implements IGrowable
 	{
 		return true;
 	}
+	
+	// copy/rename func_149853_b to this
+	public void AppleCore_fertilize(World world, Random random, int x, int y, int z)
+	{
+		// func_149853_b's implementation
+	}
 
 	// fertilize
 	@Override
 	public void func_149853_b(World p_149853_1_, Random p_149853_2_, int p_149853_3_, int p_149853_4_, int p_149853_5_)
 	{
 		// added at start
-		int previousMetadata = p_149853_1_.getBlockMetadata(p_149853_3_, p_149853_4_, p_149853_5_);
-		Event.Result fertilizeResult = Hooks.fireFertilizeEvent(this, p_149853_1_, p_149853_3_, p_149853_4_, p_149853_5_, p_149853_2_, previousMetadata);
+		Hooks.fireAppleCoreFertilizeEvent(this, p_149853_1_, p_149853_3_, p_149853_4_, p_149853_5_, p_149853_2_);
+		return;
 		
-		if (fertilizeResult == Event.Result.DENY)
-			return;
-		
-		// wrap the default implementation in a conditional
-		if (fertilizeResult == Event.Result.DEFAULT)
-		{
-			// default implementation
-		}
-
-		// added at end
-		Hooks.fireFertilizedEvent(this, p_149853_1_, p_149853_3_, p_149853_4_, p_149853_5_, previousMetadata);
+		// default implementation, left alone but unused because of the inserted return above
 	}
 
 }
