@@ -181,6 +181,10 @@ public class Hooks
 				Method renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", World.class, Random.class, int.class, int.class, int.class);
 				renamedFertilize.invoke(block, world, random, x, y, z);
 			}
+			catch (RuntimeException e)
+			{
+				throw e;
+			}
 			catch (Exception e)
 			{
 				throw new RuntimeException(e);

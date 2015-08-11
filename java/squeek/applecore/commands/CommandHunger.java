@@ -67,4 +67,16 @@ public class CommandHunger extends CommandBase
 		else
 			return 0;
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		return super.equals(obj) || (obj instanceof ICommand && compareTo(obj) == 0);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return getCommandName().hashCode();
+	}
 }

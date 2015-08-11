@@ -35,7 +35,7 @@ public class FoodStatsModifications extends FoodStats
 		if (!Hooks.fireFoodStatsAdditionEvent(player, new FoodValues(p_75122_1_, p_75122_2_)))
 		{
 			this.foodLevel = Math.min(p_75122_1_ + this.foodLevel, 20);
-			this.foodSaturationLevel = Math.min(this.foodSaturationLevel + (float) p_75122_1_ * p_75122_2_ * 2.0F, (float) this.foodLevel);
+			this.foodSaturationLevel = Math.min(this.foodSaturationLevel + p_75122_1_ * p_75122_2_ * 2.0F, this.foodLevel);
 		}
 	}
 

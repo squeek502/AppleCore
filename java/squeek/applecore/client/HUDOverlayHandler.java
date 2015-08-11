@@ -30,7 +30,7 @@ public class HUDOverlayHandler
 	float flashAlpha = 0f;
 	byte alphaDir = 1;
 
-	private static final ResourceLocation modIcons = new ResourceLocation(ModInfo.MODID.toLowerCase(), "textures/icons.png");
+	private static final ResourceLocation modIcons = new ResourceLocation(ModInfo.MODID_LOWER, "textures/icons.png");
 
 	public static void init()
 	{

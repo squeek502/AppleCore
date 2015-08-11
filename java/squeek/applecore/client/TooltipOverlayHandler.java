@@ -33,7 +33,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class TooltipOverlayHandler
 {
-	private static ResourceLocation modIcons = new ResourceLocation(ModInfo.MODID.toLowerCase(), "textures/icons.png");
+	private static ResourceLocation modIcons = new ResourceLocation(ModInfo.MODID_LOWER, "textures/icons.png");
 
 	public static void init()
 	{
@@ -61,6 +61,10 @@ public class TooltipOverlayHandler
 				getStackMouseOver = Class.forName("codechicken.nei.ItemPanel").getDeclaredMethod("getStackMouseOver", int.class, int.class);
 			}
 		}
+		catch (RuntimeException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
 			AppleCore.Log.error("Unable to integrate the food values tooltip overlay with NEI: ");
@@ -74,6 +78,10 @@ public class TooltipOverlayHandler
 				tinkersContainerGui = ReflectionHelper.getClass(TooltipOverlayHandler.class.getClassLoader(), "tconstruct.client.gui.NewContainerGui");
 				mainSlot = ReflectionHelper.findField(tinkersContainerGui, "mainSlot");
 			}
+		}
+		catch (RuntimeException e)
+		{
+			throw e;
 		}
 		catch (Exception e)
 		{
@@ -140,6 +148,10 @@ public class TooltipOverlayHandler
 					if (hoveredStack == null && isFoodJournalGui)
 						hoveredStack = (ItemStack) foodJournalHoveredStack.get(gui);
 				}
+				catch (RuntimeException e)
+				{
+					throw e;
+				}
 				catch (Exception e)
 				{
 					e.printStackTrace();
@@ -164,7 +176,7 @@ public class TooltipOverlayHandler
 					if (saturationOverflow)
 						saturationBarsNeeded = 1;
 
-					boolean needsCoordinateShift = isTinkersContainerGui || (!isTinkersContainerGui && !neiLoaded) || isFoodJournalGui;
+					boolean needsCoordinateShift = isTinkersContainerGui || !neiLoaded || isFoodJournalGui;
 					//int toolTipTopY = Hooks.toolTipY;
 					//int toolTipLeftX = Hooks.toolTipX;
 					int toolTipBottomY = Hooks.toolTipY + Hooks.toolTipH + 1 + (needsCoordinateShift ? 3 : 0);
@@ -175,7 +187,7 @@ public class TooltipOverlayHandler
 					int rightX = toolTipRightX - 3;
 					int leftX = rightX - (Math.max(barsNeeded * 9, saturationBarsNeeded * 6 + (int) (mc.fontRenderer.getStringWidth(saturationText) * 0.75f))) - 4;
 					int topY = (shouldDrawBelow ? toolTipBottomY : Hooks.toolTipY - 20 + (needsCoordinateShift ? -4 : 0));
-					int bottomY = topY + (shouldDrawBelow ? 20 : 20);
+					int bottomY = topY + 20;
 
 					boolean wasLightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);
 					if (wasLightingEnabled)

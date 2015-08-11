@@ -105,6 +105,10 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		{
 			return foodExhaustion.getFloat(player.getFoodStats());
 		}
+		catch (RuntimeException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
 			return 0f;
@@ -145,8 +149,13 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		{
 			foodExhaustion.setFloat(player.getFoodStats(), exhaustion);
 		}
+		catch (RuntimeException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -157,8 +166,13 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		{
 			foodLevel.setInt(player.getFoodStats(), hunger);
 		}
+		catch (RuntimeException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -169,8 +183,13 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		{
 			foodSaturationLevel.setFloat(player.getFoodStats(), saturation);
 		}
+		catch (RuntimeException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -181,8 +200,13 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		{
 			foodTimer.setInt(player.getFoodStats(), tickCounter);
 		}
+		catch (RuntimeException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -193,8 +217,13 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		{
 			starveTimer.setInt(player.getFoodStats(), tickCounter);
 		}
+		catch (RuntimeException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
+			throw new RuntimeException(e);
 		}
 	}
 
