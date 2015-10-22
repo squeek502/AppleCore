@@ -5,13 +5,14 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import squeek.applecore.api_impl.AppleCoreAccessorMutatorImpl;
+import squeek.applecore.api_impl.AppleCoreDispatcherImpl;
 import squeek.applecore.asm.TransformerModuleHandler;
 import squeek.applecore.client.DebugInfoHandler;
 import squeek.applecore.client.HUDOverlayHandler;
 import squeek.applecore.client.TooltipOverlayHandler;
 import squeek.applecore.commands.Commands;
 import squeek.applecore.network.SyncHandler;
-import squeek.asmhelper.ObfHelper;
+import squeek.asmhelper.applecore.ObfHelper;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.Mod;
@@ -25,7 +26,7 @@ import cpw.mods.fml.relauncher.Side;
 
 @IFMLLoadingPlugin.SortingIndex(1100)
 @IFMLLoadingPlugin.MCVersion("1.7.10")
-@IFMLLoadingPlugin.TransformerExclusions("squeek.applecore.asm")
+@IFMLLoadingPlugin.TransformerExclusions({"squeek.applecore.asm", "squeek.asmhelper"})
 @Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, acceptableRemoteVersions="*")
 public class AppleCore implements IFMLLoadingPlugin
 {
@@ -40,8 +41,9 @@ public class AppleCore implements IFMLLoadingPlugin
 		MetadataCollection metadataCollection = MetadataCollection.from(is, ModInfo.MODID);
 		Loader.instance().activeModContainer().bindMetadata(metadataCollection);
 
-		// force initialization of the singleton
+		// force initialization of the singletons
 		AppleCoreAccessorMutatorImpl.values();
+		AppleCoreDispatcherImpl.values();
 
 		ModConfig.init(event.getSuggestedConfigurationFile());
 

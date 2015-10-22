@@ -34,7 +34,7 @@ if (System.getenv("GIT_COMMIT") != null)
 
 sourceSets.main{
 	java {
-		srcDirs 'java', 'apis', 'ASMHelper/java'
+		srcDirs 'java', 'apis'
 	}
 	resources {
 		srcDirs 'resources'

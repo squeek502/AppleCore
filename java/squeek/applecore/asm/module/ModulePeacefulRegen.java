@@ -6,7 +6,7 @@ import org.objectweb.asm.tree.*;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.asmhelper.ASMHelper;
+import squeek.asmhelper.applecore.ASMHelper;
 
 public class ModulePeacefulRegen implements IClassTransformerModule
 {
@@ -61,7 +61,7 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 		LabelNode ifNotCanceled = new LabelNode();
 
 		ifNotCanceledBlock.add(new VarInsnNode(ALOAD, peacefulRegenEventIndex));
-		ifNotCanceledBlock.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(HealthRegenEvent.PeacefulRegen.class), "isCanceled", "()Z"));
+		ifNotCanceledBlock.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(HealthRegenEvent.PeacefulRegen.class), "isCanceled", "()Z", false));
 		ifNotCanceledBlock.add(new JumpInsnNode(IFNE, ifNotCanceled));
 		method.instructions.insertBefore(targetNode, ifNotCanceledBlock);
 
@@ -80,7 +80,7 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 
 		// HealthRegenEvent.PeacefulRegen peacefulRegenEvent = Hooks.firePeacefulRegenEvent(this);
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "firePeacefulRegenEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/hunger/HealthRegenEvent$PeacefulRegen;"));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "firePeacefulRegenEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/hunger/HealthRegenEvent$PeacefulRegen;", false));
 		toInject.add(new VarInsnNode(ASTORE, peacefulRegenEvent.index));
 		toInject.add(peacefulRegenEventStart);
 

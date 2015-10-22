@@ -21,6 +21,7 @@ public class ItemFoodProxy extends ItemFood
 	public ItemFoodProxy(IEdible proxyEdible)
 	{
 		super(0, false);
+		this.proxyEdible = proxyEdible;
 	}
 
 	/**

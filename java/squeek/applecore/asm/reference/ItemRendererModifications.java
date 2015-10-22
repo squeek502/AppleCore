@@ -22,8 +22,8 @@ public class ItemRendererModifications
 		// this block is deep in the method
 		if (enumaction == EnumAction.eat || enumaction == EnumAction.drink)
 		{
-			f6 = (float) entityclientplayermp.getItemInUseCount() - p_78440_1_ + 1.0F;
-			f7 = 1.0F - f6 / (float) entityclientplayermp.itemInUseMaxDuration;
+			f6 = entityclientplayermp.getItemInUseCount() - p_78440_1_ + 1.0F;
+			f7 = 1.0F - f6 / entityclientplayermp.itemInUseMaxDuration;
 
 			// ...
 		}

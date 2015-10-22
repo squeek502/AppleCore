@@ -31,7 +31,7 @@ public class BlockCocoaModifications extends BlockCocoa
 				p_149674_1_.setBlockMetadataWithNotify(p_149674_2_, p_149674_3_, p_149674_4_, i1 << 2 | getDirection(l), 2);
 
 				// added line
-				Hooks.fireOnGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_);
+				Hooks.fireOnGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, l);
 			}
 		}
 	}

@@ -1,11 +1,14 @@
 package squeek.applecore.api.hunger;
 
+import squeek.applecore.api.AppleCoreAPI;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.eventhandler.Cancelable;
 import cpw.mods.fml.common.eventhandler.Event;
+import static cpw.mods.fml.common.eventhandler.Event.Result;
+import static cpw.mods.fml.common.eventhandler.Event.HasResult;
 
 /**
  * Base class for all StarvationEvent events.<br>

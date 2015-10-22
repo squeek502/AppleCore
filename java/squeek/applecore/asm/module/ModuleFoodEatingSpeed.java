@@ -4,8 +4,8 @@ import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.ILOAD;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 
 import java.io.FileOutputStream;
@@ -14,8 +14,8 @@ import java.io.IOException;
 import org.objectweb.asm.tree.*;
 
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.asmhelper.ASMHelper;
-import squeek.asmhelper.ObfHelper;
+import squeek.asmhelper.applecore.ASMHelper;
+import squeek.asmhelper.applecore.ObfHelper;
 
 public class ModuleFoodEatingSpeed implements IClassTransformerModule
 {
@@ -111,13 +111,13 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 0));
 		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "field_71074_e" : "itemInUse", ObfHelper.getDescriptor("net.minecraft.item.ItemStack")));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), isObfuscated ? "func_77988_m" : "getMaxItemUseDuration", "()I"));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), isObfuscated ? "func_77988_m" : "getMaxItemUseDuration", "()I", false));
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new FieldInsnNode(GETFIELD, classNode.name.replace('.', '/'), "itemInUseMaxDuration", "I"));
-		replacement.add(new MethodInsnNode(INVOKESTATIC, "squeek/applecore/asm/Hooks", "getItemInUseMaxDuration", "(Lnet/minecraft/entity/player/EntityPlayer;I)I"));
+		replacement.add(new MethodInsnNode(INVOKESTATIC, "squeek/applecore/asm/Hooks", "getItemInUseMaxDuration", "(Lnet/minecraft/entity/player/EntityPlayer;I)I", false));
 
 		int numReplacementsMade = ASMHelper.findAndReplaceAll(method.instructions, needle, replacement);
 		if (numReplacementsMade == 0)
