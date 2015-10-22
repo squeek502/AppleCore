@@ -96,8 +96,8 @@ public class ModulePlantFertilization implements IClassTransformerModule
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes, ClassReader.EXPAND_FRAMES);
 			// necessary because mod classes do not reference obfuscated class/method names
 			boolean isClassObfuscated = !name.equals(transformedName);
-			String methodName = isClassObfuscated ? "b" : methodInfo.name;
-			String methodDesc = isClassObfuscated ? ObfHelper.desc(methodInfo.desc) : methodInfo.desc;
+			String methodName = isClassObfuscated ? "func_149853_b" : methodInfo.name;
+			String methodDesc = methodInfo.desc;
 			// obfuscate the method descriptor here because FMLDeobfuscatingRemapper doesn't want to unmap
 			// when the FertilizeMethodInfo enum is initialized
 			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodName, methodDesc);
