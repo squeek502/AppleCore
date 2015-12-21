@@ -41,7 +41,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "updateTick","(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "updateTick", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 
 		if (methodNode == null)
 			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");

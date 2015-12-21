@@ -8,7 +8,6 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.RemappingMethodAdapter;
 import org.objectweb.asm.tree.*;
-import squeek.applecore.AppleCore;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.applecore.asm.TransformerModuleHandler;
@@ -94,12 +93,9 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		{
 			FertilizeMethodInfo methodInfo = FertilizeMethodInfo.IGROWABLE_BLOCK;
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes, ClassReader.EXPAND_FRAMES);
-			// necessary because mod classes do not reference obfuscated class/method names
 			boolean isClassObfuscated = !name.equals(transformedName);
 			String methodName = isClassObfuscated ? "func_149853_b" : methodInfo.name;
 			String methodDesc = methodInfo.desc;
-			// obfuscate the method descriptor here because FMLDeobfuscatingRemapper doesn't want to unmap
-			// when the FertilizeMethodInfo enum is initialized
 			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodName, methodDesc);
 			if (method != null)
 			{

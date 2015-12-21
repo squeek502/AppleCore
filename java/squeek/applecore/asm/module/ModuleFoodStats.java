@@ -73,7 +73,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 			}
 			else
 				throw new RuntimeException("FoodStats: onUpdate method not found");
-			
+
 			return ASMHelper.writeClassToBytes(classNode);
 		}
 		return basicClass;
@@ -290,7 +290,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 	private void hookExhaustion(ClassNode classNode, MethodNode method)
 	{
 		boolean isObfuscated = method.name.startsWith("func_");
-		
+
 		// exhaustion block replaced with:
 		/*
 		Result allowExhaustionResult = Hooks.fireAllowExhaustionEvent(player);
@@ -559,7 +559,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 	private void hookStarvation(ClassNode classNode, MethodNode method)
 	{
 		boolean isObfuscated = method.name.startsWith("func_");
-		
+
 		// add starveTimer field
 		classNode.fields.add(new FieldNode(ACC_PUBLIC, "starveTimer", "I", null, null));
 
@@ -660,7 +660,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new FieldInsnNode(GETSTATIC, ObfHelper.getInternalClassName("net.minecraft.util.DamageSource"), isObfuscated ? "field_76366_f" : "starve", "Lnet/minecraft/util/DamageSource;"));
 		toInject.add(new VarInsnNode(ALOAD, starveEvent.index));
 		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(StarvationEvent.Starve.class), "starveDamage", "F"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "func_70097_a" : "attackEntityFrom","(Lnet/minecraft/util/DamageSource;F)Z", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "func_70097_a" : "attackEntityFrom", "(Lnet/minecraft/util/DamageSource;F)Z", false));
 		toInject.add(new InsnNode(POP));
 
 		// this.starveTimer = 0;

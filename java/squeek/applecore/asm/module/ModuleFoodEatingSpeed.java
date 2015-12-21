@@ -7,12 +7,7 @@ import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import org.objectweb.asm.tree.*;
-
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
 import squeek.asmhelper.applecore.ObfHelper;
@@ -33,7 +28,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	{
 		if (ASMHelper.isCauldron())
 			return basicClass;
-		
+
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
 		if (transformedName.equals("net.minecraft.entity.player.EntityPlayer"))
@@ -72,17 +67,9 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	private void patchRenderItemInFirstPerson(ClassNode classNode, MethodNode method)
 	{
 		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionWithOpcode(method, INVOKEVIRTUAL);
-		while (targetNode != null
-				&& !(
-						(
-							((MethodInsnNode) targetNode).name.equals("getMaxItemUseDuration")
-							|| 
-							((MethodInsnNode) targetNode).name.equals("func_77988_m")
-						)
-						&& ((MethodInsnNode) targetNode).desc.equals("()I")
-						&& ((MethodInsnNode) targetNode).owner.equals(ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"))
-					)
-				)
+		while (targetNode != null && !((((MethodInsnNode) targetNode).name.equals("getMaxItemUseDuration") || ((MethodInsnNode) targetNode).name.equals("func_77988_m"))
+				&& ((MethodInsnNode) targetNode).desc.equals("()I")
+				&& ((MethodInsnNode) targetNode).owner.equals(ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"))))
 		{
 			targetNode = ASMHelper.findNextInstructionWithOpcode(targetNode, INVOKEVIRTUAL);
 		}
@@ -107,7 +94,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 
 	private void patchGetItemInUseDuration(ClassNode classNode, MethodNode method)
 	{
-		boolean isObfuscated = method.name.startsWith("func_"); 
+		boolean isObfuscated = method.name.startsWith("func_");
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 0));
 		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "field_71074_e" : "itemInUse", ObfHelper.getDescriptor("net.minecraft.item.ItemStack")));
