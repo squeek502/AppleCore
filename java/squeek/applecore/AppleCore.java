@@ -91,6 +91,7 @@ public class AppleCore implements IFMLLoadingPlugin
 	public void injectData(Map<String, Object> data)
 	{
 		ObfHelper.setObfuscated((Boolean) data.get("runtimeDeobfuscationEnabled"));
+		ObfHelper.setRunsAfterDeobfRemapper(true);
 	}
 
 	@Override
