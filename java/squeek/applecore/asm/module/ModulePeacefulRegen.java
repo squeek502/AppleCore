@@ -1,10 +1,8 @@
 package squeek.applecore.asm.module;
 
 import static org.objectweb.asm.Opcodes.*;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-import squeek.applecore.api.hunger.HealthRegenEvent;
-import squeek.applecore.asm.Hooks;
+import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
 
@@ -53,7 +51,7 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 
 		InsnList healAmountReplacement = new InsnList();
 		healAmountReplacement.add(new VarInsnNode(ALOAD, peacefulRegenEventIndex));
-		healAmountReplacement.add(new FieldInsnNode(GETFIELD, Type.getInternalName(HealthRegenEvent.PeacefulRegen.class), "deltaHealth", "F"));
+		healAmountReplacement.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(ASMConstants.HealthRegenEvent.PeacefulRegen), "deltaHealth", "F"));
 
 		ASMHelper.findAndReplace(method.instructions, healAmountNeedle, healAmountReplacement, targetNode);
 
@@ -61,7 +59,7 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 		LabelNode ifNotCanceled = new LabelNode();
 
 		ifNotCanceledBlock.add(new VarInsnNode(ALOAD, peacefulRegenEventIndex));
-		ifNotCanceledBlock.add(new MethodInsnNode(INVOKEVIRTUAL, Type.getInternalName(HealthRegenEvent.PeacefulRegen.class), "isCanceled", "()Z", false));
+		ifNotCanceledBlock.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.HealthRegenEvent.PeacefulRegen), "isCanceled", "()Z", false));
 		ifNotCanceledBlock.add(new JumpInsnNode(IFNE, ifNotCanceled));
 		method.instructions.insertBefore(targetNode, ifNotCanceledBlock);
 
@@ -72,7 +70,7 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 	{
 		// create  variable
 		LabelNode peacefulRegenEventStart = new LabelNode();
-		LocalVariableNode peacefulRegenEvent = new LocalVariableNode("peacefulRegenEvent", Type.getDescriptor(HealthRegenEvent.PeacefulRegen.class), null, peacefulRegenEventStart, endLabel, method.maxLocals);
+		LocalVariableNode peacefulRegenEvent = new LocalVariableNode("peacefulRegenEvent", ASMHelper.toDescriptor(ASMConstants.HealthRegenEvent.PeacefulRegen), null, peacefulRegenEventStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(peacefulRegenEvent);
 
@@ -80,7 +78,7 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 
 		// HealthRegenEvent.PeacefulRegen peacefulRegenEvent = Hooks.firePeacefulRegenEvent(this);
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "firePeacefulRegenEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/hunger/HealthRegenEvent$PeacefulRegen;", false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "firePeacefulRegenEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/hunger/HealthRegenEvent$PeacefulRegen;", false));
 		toInject.add(new VarInsnNode(ASTORE, peacefulRegenEvent.index));
 		toInject.add(peacefulRegenEventStart);
 

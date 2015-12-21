@@ -1,9 +1,8 @@
 package squeek.applecore.asm.module;
 
 import static org.objectweb.asm.Opcodes.*;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-import squeek.applecore.asm.Hooks;
+import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
 import squeek.asmhelper.applecore.InsnComparator;
@@ -431,7 +430,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		insnList.add(new VarInsnNode(ILOAD, 3));
 		insnList.add(new VarInsnNode(ILOAD, 4));
 		insnList.add(new VarInsnNode(ALOAD, 5));
-		insnList.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireAllowPlantGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)Lcpw/mods/fml/common/eventhandler/Event$Result;", false));
+		insnList.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAllowPlantGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)Lcpw/mods/fml/common/eventhandler/Event$Result;", false));
 	}
 
 	private void injectAllowedOrDefaultCheckBefore(MethodNode method, AbstractInsnNode injectPoint, int resultIndex, LabelNode ifAllowedLabel, LabelNode ifFailedLabel)
@@ -469,7 +468,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 3));
 		toInject.add(new VarInsnNode(ILOAD, 4));
 		toInject.add(new VarInsnNode(ILOAD, previousMetadataVarIndex));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireOnGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}
@@ -483,7 +482,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 2));
 		toInject.add(new VarInsnNode(ILOAD, 3));
 		toInject.add(new VarInsnNode(ILOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireOnGrowthWithoutMetadataChangeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;III)V", false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthWithoutMetadataChangeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;III)V", false));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}

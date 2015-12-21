@@ -103,7 +103,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new VarInsnNode(ALOAD, 0));
-		replacement.add(new FieldInsnNode(GETFIELD, classNode.name.replace('.', '/'), "itemInUseMaxDuration", "I"));
+		replacement.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(classNode.name), "itemInUseMaxDuration", "I"));
 		replacement.add(new MethodInsnNode(INVOKESTATIC, "squeek/applecore/asm/Hooks", "getItemInUseMaxDuration", "(Lnet/minecraft/entity/player/EntityPlayer;I)I", false));
 
 		int numReplacementsMade = ASMHelper.findAndReplaceAll(method.instructions, needle, replacement);
@@ -128,7 +128,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		// this.itemInUseMaxDuration = p_71008_2_;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ILOAD, 2));
-		toInject.add(new FieldInsnNode(PUTFIELD, classNode.name.replace(".", "/"), "itemInUseMaxDuration", "I"));
+		toInject.add(new FieldInsnNode(PUTFIELD, ASMHelper.toInternalClassName(classNode.name), "itemInUseMaxDuration", "I"));
 
 		method.instructions.insert(targetNode, toInject);
 	}

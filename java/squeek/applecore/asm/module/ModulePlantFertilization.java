@@ -1,14 +1,22 @@
 package squeek.applecore.asm.module;
 
-import static org.objectweb.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.ACONST_NULL;
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.ILOAD;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.RETURN;
 import java.util.HashMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.RemappingMethodAdapter;
-import org.objectweb.asm.tree.*;
-import squeek.applecore.asm.Hooks;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
+import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.applecore.asm.TransformerModuleHandler;
 import squeek.asmhelper.applecore.ASMHelper;
@@ -133,7 +141,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		toInjectAtStart.add(methodInfo.getLoadWorldInsns());
 		toInjectAtStart.add(methodInfo.getLoadCoordinatesInsns());
 		toInjectAtStart.add(methodInfo.getLoadRandomInsns());
-		toInjectAtStart.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireAppleCoreFertilizeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)V", false));
+		toInjectAtStart.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAppleCoreFertilizeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)V", false));
 		// just return, we're done here
 		toInjectAtStart.add(new InsnNode(RETURN));
 		method.instructions.insertBefore(ASMHelper.findFirstInstruction(method), toInjectAtStart);

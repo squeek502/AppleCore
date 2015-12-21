@@ -11,7 +11,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import squeek.applecore.AppleCore;
-import squeek.applecore.asm.Hooks;
+import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
 
@@ -38,7 +38,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 
 			if (methodNode != null)
 			{
-				addDrawHoveringTextHook(methodNode, Hooks.class, "onDrawHoveringText", "(IIII)V");
+				addDrawHoveringTextHook(methodNode, "onDrawHoveringText", "(IIII)V");
 			}
 			else
 				throw new RuntimeException("GuiScreen.drawHoveringText not found");
@@ -49,7 +49,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 
 			if (methodNode != null)
 			{
-				addCodeChickenDrawHoveringTextHook(methodNode, Hooks.class, "onDrawHoveringText", "(IIII)V");
+				addCodeChickenDrawHoveringTextHook(methodNode, "onDrawHoveringText", "(IIII)V");
 			}
 			else
 				AppleCore.Log.error("drawTooltipBox method in codechicken.lib.gui.GuiDraw not found");
@@ -58,7 +58,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		return ASMHelper.writeClassToBytes(classNode);
 	}
 
-	public void addDrawHoveringTextHook(MethodNode method, Class<?> hookClass, String hookMethod, String hookDesc)
+	public void addDrawHoveringTextHook(MethodNode method, String hookMethod, String hookDesc)
 	{
 		AbstractInsnNode targetNode = null;
 
@@ -98,12 +98,12 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, y.index));
 		toInject.add(new VarInsnNode(ILOAD, w.index));
 		toInject.add(new VarInsnNode(ILOAD, h.index));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc, false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, hookMethod, hookDesc, false));
 
 		method.instructions.insert(targetNode, toInject);
 	}
 
-	public void addCodeChickenDrawHoveringTextHook(MethodNode method, Class<?> hookClass, String hookMethod, String hookDesc)
+	public void addCodeChickenDrawHoveringTextHook(MethodNode method, String hookMethod, String hookDesc)
 	{
 		AbstractInsnNode targetNode = ASMHelper.findFirstInstruction(method);
 
@@ -118,7 +118,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 1));	// y
 		toInject.add(new VarInsnNode(ILOAD, 2));	// w
 		toInject.add(new VarInsnNode(ILOAD, 3));	// h
-		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc, false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, hookMethod, hookDesc, false));
 
 		method.instructions.insertBefore(targetNode, toInject);
 	}
