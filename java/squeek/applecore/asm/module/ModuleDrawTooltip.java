@@ -34,20 +34,19 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 
 		if (transformedName.equals("net.minecraft.client.gui.GuiScreen"))
 		{
-			boolean isObfuscated = !name.equals(transformedName);
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", isObfuscated ? "(Ljava/util/List;IILbbu;)V" : "(Ljava/util/List;IILnet/minecraft/client/gui/FontRenderer;)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", "drawHoveringText", "(Ljava/util/List;IILnet/minecraft/client/gui/FontRenderer;)V");
 
 			if (methodNode != null)
 			{
-				addDrawHoveringTextHook(methodNode, Hooks.class, "onDrawHoveringText", "(IIII)V", isObfuscated);
+				addDrawHoveringTextHook(methodNode, Hooks.class, "onDrawHoveringText", "(IIII)V");
 			}
 			else
 				throw new RuntimeException("GuiScreen.drawHoveringText not found");
 		}
 		else if (name.equals("codechicken.lib.gui.GuiDraw"))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawTooltipBox", "(IIII)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawTooltipBox", "drawTooltipBox", "(IIII)V");
 
 			if (methodNode != null)
 			{
@@ -58,7 +57,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		}
 		else if (name.equals("tconstruct.client.gui.NewContainerGui"))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_102021_a", "(Ljava/util/List;II)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_102021_a", "func_102021_a", "(Ljava/util/List;II)V");
 
 			if (methodNode != null)
 			{
@@ -71,7 +70,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		return ASMHelper.writeClassToBytes(classNode);
 	}
 
-	public void addDrawHoveringTextHook(MethodNode method, Class<?> hookClass, String hookMethod, String hookDesc, boolean isObfuscated)
+	public void addDrawHoveringTextHook(MethodNode method, Class<?> hookClass, String hookMethod, String hookDesc)
 	{
 		AbstractInsnNode targetNode = null;
 

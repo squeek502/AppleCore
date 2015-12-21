@@ -38,17 +38,13 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
 	{
-		// overwrite global isObfuscated with local obfuscation status of the current class
-		// necessary because mod classes do not reference obfuscated class/method names
-		isClassObfuscated = !name.equals(transformedName);
-		ObfHelper.setObfuscated(isClassObfuscated);
 
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, isClassObfuscated ? "a" : "updateTick", isClassObfuscated ? "(Lahb;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "updateTick","(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 
 		if (methodNode == null)
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", isClassObfuscated ? "(Lahb;IIILjava/util/Random;)V" : "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "func_149674_a", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 
 		if (methodNode == null)
 			throw new RuntimeException(classNode.name + ": updateTick method not found");

@@ -27,14 +27,12 @@ public class ModuleFoodStats implements IClassTransformerModule
 	{
 		if (!ASMHelper.isCauldron() && transformedName.equals("net.minecraft.entity.player.EntityPlayer"))
 		{
-			boolean isObfuscated = !name.equals(transformedName);
-
 			ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "<init>", null);
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "<init>", null);
 			if (methodNode != null)
 			{
-				patchEntityPlayerInit(methodNode, isObfuscated);
+				patchEntityPlayerInit(methodNode);
 				return ASMHelper.writeClassToBytes(classNode);
 			}
 			else
@@ -42,51 +40,49 @@ public class ModuleFoodStats implements IClassTransformerModule
 		}
 		if (transformedName.equals("net.minecraft.util.FoodStats"))
 		{
-			boolean isObfuscated = !name.equals(transformedName);
-
 			ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
 			if (!ASMHelper.isCauldron())
 			{
 				injectFoodStatsPlayerField(classNode);
-				injectFoodStatsConstructor(classNode, isObfuscated);
+				injectFoodStatsConstructor(classNode);
 			}
 
-			MethodNode addStatsMethodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "addStats", "(IF)V");
+			MethodNode addStatsMethodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_75122_a", "addStats", "(IF)V");
 			if (addStatsMethodNode != null)
 			{
-				hookFoodStatsAddition(classNode, addStatsMethodNode, isObfuscated);
+				hookFoodStatsAddition(classNode, addStatsMethodNode);
 			}
 			else
 				throw new RuntimeException("FoodStats: addStats(IF)V method not found");
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "func_151686_a", isObfuscated ? "(Lacx;Ladd;)V" : "(Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_151686_a", "func_151686_a", "(Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;)V");
 			if (methodNode != null)
 			{
-				addItemStackAwareFoodStatsHook(classNode, methodNode, isObfuscated);
+				addItemStackAwareFoodStatsHook(classNode, methodNode, addStatsMethodNode.name.startsWith("func_"));
 			}
 			else
 				throw new RuntimeException("FoodStats: ItemStack-aware addStats method not found");
 
-			MethodNode updateMethodNode = ASMHelper.findMethodNodeOfClass(classNode, isObfuscated ? "a" : "onUpdate", isObfuscated ? "(Lyz;)V" : "(Lnet/minecraft/entity/player/EntityPlayer;)V");
+			MethodNode updateMethodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_75118_a", "onUpdate", "(Lnet/minecraft/entity/player/EntityPlayer;)V");
 			if (updateMethodNode != null)
 			{
-				hookHealthRegen(classNode, updateMethodNode, isObfuscated);
-				hookExhaustion(classNode, updateMethodNode, isObfuscated);
-				hookStarvation(classNode, updateMethodNode, isObfuscated);
+				hookHealthRegen(classNode, updateMethodNode);
+				hookExhaustion(classNode, updateMethodNode);
+				hookStarvation(classNode, updateMethodNode);
 			}
 			else
 				throw new RuntimeException("FoodStats: onUpdate method not found");
-
+			
 			return ASMHelper.writeClassToBytes(classNode);
 		}
 		return basicClass;
 	}
 
-	public void patchEntityPlayerInit(MethodNode method, boolean isObfuscated)
+	public void patchEntityPlayerInit(MethodNode method)
 	{
 		// find NEW net/minecraft/util/FoodStats
-		AbstractInsnNode targetNode = ASMHelper.find(method.instructions, new TypeInsnNode(NEW, isObfuscated ? "zr" : "net/minecraft/util/FoodStats"));
+		AbstractInsnNode targetNode = ASMHelper.find(method.instructions, new TypeInsnNode(NEW, "net/minecraft/util/FoodStats"));
 
 		if (targetNode == null)
 		{
@@ -105,7 +101,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		}
 
 		method.instructions.insertBefore(targetNode, new VarInsnNode(ALOAD, 0));
-		((MethodInsnNode) targetNode).desc = isObfuscated ? "(Lyz;)V" : "(Lnet/minecraft/entity/player/EntityPlayer;)V";
+		((MethodInsnNode) targetNode).desc = "(Lnet/minecraft/entity/player/EntityPlayer;)V";
 	}
 
 	public void injectFoodStatsPlayerField(ClassNode classNode)
@@ -113,11 +109,11 @@ public class ModuleFoodStats implements IClassTransformerModule
 		classNode.fields.add(new FieldNode(ACC_PUBLIC, foodStatsPlayerField, ObfHelper.getDescriptor("net.minecraft.entity.player.EntityPlayer"), null, null));
 	}
 
-	public void injectFoodStatsConstructor(ClassNode classNode, boolean isObfuscated)
+	public void injectFoodStatsConstructor(ClassNode classNode)
 	{
 		// get the default constructor and copy it
-		MethodNode defaultConstructor = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "()V");
-		MethodNode constructor = new MethodNode(ACC_PUBLIC, "<init>", isObfuscated ? "(Lyz;)V" : "(Lnet/minecraft/entity/player/EntityPlayer;)V", null, null);
+		MethodNode defaultConstructor = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "<init>", "()V");
+		MethodNode constructor = new MethodNode(ACC_PUBLIC, "<init>", "(Lnet/minecraft/entity/player/EntityPlayer;)V", null, null);
 		constructor.instructions = ASMHelper.cloneInsnList(defaultConstructor.instructions);
 
 		AbstractInsnNode targetNode = ASMHelper.findLastInstructionWithOpcode(constructor, RETURN);
@@ -187,11 +183,11 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// save current hunger/saturation levels
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75127_a" : "foodLevel", "I"));
 		toInject.add(new VarInsnNode(ISTORE, prevFoodLevel.index));
 		toInject.add(prevFoodLevelStart);
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "b" : "foodSaturationLevel", "F"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75125_b" : "foodSaturationLevel", "F"));
 		toInject.add(new VarInsnNode(FSTORE, prevSaturationLevel.index));
 		toInject.add(prevSaturationLevelStart);
 
@@ -203,7 +199,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		InsnList hungerNeedle = new InsnList();
 		hungerNeedle.add(new VarInsnNode(ALOAD, 1));
 		hungerNeedle.add(new VarInsnNode(ALOAD, 2));
-		hungerNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemFood"), isObfuscated ? "g" : "func_150905_g", "(" + ObfHelper.getDescriptor("net.minecraft.item.ItemStack") + ")I", false));
+		hungerNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemFood"), "func_150905_g", "(" + ObfHelper.getDescriptor("net.minecraft.item.ItemStack") + ")I", false));
 
 		InsnList hungerReplacement = new InsnList();
 		hungerReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
@@ -212,7 +208,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		InsnList saturationNeedle = new InsnList();
 		saturationNeedle.add(new VarInsnNode(ALOAD, 1));
 		saturationNeedle.add(new VarInsnNode(ALOAD, 2));
-		saturationNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemFood"), isObfuscated ? "h" : "func_150906_h", "(" + ObfHelper.getDescriptor("net.minecraft.item.ItemStack") + ")F", false));
+		saturationNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemFood"), "func_150906_h", "(" + ObfHelper.getDescriptor("net.minecraft.item.ItemStack") + ")F", false));
 
 		InsnList saturationReplacement = new InsnList();
 		saturationReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
@@ -241,13 +237,13 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// prevFoodLevel - this.foodLevel
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75127_a" : "foodLevel", "I"));
 		toInject.add(new VarInsnNode(ILOAD, prevFoodLevel.index));
 		toInject.add(new InsnNode(ISUB));
 
 		// prevSaturationLevel - this.foodSaturationLevel
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "b" : "foodSaturationLevel", "F"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75125_b" : "foodSaturationLevel", "F"));
 		toInject.add(new VarInsnNode(FLOAD, prevSaturationLevel.index));
 		toInject.add(new InsnNode(FSUB));
 
@@ -259,7 +255,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		method.instructions.insertBefore(targetNode, toInject);
 	}
 
-	private void hookFoodStatsAddition(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookFoodStatsAddition(ClassNode classNode, MethodNode method)
 	{
 		// injected code:
 		/*
@@ -291,8 +287,10 @@ public class ModuleFoodStats implements IClassTransformerModule
 		method.instructions.insertBefore(targetNode, ifCanceled);
 	}
 
-	private void hookExhaustion(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookExhaustion(ClassNode classNode, MethodNode method)
 	{
+		boolean isObfuscated = method.name.startsWith("func_");
+		
 		// exhaustion block replaced with:
 		/*
 		Result allowExhaustionResult = Hooks.fireAllowExhaustionEvent(player);
@@ -343,7 +341,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		// float maxExhaustion = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75126_c" : "foodExhaustionLevel", "F"));
 		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireExhaustionTickEvent", "(Lnet/minecraft/entity/player/EntityPlayer;F)F", false));
 		toInject.add(new VarInsnNode(FSTORE, maxExhaustion.index));
 		toInject.add(maxExhaustionStart);
@@ -357,7 +355,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, foodExhaustionBlockEndLabel));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75126_c" : "foodExhaustionLevel", "F"));
 		toInject.add(new VarInsnNode(FLOAD, maxExhaustion.index));
 		toInject.add(new InsnNode(FCMPL));
 		toInject.add(new JumpInsnNode(IFLT, foodExhaustionBlockEndLabel));
@@ -373,7 +371,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(FLOAD, maxExhaustion.index));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75126_c" : "foodExhaustionLevel", "F"));
 		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireExhaustionMaxEvent", "(Lnet/minecraft/entity/player/EntityPlayer;FF)Lsqueek/applecore/api/hunger/ExhaustionEvent$Exhausted;", false));
 		toInject.add(new VarInsnNode(ASTORE, exhaustedEvent.index));
 		toInject.add(exhaustedEventStart);
@@ -381,11 +379,11 @@ public class ModuleFoodStats implements IClassTransformerModule
 		// this.foodExhaustionLevel += exhaustionMaxEvent.deltaExhaustion;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DUP));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75126_c" : "foodExhaustionLevel", "F"));
 		toInject.add(new VarInsnNode(ALOAD, exhaustedEvent.index));
 		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.Exhausted.class), "deltaExhaustion", "F"));
 		toInject.add(new InsnNode(FADD));
-		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "c" : "foodExhaustionLevel", "F"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "field_75126_c" : "foodExhaustionLevel", "F"));
 
 		// if (!exhaustionMaxEvent.isCanceled())
 		toInject.add(new VarInsnNode(ALOAD, exhaustedEvent.index));
@@ -395,30 +393,31 @@ public class ModuleFoodStats implements IClassTransformerModule
 		// this.foodSaturationLevel = Math.max(this.foodSaturationLevel + exhaustionMaxEvent.deltaSaturation, 0.0F);
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "b" : "foodSaturationLevel", "F"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75125_b" : "foodSaturationLevel", "F"));
 		toInject.add(new VarInsnNode(ALOAD, exhaustedEvent.index));
 		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.Exhausted.class), "deltaSaturation", "F"));
 		toInject.add(new InsnNode(FADD));
 		toInject.add(new InsnNode(FCONST_0));
 		toInject.add(new MethodInsnNode(INVOKESTATIC, "java/lang/Math", "max", "(FF)F", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "b" : "foodSaturationLevel", "F"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "field_75125_b" : "foodSaturationLevel", "F"));
 
 		// this.foodLevel = Math.max(this.foodLevel + exhaustionMaxEvent.deltaHunger, 0);
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75127_a" : "foodLevel", "I"));
 		toInject.add(new VarInsnNode(ALOAD, exhaustedEvent.index));
 		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(ExhaustionEvent.Exhausted.class), "deltaHunger", "I"));
 		toInject.add(new InsnNode(IADD));
 		toInject.add(new InsnNode(ICONST_0));
 		toInject.add(new MethodInsnNode(INVOKESTATIC, "java/lang/Math", "max", "(II)I", false));
-		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "field_75127_a" : "foodLevel", "I"));
 
 		method.instructions.insert(injectPoint, toInject);
 	}
 
-	private void hookHealthRegen(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookHealthRegen(ClassNode classNode, MethodNode method)
 	{
+		boolean isObfuscated = method.name.startsWith("func_");
 		// health regen block replaced with:
 		/*
 		Result allowRegenResult = Hooks.fireAllowRegenEvent(player);
@@ -478,31 +477,31 @@ public class ModuleFoodStats implements IClassTransformerModule
 		LabelNode elseStart = new LabelNode();
 		toInject.add(new JumpInsnNode(IF_ACMPNE, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "o" : "worldObj", isObfuscated ? "Lahb;" : "Lnet/minecraft/world/World;"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "O" : "getGameRules", isObfuscated ? "()Lagy;" : "()Lnet/minecraft/world/GameRules;", false));
+		toInject.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "field_70170_p" : "worldObj", "Lnet/minecraft/world/World;"));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "func_82736_K" : "getGameRules", "()Lnet/minecraft/world/GameRules;", false));
 		toInject.add(new LdcInsnNode("naturalRegeneration"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.GameRules"), isObfuscated ? "b" : "getGameRuleBooleanValue", "(Ljava/lang/String;)Z", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.GameRules"), isObfuscated ? "func_82758_b" : "getGameRuleBooleanValue", "(Ljava/lang/String;)Z", false));
 		toInject.add(new JumpInsnNode(IFEQ, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75127_a" : "foodLevel", "I"));
 		toInject.add(new IntInsnNode(BIPUSH, 18));
 		toInject.add(new JumpInsnNode(IF_ICMPLT, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "bR" : "shouldHeal", "()Z", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "func_70996_bM" : "shouldHeal", "()Z", false));
 		toInject.add(new JumpInsnNode(IFEQ, elseStart));
 		toInject.add(ifAllowed);
 
 		// ++this.foodTimer;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(DUP));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "d" : "foodTimer", "I"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75123_d" : "foodTimer", "I"));
 		toInject.add(new InsnNode(ICONST_1));
 		toInject.add(new InsnNode(IADD));
-		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "d" : "foodTimer", "I"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "field_75123_d" : "foodTimer", "I"));
 
 		// if (this.foodTimer >= Hooks.fireRegenTickEvent(player))
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "d" : "foodTimer", "I"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75123_d" : "foodTimer", "I"));
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(Hooks.class), "fireRegenTickEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)I", false));
 		toInject.add(new JumpInsnNode(IF_ICMPLT, healthBlockEndLabel));
@@ -530,19 +529,19 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, regenEvent.index));
 		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(HealthRegenEvent.Regen.class), "deltaHealth", "F"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.EntityLivingBase"), isObfuscated ? "f" : "heal", "(F)V", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.EntityLivingBase"), isObfuscated ? "func_70691_i" : "heal", "(F)V", false));
 
 		// this.addExhaustion(regenEvent.deltaExhaustion);
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, regenEvent.index));
 		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(HealthRegenEvent.Regen.class), "deltaExhaustion", "F"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, internalFoodStatsName, isObfuscated ? "a" : "addExhaustion", "(F)V", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, internalFoodStatsName, isObfuscated ? "func_75113_a" : "addExhaustion", "(F)V", false));
 
 		// this.foodTimer = 0;
 		toInject.add(ifCanceled);
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "d" : "foodTimer", "I"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "field_75123_d" : "foodTimer", "I"));
 		toInject.add(regenEventEnd);
 		toInject.add(new JumpInsnNode(GOTO, healthBlockEndLabel));
 
@@ -552,13 +551,15 @@ public class ModuleFoodStats implements IClassTransformerModule
 		// this.foodTimer = 0;
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new InsnNode(ICONST_0));
-		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "d" : "foodTimer", "I"));
+		toInject.add(new FieldInsnNode(PUTFIELD, internalFoodStatsName, isObfuscated ? "field_75123_d" : "foodTimer", "I"));
 
 		method.instructions.insert(injectPoint, toInject);
 	}
 
-	private void hookStarvation(ClassNode classNode, MethodNode method, boolean isObfuscated)
+	private void hookStarvation(ClassNode classNode, MethodNode method)
 	{
+		boolean isObfuscated = method.name.startsWith("func_");
+		
 		// add starveTimer field
 		classNode.fields.add(new FieldNode(ACC_PUBLIC, "starveTimer", "I", null, null));
 
@@ -616,7 +617,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "a" : "foodLevel", "I"));
+		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75127_a" : "foodLevel", "I"));
 		toInject.add(new JumpInsnNode(IFGT, elseStart));
 		toInject.add(ifAllowed);
 
@@ -656,10 +657,10 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// player.attackEntityFrom(DamageSource.starve, starveEvent.starveDamage);
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new FieldInsnNode(GETSTATIC, ObfHelper.getInternalClassName("net.minecraft.util.DamageSource"), isObfuscated ? "field_76366_f" : "starve", isObfuscated ? "Lro;" : "Lnet/minecraft/util/DamageSource;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, ObfHelper.getInternalClassName("net.minecraft.util.DamageSource"), isObfuscated ? "field_76366_f" : "starve", "Lnet/minecraft/util/DamageSource;"));
 		toInject.add(new VarInsnNode(ALOAD, starveEvent.index));
 		toInject.add(new FieldInsnNode(GETFIELD, Type.getInternalName(StarvationEvent.Starve.class), "starveDamage", "F"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "a" : "attackEntityFrom", isObfuscated ? "(Lro;F)Z" : "(Lnet/minecraft/util/DamageSource;F)Z", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "func_70097_a" : "attackEntityFrom","(Lnet/minecraft/util/DamageSource;F)Z", false));
 		toInject.add(new InsnNode(POP));
 
 		// this.starveTimer = 0;
