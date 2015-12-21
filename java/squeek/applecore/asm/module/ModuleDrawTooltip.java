@@ -22,8 +22,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 	{
 		return new String[]{
 		"net.minecraft.client.gui.GuiScreen",
-		"codechicken.lib.gui.GuiDraw",
-		"tconstruct.client.gui.NewContainerGui"
+		"codechicken.lib.gui.GuiDraw"
 		};
 	}
 
@@ -55,17 +54,6 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 			else
 				AppleCore.Log.error("drawTooltipBox method in codechicken.lib.gui.GuiDraw not found");
 		}
-		else if (name.equals("tconstruct.client.gui.NewContainerGui"))
-		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_102021_a", "(Ljava/util/List;II)V");
-
-			if (methodNode != null)
-			{
-				addTinkersDrawHoveringTextHook(methodNode, Hooks.class, "onDrawHoveringText", "(IIII)V", false);
-			}
-			else
-				AppleCore.Log.error("func_102021_a method in tconstruct.client.gui.NewContainerGui not found");
-		}
 
 		return ASMHelper.writeClassToBytes(classNode);
 	}
@@ -92,54 +80,6 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		LocalVariableNode y = ASMHelper.findLocalVariableOfMethod(method, "k2", "I");
 		LocalVariableNode w = ASMHelper.findLocalVariableOfMethod(method, "k", "I");
 		LocalVariableNode h = ASMHelper.findLocalVariableOfMethod(method, "i1", "I");
-
-		if (x == null || y == null || w == null || h == null)
-		{
-			AppleCore.Log.warn("Could not patch " + method.name + "; local variables not found");
-			return;
-		}
-
-		InsnList toInject = new InsnList();
-
-		/*
-		// equivalent to:
-		Hooks.onDrawHoveringText(0, 0, 0, 0);
-		*/
-
-		toInject.add(new VarInsnNode(ILOAD, x.index));
-		toInject.add(new VarInsnNode(ILOAD, y.index));
-		toInject.add(new VarInsnNode(ILOAD, w.index));
-		toInject.add(new VarInsnNode(ILOAD, h.index));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, hookClass.getName().replace('.', '/'), hookMethod, hookDesc, false));
-
-		method.instructions.insert(targetNode, toInject);
-	}
-
-	public void addTinkersDrawHoveringTextHook(MethodNode method, Class<?> hookClass, String hookMethod, String hookDesc, boolean isObfuscated)
-	{
-		AbstractInsnNode targetNode = null;
-
-		// get last drawGradientRect call
-		for (AbstractInsnNode instruction : method.instructions.toArray())
-		{
-			if (instruction.getOpcode() == INVOKEVIRTUAL)
-			{
-				MethodInsnNode methodInsn = (MethodInsnNode) instruction;
-
-				if (methodInsn.desc.equals("(IIIIII)V"))
-					targetNode = instruction;
-			}
-		}
-		if (targetNode == null)
-		{
-			AppleCore.Log.warn("Could not patch " + method.name + "; target node not found");
-			return;
-		}
-
-		LocalVariableNode x = ASMHelper.findLocalVariableOfMethod(method, "i1", "I");
-		LocalVariableNode y = ASMHelper.findLocalVariableOfMethod(method, "j1", "I");
-		LocalVariableNode w = ASMHelper.findLocalVariableOfMethod(method, "k", "I");
-		LocalVariableNode h = ASMHelper.findLocalVariableOfMethod(method, "k1", "I");
 
 		if (x == null || y == null || w == null || h == null)
 		{
