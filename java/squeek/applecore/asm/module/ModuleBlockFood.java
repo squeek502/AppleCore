@@ -23,7 +23,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_150036_b", "func_150036_b", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/player/EntityPlayer;)V");
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_150036_b", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/player/EntityPlayer;)V");
 
 		if (methodNode != null)
 		{

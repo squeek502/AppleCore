@@ -35,7 +35,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		if (transformedName.equals("net.minecraft.client.gui.GuiScreen"))
 		{
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", "drawHoveringText", "(Ljava/util/List;IILnet/minecraft/client/gui/FontRenderer;)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", "(Ljava/util/List;IILnet/minecraft/client/gui/FontRenderer;)V");
 
 			if (methodNode != null)
 			{
@@ -46,7 +46,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		}
 		else if (name.equals("codechicken.lib.gui.GuiDraw"))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawTooltipBox", "drawTooltipBox", "(IIII)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawTooltipBox", "(IIII)V");
 
 			if (methodNode != null)
 			{
@@ -57,7 +57,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		}
 		else if (name.equals("tconstruct.client.gui.NewContainerGui"))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_102021_a", "func_102021_a", "(Ljava/util/List;II)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_102021_a", "(Ljava/util/List;II)V");
 
 			if (methodNode != null)
 			{

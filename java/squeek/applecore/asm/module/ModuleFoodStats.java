@@ -29,7 +29,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		{
 			ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "<init>", null);
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "<init>", null);
 			if (methodNode != null)
 			{
 				patchEntityPlayerInit(methodNode);
@@ -56,7 +56,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 			else
 				throw new RuntimeException("FoodStats: addStats(IF)V method not found");
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_151686_a", "func_151686_a", "(Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_151686_a", "(Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;)V");
 			if (methodNode != null)
 			{
 				addItemStackAwareFoodStatsHook(classNode, methodNode, addStatsMethodNode.name.startsWith("func_"));
@@ -112,7 +112,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 	public void injectFoodStatsConstructor(ClassNode classNode)
 	{
 		// get the default constructor and copy it
-		MethodNode defaultConstructor = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "<init>", "()V");
+		MethodNode defaultConstructor = ASMHelper.findMethodNodeOfClass(classNode, "<init>", "()V");
 		MethodNode constructor = new MethodNode(ACC_PUBLIC, "<init>", "(Lnet/minecraft/entity/player/EntityPlayer;)V", null, null);
 		constructor.instructions = ASMHelper.cloneInsnList(defaultConstructor.instructions);
 
