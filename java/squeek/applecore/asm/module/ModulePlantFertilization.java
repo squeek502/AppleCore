@@ -8,6 +8,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.RemappingMethodAdapter;
 import org.objectweb.asm.tree.*;
+import squeek.applecore.AppleCore;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.applecore.asm.TransformerModuleHandler;
@@ -16,7 +17,6 @@ import squeek.asmhelper.applecore.ObfHelper;
 
 public class ModulePlantFertilization implements IClassTransformerModule
 {
-	private static final boolean isObfuscatedEnvironment = ObfHelper.isObfuscated();
 	private static final HashMap<String, FertilizeMethodInfo> customFertilizeMethods = new HashMap<String, FertilizeMethodInfo>();
 	static
 	{
@@ -90,7 +90,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 	public byte[] transform(String name, String transformedName, byte[] bytes)
 	{
 		ClassReader classReader = new ClassReader(bytes);
-		if (ASMHelper.doesClassExtend(classReader, ObfHelper.getInternalClassName("net.minecraft.block.Block")) && ASMHelper.doesClassImplement(classReader, ObfHelper.getInternalClassName("net.minecraft.block.IGrowable")))
+		if (ASMHelper.doesClassImplement(classReader, ObfHelper.getInternalClassName("net.minecraft.block.IGrowable")))
 		{
 			FertilizeMethodInfo methodInfo = FertilizeMethodInfo.IGROWABLE_BLOCK;
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes, ClassReader.EXPAND_FRAMES);
@@ -110,11 +110,6 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		}
 		else if (customFertilizeMethods.containsKey(transformedName))
 		{
-			// overwrite global isObfuscated with local obfuscation status of the current class
-			// necessary because mod classes do not reference obfuscated class/method names
-			boolean isClassObfuscated = !name.equals(transformedName);
-			ObfHelper.setObfuscated(isClassObfuscated);
-
 			FertilizeMethodInfo methodInfo = customFertilizeMethods.get(transformedName);
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes, ClassReader.EXPAND_FRAMES);
 			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodInfo.name, methodInfo.desc);
@@ -122,10 +117,8 @@ public class ModulePlantFertilization implements IClassTransformerModule
 			{
 				copyAndRenameMethod(classNode, method, methodInfo);
 				wrapFertilizeMethod(method, methodInfo);
-				ObfHelper.setObfuscated(isObfuscatedEnvironment);
 				return ASMHelper.writeClassToBytes(classNode);
 			}
-			ObfHelper.setObfuscated(isObfuscatedEnvironment);
 		}
 		return bytes;
 	}
