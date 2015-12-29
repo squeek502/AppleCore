@@ -135,6 +135,9 @@ public class ModulePlantFertilization implements IClassTransformerModule
 
 	private void wrapFertilizeMethod(MethodNode method, FertilizeMethodInfo methodInfo)
 	{
+		if (ASMHelper.isMethodAbstract(method))
+			return;
+
 		InsnList toInjectAtStart = new InsnList();
 		// fire event
 		toInjectAtStart.add(new VarInsnNode(ALOAD, 0));
