@@ -42,8 +42,6 @@ public class TooltipOverlayHandler
 	//private static final Field guiLeft = ReflectionHelper.findField(GuiContainer.class, ObfuscationReflectionHelper.remapFieldNames(GuiContainer.class.getName(), "guiLeft", "field_147003_i", "i"));
 	//private static final Field guiTop = ReflectionHelper.findField(GuiContainer.class, ObfuscationReflectionHelper.remapFieldNames(GuiContainer.class.getName(), "guiTop", "field_147009_r", "r"));
 	public static final Field theSlot = ReflectionHelper.findField(GuiContainer.class, ObfuscationReflectionHelper.remapFieldNames(GuiContainer.class.getName(), "theSlot", "field_147006_u", "u"));
-	private static Class<?> tinkersContainerGui = null;
-	private static Field mainSlot = null;
 	private static Method getStackMouseOver = null;
 	private static Field itemPanel = null;
 	private static boolean neiLoaded = false;
@@ -69,26 +67,6 @@ public class TooltipOverlayHandler
 		{
 			AppleCore.Log.error("Unable to integrate the food values tooltip overlay with NEI: ");
 			e.printStackTrace();
-		}
-
-		try
-		{
-			if (Loader.isModLoaded("TConstruct"))
-			{
-				tinkersContainerGui = ReflectionHelper.getClass(TooltipOverlayHandler.class.getClassLoader(), "tconstruct.client.gui.NewContainerGui");
-				mainSlot = ReflectionHelper.findField(tinkersContainerGui, "mainSlot");
-			}
-		}
-		catch (RuntimeException e)
-		{
-			throw e;
-		}
-		catch (Exception e)
-		{
-			// NewContainerGui only exists in early 1.7.10 versions of TiC
-			// Keeping the reflection but removing the error printing will
-			// maintain compatibility with those versions while removing the
-			// confusing/misleading errors in logs when using recent versions
 		}
 
 		try
@@ -120,9 +98,8 @@ public class TooltipOverlayHandler
 
 			ScaledResolution scale = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
 
-			boolean isTinkersContainerGui = (tinkersContainerGui != null && tinkersContainerGui.isInstance(curScreen));
 			boolean isFoodJournalGui = foodJournalGui != null && foodJournalGui.isInstance(curScreen);
-			boolean isValidContainerGui = curScreen instanceof GuiContainer || isTinkersContainerGui;
+			boolean isValidContainerGui = curScreen instanceof GuiContainer;
 			if (isValidContainerGui && KeyHelper.isShiftKeyDown())
 			{
 				Gui gui = curScreen;
@@ -134,7 +111,7 @@ public class TooltipOverlayHandler
 				try
 				{
 					// try regular container
-					Slot hoveredSlot = !isTinkersContainerGui ? (Slot) TooltipOverlayHandler.theSlot.get(gui) : (Slot) TooltipOverlayHandler.mainSlot.get(gui);
+					Slot hoveredSlot = (Slot) TooltipOverlayHandler.theSlot.get(gui);
 
 					// get the stack
 					if (hoveredSlot != null)
@@ -176,7 +153,7 @@ public class TooltipOverlayHandler
 					if (saturationOverflow)
 						saturationBarsNeeded = 1;
 
-					boolean needsCoordinateShift = isTinkersContainerGui || !neiLoaded || isFoodJournalGui;
+					boolean needsCoordinateShift = !neiLoaded || isFoodJournalGui;
 					//int toolTipTopY = Hooks.toolTipY;
 					//int toolTipLeftX = Hooks.toolTipX;
 					int toolTipBottomY = Hooks.toolTipY + Hooks.toolTipH + 1 + (needsCoordinateShift ? 3 : 0);
