@@ -101,10 +101,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		{
 			FertilizeMethodInfo methodInfo = FertilizeMethodInfo.IGROWABLE_BLOCK;
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes, ClassReader.EXPAND_FRAMES);
-			boolean isClassObfuscated = !name.equals(transformedName);
-			String methodName = isClassObfuscated ? "func_149853_b" : methodInfo.name;
-			String methodDesc = methodInfo.desc;
-			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodName, methodDesc);
+			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodInfo.name, methodInfo.desc);
 			if (method != null)
 			{
 				copyAndRenameMethod(classNode, method, methodInfo);

@@ -34,7 +34,6 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 	private void addOnBlockFoodEatenHook(ClassNode classNode, MethodNode method)
 	{
-		boolean isObfuscated = method.name.startsWith("func_");
 		// default p_150036_5_.getFoodStats().addStats call replaced with:
 		/*
 		FoodValues modifiedFoodValues = Hooks.onBlockFoodEaten(this, p_150036_1_, p_150036_5_);
@@ -81,8 +80,8 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// int prevFoodLevel = p_150036_5_.getFoodStats().getFoodLevel();
 		toInject.add(new VarInsnNode(ALOAD, 5));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "func_71024_bL" : "getFoodStats", "()Lnet/minecraft/util/FoodStats;", false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), isObfuscated ? "func_75116_a" : "getFoodLevel", "()I", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", "()Lnet/minecraft/util/FoodStats;", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), ObfHelper.isObfuscated() ? "func_75116_a" : "getFoodLevel", "()I", false));
 		toInject.add(new VarInsnNode(ISTORE, prevFoodLevel.index));
 		toInject.add(prevFoodLevelStart);
 
@@ -94,8 +93,8 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// float prevSaturationLevel = p_150036_5_.getFoodStats().getSaturationLevel();
 		toInject.add(new VarInsnNode(ALOAD, 5));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "func_71024_bL" : "getFoodStats", "()Lnet/minecraft/util/FoodStats;", false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), isObfuscated ? "func_75115_e" : "getSaturationLevel", "()F", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", "()Lnet/minecraft/util/FoodStats;", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), ObfHelper.isObfuscated() ? "func_75115_e" : "getSaturationLevel", "()F", false));
 		toInject.add(new VarInsnNode(FSTORE, prevSaturationLevel.index));
 		toInject.add(prevSaturationLevelStart);
 

@@ -8,7 +8,6 @@ import squeek.asmhelper.applecore.ASMHelper;
 
 public class ModulePeacefulRegen implements IClassTransformerModule
 {
-
 	@Override
 	public String[] getClassesToTransform()
 	{

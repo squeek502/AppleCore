@@ -10,8 +10,6 @@ import squeek.asmhelper.applecore.ObfHelper;
 
 public class ModulePlantGrowth implements IClassTransformerModule
 {
-	private static final boolean isObfuscatedEnvironment = ObfHelper.isObfuscated();
-
 	@Override
 	public String[] getClassesToTransform()
 	{
@@ -36,7 +34,6 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
 	{
-
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
 		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "updateTick", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
@@ -75,9 +72,6 @@ public class ModulePlantGrowth implements IClassTransformerModule
 			hookBlockMushroom(classNode, methodNode);
 		else
 			throw new RuntimeException("Unexpected class passed to transformer : " + transformedName);
-
-		// reset ObfHelper to original value
-		ObfHelper.setObfuscated(isObfuscatedEnvironment);
 
 		return ASMHelper.writeClassToBytes(classNode);
 	}
@@ -349,7 +343,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		needle.add(new VarInsnNode(ILOAD, 2)); // x
 		needle.add(new VarInsnNode(ILOAD, 3)); // y
 		needle.add(new VarInsnNode(ILOAD, 4)); // z
-		String getBlockMetadataName = isObfuscatedEnvironment ? "func_72805_g" : "getBlockMetadata";
+		String getBlockMetadataName = ObfHelper.isObfuscated() ? "func_72805_g" : "getBlockMetadata";
 		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), getBlockMetadataName, "(III)I", false));
 		needle.add(new VarInsnNode(ISTORE, InsnComparator.INT_WILDCARD));
 
@@ -393,7 +387,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 2)); // x
 		toInject.add(new VarInsnNode(ILOAD, 3)); // y
 		toInject.add(new VarInsnNode(ILOAD, 4)); // z
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscatedEnvironment ? "func_72805_g" : "getBlockMetadata", "(III)I", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), ObfHelper.isObfuscated() ? "func_72805_g" : "getBlockMetadata", "(III)I", false));
 		toInject.add(new VarInsnNode(ISTORE, previousMetadata.index));
 		toInject.add(previousMetadataStart);
 

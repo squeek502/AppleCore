@@ -94,11 +94,10 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 
 	private void patchGetItemInUseDuration(ClassNode classNode, MethodNode method)
 	{
-		boolean isObfuscated = method.name.startsWith("func_");
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 0));
-		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "field_71074_e" : "itemInUse", ObfHelper.getDescriptor("net.minecraft.item.ItemStack")));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), isObfuscated ? "func_77988_m" : "getMaxItemUseDuration", "()I", false));
+		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), ObfHelper.isObfuscated() ? "field_71074_e" : "itemInUse", ObfHelper.getDescriptor("net.minecraft.item.ItemStack")));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", "()I", false));
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
@@ -113,9 +112,8 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 
 	private void patchSetItemInUse(ClassNode classNode, MethodNode method)
 	{
-		boolean isObfuscated = method.name.startsWith("func_");
 		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionWithOpcode(method, PUTFIELD);
-		while (targetNode != null && !((FieldInsnNode) targetNode).name.equals(isObfuscated ? "field_71072_f" : "itemInUseCount"))
+		while (targetNode != null && !((FieldInsnNode) targetNode).name.equals(ObfHelper.isObfuscated() ? "field_71072_f" : "itemInUseCount"))
 		{
 			targetNode = ASMHelper.findNextInstructionWithOpcode(targetNode, PUTFIELD);
 		}
