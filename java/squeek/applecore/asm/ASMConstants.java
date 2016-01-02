@@ -21,4 +21,10 @@ public class ASMConstants
 	{
 		public static final String Starve = "squeek.applecore.api.hunger.StarvationEvent$Starve";
 	}
+
+	public static final class HarvestCraft
+	{
+		public static final String BlockPamFruit = "com.pam.harvestcraft.BlockPamFruit";
+		public static final String BlockPamSapling = "com.pam.harvestcraft.BlockPamSapling";
+	}
 }

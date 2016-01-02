@@ -27,8 +27,8 @@ public class ModulePlantFertilization implements IClassTransformerModule
 	private static final HashMap<String, FertilizeMethodInfo> customFertilizeMethods = new HashMap<String, FertilizeMethodInfo>();
 	static
 	{
-		customFertilizeMethods.put("com.pam.harvestcraft.BlockPamFruit", FertilizeMethodInfo.BLOCK_PAM_FRUIT);
-		customFertilizeMethods.put("com.pam.harvestcraft.BlockPamSapling", FertilizeMethodInfo.BLOCK_PAM_SAPLING);
+		customFertilizeMethods.put(ASMConstants.HarvestCraft.BlockPamFruit, FertilizeMethodInfo.BLOCK_PAM_FRUIT);
+		customFertilizeMethods.put(ASMConstants.HarvestCraft.BlockPamSapling, FertilizeMethodInfo.BLOCK_PAM_SAPLING);
 	}
 
 	public static enum FertilizeMethodInfo

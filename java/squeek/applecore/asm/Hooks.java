@@ -1,6 +1,8 @@
 package squeek.applecore.asm;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCake;
@@ -163,6 +165,12 @@ public class Hooks
 	}
 
 	private static final Random fertilizeRandom = new Random();
+	private static final Map<String, Class<?>[]> fertilizeMethods = new HashMap<String, Class<?>[]>();
+	static 
+	{
+		fertilizeMethods.put(ASMConstants.HarvestCraft.BlockPamFruit, new Class<?>[] { World.class, int.class, int.class, int.class });
+		fertilizeMethods.put(ASMConstants.HarvestCraft.BlockPamSapling, new Class<?>[] { World.class, int.class, int.class, int.class, Random.class });
+	}
 
 	public static void fireAppleCoreFertilizeEvent(Block block, World world, int x, int y, int z, Random random)
 	{
@@ -182,8 +190,21 @@ public class Hooks
 		{
 			try
 			{
-				Method renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", World.class, Random.class, int.class, int.class, int.class);
-				renamedFertilize.invoke(block, world, random, x, y, z);
+				Method renamedFertilize;
+				if (fertilizeMethods.containsKey(block.getClass().getName()))
+				{
+					Class<?>[] argTypes = fertilizeMethods.get(block.getClass().getName());
+					renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", argTypes);
+					if (argTypes.length == 4)
+						renamedFertilize.invoke(block, world, x, y, z);
+					else
+						renamedFertilize.invoke(block, world, x, y, z, random);
+				}
+				else
+				{
+					renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", World.class, Random.class, int.class, int.class, int.class);
+					renamedFertilize.invoke(block, world, random, x, y, z);
+				}
 			}
 			catch (RuntimeException e)
 			{
