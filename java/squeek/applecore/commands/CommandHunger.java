@@ -7,6 +7,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.StatCollector;
 import squeek.applecore.api.AppleCoreAPI;
 
 public class CommandHunger extends CommandBase
@@ -20,7 +21,7 @@ public class CommandHunger extends CommandBase
 	@Override
 	public String getCommandUsage(ICommandSender icommandsender)
 	{
-		return "/hunger [player] <value>";
+		return StatCollector.translateToLocal("applecore.commands.hunger.usage");
 	}
 
 	@Override
@@ -41,7 +42,7 @@ public class CommandHunger extends CommandBase
 			if (playerToActOn.getFoodStats().getSaturationLevel() > newHunger)
 				AppleCoreAPI.mutator.setSaturation(playerToActOn, newHunger);
 
-			func_152374_a(commandSender, this, 1, "Set " + playerToActOn.getDisplayName() + "'s hunger to " + newHunger);
+			func_152374_a(commandSender, this, 1, StatCollector.translateToLocalFormatted("applecore.commands.hunger.set.hunger.to", playerToActOn.getDisplayName(), newHunger));
 		}
 		else
 		{
