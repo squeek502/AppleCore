@@ -25,6 +25,11 @@ public class ModConfig
 	private static final String SHOW_FOOD_VALUES_IN_TOOLTIP_COMMENT =
 			"If true, shows the hunger and saturation values of food in its tooltip while holding SHIFT";
 
+	public static boolean ALWAYS_SHOW_FOOD_VALUES_TOOLTIP = false;
+	private static final String ALWAYS_SHOW_FOOD_VALUES_TOOLTIP_NAME = "show.food.values.in.tooltip.always";
+	private static final String ALWAYS_SHOW_FOOD_VALUES_TOOLTIP_COMMENT =
+			"If true, shows the hunger and saturation values of food in its tooltip automatically (without needing to hold SHIFT)";
+
 	public static boolean SHOW_SATURATION_OVERLAY = true;
 	private static final String SHOW_SATURATION_OVERLAY_NAME = "show.saturation.hud.overlay";
 	private static final String SHOW_SATURATION_OVERLAY_COMMENT =
@@ -64,6 +69,7 @@ public class ModConfig
 		config.getCategory(CATEGORY_CLIENT).remove(SHOW_FOOD_EXHAUSTION_OVERLAY_NAME);
 
 		SHOW_FOOD_VALUES_IN_TOOLTIP = config.get(CATEGORY_CLIENT, SHOW_FOOD_VALUES_IN_TOOLTIP_NAME, true, SHOW_FOOD_VALUES_IN_TOOLTIP_COMMENT).getBoolean(true);
+		ALWAYS_SHOW_FOOD_VALUES_TOOLTIP = config.get(CATEGORY_CLIENT, ALWAYS_SHOW_FOOD_VALUES_TOOLTIP_NAME, false, ALWAYS_SHOW_FOOD_VALUES_TOOLTIP_COMMENT).getBoolean(false);
 		SHOW_SATURATION_OVERLAY = config.get(CATEGORY_CLIENT, SHOW_SATURATION_OVERLAY_NAME, true, SHOW_SATURATION_OVERLAY_COMMENT).getBoolean(true);
 		SHOW_FOOD_VALUES_OVERLAY = config.get(CATEGORY_CLIENT, SHOW_FOOD_VALUES_OVERLAY_NAME, true, SHOW_FOOD_VALUES_OVERLAY_COMMENT).getBoolean(true);
 		SHOW_FOOD_EXHAUSTION_UNDERLAY = config.get(CATEGORY_CLIENT, SHOW_FOOD_EXHAUSTION_UNDERLAY_NAME, foodExhaustionOverlayValue, SHOW_FOOD_EXHAUSTION_UNDERLAY_COMMENT).getBoolean(foodExhaustionOverlayValue);

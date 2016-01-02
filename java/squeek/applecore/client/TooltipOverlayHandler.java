@@ -90,7 +90,7 @@ public class TooltipOverlayHandler
 		if (event.phase != TickEvent.Phase.END)
 			return;
 
-		if (ModConfig.SHOW_FOOD_VALUES_IN_TOOLTIP)
+		if ((ModConfig.SHOW_FOOD_VALUES_IN_TOOLTIP && KeyHelper.isShiftKeyDown()) || ModConfig.ALWAYS_SHOW_FOOD_VALUES_TOOLTIP)
 		{
 			Minecraft mc = Minecraft.getMinecraft();
 			EntityPlayer player = mc.thePlayer;
@@ -100,7 +100,7 @@ public class TooltipOverlayHandler
 
 			boolean isFoodJournalGui = foodJournalGui != null && foodJournalGui.isInstance(curScreen);
 			boolean isValidContainerGui = curScreen instanceof GuiContainer;
-			if (isValidContainerGui && KeyHelper.isShiftKeyDown())
+			if (isValidContainerGui)
 			{
 				Gui gui = curScreen;
 				int mouseX = Mouse.getX() * scale.getScaledWidth() / mc.displayWidth;
