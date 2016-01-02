@@ -475,7 +475,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), isObfuscated ? "field_70170_p" : "worldObj", "Lnet/minecraft/world/World;"));
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), isObfuscated ? "func_82736_K" : "getGameRules", "()Lnet/minecraft/world/GameRules;", false));
 		toInject.add(new LdcInsnNode("naturalRegeneration"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.GameRules"), isObfuscated ? "func_82758_b" : "getGameRuleBooleanValue", "(Ljava/lang/String;)Z", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.GameRules"), isObfuscated ? "func_82766_b" : "getGameRuleBooleanValue", "(Ljava/lang/String;)Z", false));
 		toInject.add(new JumpInsnNode(IFEQ, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, isObfuscated ? "field_75127_a" : "foodLevel", "I"));
