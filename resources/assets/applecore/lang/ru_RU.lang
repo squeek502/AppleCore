@@ -1,0 +1,2 @@
+applecore.commands.hunger.usage=/hunger [игрок] <значение>
+applecore.commands.hunger.set.hunger.to=Голод игрока %s изменён на %d
