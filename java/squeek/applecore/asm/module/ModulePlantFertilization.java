@@ -1,26 +1,19 @@
 package squeek.applecore.asm.module;
 
-import static org.objectweb.asm.Opcodes.ACONST_NULL;
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.ILOAD;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.RETURN;
-import java.util.HashMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.RemappingMethodAdapter;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.VarInsnNode;
+import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.applecore.asm.TransformerModuleHandler;
 import squeek.asmhelper.applecore.ASMHelper;
 import squeek.asmhelper.applecore.ObfHelper;
+
+import java.util.HashMap;
+
+import static org.objectweb.asm.Opcodes.*;
 
 public class ModulePlantFertilization implements IClassTransformerModule
 {
@@ -33,7 +26,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 
 	public static enum FertilizeMethodInfo
 	{
-		IGROWABLE_BLOCK("func_149853_b", "(Lnet/minecraft/world/World;Ljava/util/Random;III)V", 1, 3, 4, 5, 2),
+		IGROWABLE_BLOCK("grow", "(Lnet/minecraft/world/World;Ljava/util/Random;III)V", 1, 3, 4, 5, 2),
 		BLOCK_PAM_FRUIT("fertilize", "(Lnet/minecraft/world/World;III)V", 1, 2, 3, 4, FertilizeMethodInfo.NULL_PARAM),
 		BLOCK_PAM_SAPLING("markOrGrowMarked", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V", 1, 2, 3, 4, 5);
 

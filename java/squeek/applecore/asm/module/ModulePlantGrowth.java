@@ -344,8 +344,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		needle.add(new VarInsnNode(ILOAD, 2)); // x
 		needle.add(new VarInsnNode(ILOAD, 3)); // y
 		needle.add(new VarInsnNode(ILOAD, 4)); // z
-		String getBlockMetadataName = ObfHelper.isObfuscated() ? "func_72805_g" : "getBlockMetadata";
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), getBlockMetadataName, "(III)I", false));
+		String getBlockStateName = ObfHelper.isObfuscated() ? "func_180495_p" : "getBlockState";
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), getBlockStateName, "(III)I", false));
 		needle.add(new VarInsnNode(ISTORE, InsnComparator.INT_WILDCARD));
 
 		InsnList foundInsns = ASMHelper.findAndGetFoundInsnList(method.instructions.getFirst(), needle);
@@ -388,7 +388,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 2)); // x
 		toInject.add(new VarInsnNode(ILOAD, 3)); // y
 		toInject.add(new VarInsnNode(ILOAD, 4)); // z
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), ObfHelper.isObfuscated() ? "func_72805_g" : "getBlockMetadata", "(III)I", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), ObfHelper.isObfuscated() ? "func_180495_p" : "getBlockState", "(III)I", false));
 		toInject.add(new VarInsnNode(ISTORE, previousMetadata.index));
 		toInject.add(previousMetadataStart);
 

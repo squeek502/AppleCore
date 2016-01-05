@@ -33,7 +33,7 @@ public class IGrowableModifications extends Block implements IGrowable
 	}
 	
 	// copy/rename grow to this
-	public void AppleCore_fertilize(World world, Random random, int x, int y, int z)
+	public void AppleCore_fertilize(World world, Random random, BlockPos pos, IBlockState state)
 	{
 		// grow's implementation
 	}

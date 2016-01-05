@@ -1,15 +1,16 @@
 package squeek.applecore.example;
 
-import java.util.Random;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import squeek.applecore.api.AppleCoreAPI;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import squeek.applecore.api.AppleCoreAPI;
+
+import java.util.Random;
 
 public class BlockCropsExample extends BlockCrops
 {
