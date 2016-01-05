@@ -1,12 +1,13 @@
 package squeek.applecore.asm.module;
 
-import static org.objectweb.asm.Opcodes.*;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
 import squeek.asmhelper.applecore.InsnComparator;
 import squeek.asmhelper.applecore.ObfHelper;
+
+import static org.objectweb.asm.Opcodes.*;
 
 public class ModulePlantGrowth implements IClassTransformerModule
 {
@@ -36,10 +37,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "updateTick", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 
 		if (methodNode == null)
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_149674_a", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
 
 		if (methodNode == null)
 			throw new RuntimeException(classNode.name + ": updateTick method not found");
@@ -399,7 +400,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		// create allowGrowthResult variable
 		LabelNode allowGrowthResultStart = new LabelNode();
-		LocalVariableNode allowGrowthResult = new LocalVariableNode("allowGrowthResult", "Lcpw/mods/fml/common/eventhandler/Event$Result;", null, allowGrowthResultStart, endLabel, method.maxLocals);
+		LocalVariableNode allowGrowthResult = new LocalVariableNode("allowGrowthResult", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", null, allowGrowthResultStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(allowGrowthResult);
 
@@ -423,7 +424,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		insnList.add(new VarInsnNode(ILOAD, 3));
 		insnList.add(new VarInsnNode(ILOAD, 4));
 		insnList.add(new VarInsnNode(ALOAD, 5));
-		insnList.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAllowPlantGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)Lcpw/mods/fml/common/eventhandler/Event$Result;", false));
+		insnList.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAllowPlantGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", false));
 	}
 
 	private void injectAllowedOrDefaultCheckBefore(MethodNode method, AbstractInsnNode injectPoint, int resultIndex, LabelNode ifAllowedLabel, LabelNode ifFailedLabel)
@@ -431,10 +432,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 
 		toInject.add(new VarInsnNode(ALOAD, resultIndex));
-		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "ALLOW", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "ALLOW", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowedLabel));
 		toInject.add(new VarInsnNode(ALOAD, resultIndex));
-		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "DEFAULT", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, ifFailedLabel));
 
 		method.instructions.insertBefore(injectPoint, toInject);
@@ -445,7 +446,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 
 		addFireGrowthEventInsnsToList(toInject);
-		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DENY", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "DENY", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifDeniedLabel));
 
 		method.instructions.insertBefore(injectPoint, toInject);

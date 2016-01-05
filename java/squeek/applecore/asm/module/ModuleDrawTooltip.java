@@ -76,10 +76,10 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		if (targetNode == null)
 			throw new RuntimeException("Unexpected instruction pattern encountered in " + method.name);
 
-		LocalVariableNode x = ASMHelper.findLocalVariableOfMethod(method, "j2", "I");
-		LocalVariableNode y = ASMHelper.findLocalVariableOfMethod(method, "k2", "I");
-		LocalVariableNode w = ASMHelper.findLocalVariableOfMethod(method, "k", "I");
-		LocalVariableNode h = ASMHelper.findLocalVariableOfMethod(method, "i1", "I");
+		LocalVariableNode x = ASMHelper.findLocalVariableOfMethod(method, "l1", "I");
+		LocalVariableNode y = ASMHelper.findLocalVariableOfMethod(method, "i2", "I");
+		LocalVariableNode w = ASMHelper.findLocalVariableOfMethod(method, "i", "I");
+		LocalVariableNode h = ASMHelper.findLocalVariableOfMethod(method, "k", "I");
 
 		if (x == null || y == null || w == null || h == null)
 		{

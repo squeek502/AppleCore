@@ -51,7 +51,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 			else
 				throw new RuntimeException("FoodStats: addStats(IF)V method not found");
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_151686_a", "(Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_151686_a", "addStats", "(Lnet/minecraft/item/ItemFood;Lnet/minecraft/item/ItemStack;)V");
 			if (methodNode != null)
 			{
 				addItemStackAwareFoodStatsHook(classNode, methodNode, ObfHelper.isObfuscated());
@@ -315,13 +315,13 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// create allowExhaustionResult variable
 		LabelNode allowExhaustionResultStart = new LabelNode();
-		LocalVariableNode allowExhaustionResult = new LocalVariableNode("allowExhaustionResult", "Lcpw/mods/fml/common/eventhandler/Event$Result;", null, allowExhaustionResultStart, endLabel, method.maxLocals);
+		LocalVariableNode allowExhaustionResult = new LocalVariableNode("allowExhaustionResult", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", null, allowExhaustionResultStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(allowExhaustionResult);
 
 		// Result allowExhaustionResult = Hooks.fireAllowExhaustionEvent(player);
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, "fireAllowExhaustionEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lcpw/mods/fml/common/eventhandler/Event$Result;", false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, "fireAllowExhaustionEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", false));
 		toInject.add(new VarInsnNode(ASTORE, allowExhaustionResult.index));
 		toInject.add(allowExhaustionResultStart);
 
@@ -341,11 +341,11 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// if (allowExhaustionResult == Result.ALLOW || (allowExhaustionResult == Result.DEFAULT && this.foodExhaustionLevel >= maxExhaustion))
 		toInject.add(new VarInsnNode(ALOAD, allowExhaustionResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "ALLOW", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "ALLOW", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
 		LabelNode ifAllowed = new LabelNode();
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowed));
 		toInject.add(new VarInsnNode(ALOAD, allowExhaustionResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "DEFAULT", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, foodExhaustionBlockEndLabel));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, ObfHelper.isObfuscated() ? "field_75126_c" : "foodExhaustionLevel", "F"));
@@ -449,23 +449,23 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// create allowRegenResult variable
 		LabelNode allowRegenResultStart = new LabelNode();
-		LocalVariableNode allowRegenResult = new LocalVariableNode("allowRegenResult", "Lcpw/mods/fml/common/eventhandler/Event$Result;", null, allowRegenResultStart, endLabel, method.maxLocals);
+		LocalVariableNode allowRegenResult = new LocalVariableNode("allowRegenResult", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", null, allowRegenResultStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(allowRegenResult);
 
 		// Result allowRegenResult = Hooks.fireAllowRegenEvent(player);
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, "fireAllowRegenEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lcpw/mods/fml/common/eventhandler/Event$Result;", false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, "fireAllowRegenEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", false));
 		toInject.add(new VarInsnNode(ASTORE, allowRegenResult.index));
 		toInject.add(allowRegenResultStart);
 
 		// if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().getGameRuleBooleanValue("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
 		toInject.add(new VarInsnNode(ALOAD, allowRegenResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "ALLOW", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "ALLOW", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
 		LabelNode ifAllowed = new LabelNode();
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowed));
 		toInject.add(new VarInsnNode(ALOAD, allowRegenResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "DEFAULT", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
 		LabelNode elseStart = new LabelNode();
 		toInject.add(new JumpInsnNode(IF_ACMPNE, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 1));
@@ -587,24 +587,24 @@ public class ModuleFoodStats implements IClassTransformerModule
 		// for whatever reason, the end label of this variable cant be the actual end label of the method
 		// it was throwing ArrayIndexOutOfBoundException in the ClassReader in obfuscated environments
 		// not sure why that is the case, but this workaround seems to avoid the issue
-		LocalVariableNode allowStarvationResult = new LocalVariableNode("allowStarvationResult", "Lcpw/mods/fml/common/eventhandler/Event$Result;", null, allowStarvationResultStart, beforeReturn, method.maxLocals);
+		LocalVariableNode allowStarvationResult = new LocalVariableNode("allowStarvationResult", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", null, allowStarvationResultStart, beforeReturn, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(allowStarvationResult);
 
 		// Result allowStarvationResult = Hooks.fireAllowStarvation(player);
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, "fireAllowStarvation", "(Lnet/minecraft/entity/player/EntityPlayer;)Lcpw/mods/fml/common/eventhandler/Event$Result;", false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, "fireAllowStarvation", "(Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", false));
 		toInject.add(new VarInsnNode(ASTORE, allowStarvationResult.index));
 		toInject.add(allowStarvationResultStart);
 
 		// if (allowStarvationResult == Result.ALLOW || (allowStarvationResult == Result.DEFAULT && this.foodLevel <= 0))
 		toInject.add(new VarInsnNode(ALOAD, allowStarvationResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "ALLOW", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "ALLOW", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
 		LabelNode ifAllowed = new LabelNode();
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowed));
 		toInject.add(new VarInsnNode(ALOAD, allowStarvationResult.index));
 		LabelNode elseStart = new LabelNode();
-		toInject.add(new FieldInsnNode(GETSTATIC, "cpw/mods/fml/common/eventhandler/Event$Result", "DEFAULT", "Lcpw/mods/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "DEFAULT", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, ObfHelper.isObfuscated() ? "field_75127_a" : "foodLevel", "I"));

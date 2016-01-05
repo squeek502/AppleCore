@@ -34,7 +34,7 @@ public class MessageDifficultySync implements IMessage, IMessageHandler<MessageD
 	@Override
 	public IMessage onMessage(MessageDifficultySync message, MessageContext ctx)
 	{
-		message.difficulty = NetworkHelper.getSidedPlayer(ctx).worldObj.getDifficulty();
+		NetworkHelper.getSidedPlayer(ctx).worldObj.getWorldInfo().setDifficulty(message.difficulty);
 		return null;
 	}
 }
