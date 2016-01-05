@@ -5,11 +5,11 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Optional;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.food.IEdible;
 import squeek.applecore.api.food.ItemFoodProxy;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Optional;
 
 @Optional.Interface(iface = "squeek.applecore.api.food.IEdible", modid = "AppleCore")
 public class ItemNonStandardFood extends Item implements IEdible
@@ -31,14 +31,14 @@ public class ItemNonStandardFood extends Item implements IEdible
 	public void onEatenCompatibility(ItemStack itemStack, EntityPlayer player)
 	{
 		// one possible compatible method
-		player.getFoodStats().func_151686_a(new ItemFoodProxy(this), itemStack);
+		player.getFoodStats().addStats(new ItemFoodProxy(this), itemStack);
 
 		// another possible compatible method:
 		// new ItemFoodProxy(this).onEaten(itemStack, player);
 	}
 
 	@Override
-	public ItemStack onEaten(ItemStack itemStack, World world, EntityPlayer player)
+	public ItemStack onItemUseFinish(ItemStack itemStack, World world, EntityPlayer player)
 	{
 		--itemStack.stackSize;
 
@@ -59,7 +59,7 @@ public class ItemNonStandardFood extends Item implements IEdible
 	@Override
 	public EnumAction getItemUseAction(ItemStack itemStack)
 	{
-		return EnumAction.eat;
+		return EnumAction.EAT;
 	}
 
 	@Override

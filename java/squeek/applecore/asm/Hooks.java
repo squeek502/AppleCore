@@ -1,19 +1,19 @@
 package squeek.applecore.asm;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCake;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.food.FoodEvent;
 import squeek.applecore.api.food.FoodValues;
@@ -21,8 +21,11 @@ import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.api.plants.FertilizationEvent;
-import cpw.mods.fml.common.eventhandler.Event;
-import cpw.mods.fml.common.eventhandler.Event.Result;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class Hooks
 {
@@ -43,7 +46,7 @@ public class Hooks
 	public static int getItemInUseMaxDuration(EntityPlayer player, int savedMaxDuration)
 	{
 		EnumAction useAction = player.getItemInUse().getItemUseAction();
-		if (useAction == EnumAction.eat || useAction == EnumAction.drink)
+		if (useAction == EnumAction.EAT || useAction == EnumAction.DRINK)
 			return savedMaxDuration;
 		else
 			return player.getItemInUse().getMaxItemUseDuration();
@@ -149,19 +152,19 @@ public class Hooks
 		return event.isCancelable() ? event.isCanceled() : false;
 	}
 
-	public static Result fireAllowPlantGrowthEvent(Block block, World world, int x, int y, int z, Random random)
+	public static Event.Result fireAllowPlantGrowthEvent(Block block, World world, BlockPos pos, IBlockState state, Random random)
 	{
-		return AppleCoreAPI.dispatcher.validatePlantGrowth(block, world, x, y, z, random);
+		return AppleCoreAPI.dispatcher.validatePlantGrowth(block, world, pos, state, random);
 	}
 
-	public static void fireOnGrowthEvent(Block block, World world, int x, int y, int z, int previousMetadata)
+	public static void fireOnGrowthEvent(Block block, World world, BlockPos pos, IBlockState state, int previousMetadata)
 	{
-		AppleCoreAPI.dispatcher.announcePlantGrowth(block, world, x, y, z, previousMetadata);
+		AppleCoreAPI.dispatcher.announcePlantGrowth(block, world, pos, state, previousMetadata);
 	}
 
-	public static void fireOnGrowthWithoutMetadataChangeEvent(Block block, World world, int x, int y, int z)
+	public static void fireOnGrowthWithoutMetadataChangeEvent(Block block, World world, BlockPos pos, IBlockState state)
 	{
-		AppleCoreAPI.dispatcher.announcePlantGrowthWithoutMetadataChange(block, world, x, y, z);
+		AppleCoreAPI.dispatcher.announcePlantGrowthWithoutMetadataChange(block, world, pos, state);
 	}
 
 	private static final Random fertilizeRandom = new Random();
@@ -172,14 +175,14 @@ public class Hooks
 		fertilizeMethods.put(ASMConstants.HarvestCraft.BlockPamSapling, new Class<?>[] { World.class, int.class, int.class, int.class, Random.class });
 	}
 
-	public static void fireAppleCoreFertilizeEvent(Block block, World world, int x, int y, int z, Random random)
+	public static void fireAppleCoreFertilizeEvent(Block block, World world, BlockPos pos, IBlockState state, Random random)
 	{
 		if (random == null)
 			random = fertilizeRandom;
 
-		int previousMetadata = world.getBlockMetadata(x, y, z);
+		int previousMetadata = state.getBlock().getMetaFromState(state);
 
-		FertilizationEvent.Fertilize event = new FertilizationEvent.Fertilize(block, world, x, y, z, random, previousMetadata);
+		FertilizationEvent.Fertilize event = new FertilizationEvent.Fertilize(block, world, pos, state, random, previousMetadata);
 		MinecraftForge.EVENT_BUS.post(event);
 		Event.Result fertilizeResult = event.getResult();
 
@@ -196,14 +199,14 @@ public class Hooks
 					Class<?>[] argTypes = fertilizeMethods.get(block.getClass().getName());
 					renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", argTypes);
 					if (argTypes.length == 4)
-						renamedFertilize.invoke(block, world, x, y, z);
+						renamedFertilize.invoke(block, world, pos, state);
 					else
-						renamedFertilize.invoke(block, world, x, y, z, random);
+						renamedFertilize.invoke(block, world, pos, state, random);
 				}
 				else
 				{
 					renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", World.class, Random.class, int.class, int.class, int.class);
-					renamedFertilize.invoke(block, world, random, x, y, z);
+					renamedFertilize.invoke(block, world, random, pos, state);
 				}
 			}
 			catch (RuntimeException e)
@@ -216,12 +219,12 @@ public class Hooks
 			}
 		}
 
-		Hooks.fireFertilizedEvent(block, world, x, y, z, previousMetadata);
+		Hooks.fireFertilizedEvent(block, world, pos, state, previousMetadata);
 	}
 
-	public static void fireFertilizedEvent(Block block, World world, int x, int y, int z, int previousMetadata)
+	public static void fireFertilizedEvent(Block block, World world, BlockPos pos, IBlockState state, int previousMetadata)
 	{
-		FertilizationEvent.Fertilized event = new FertilizationEvent.Fertilized(block, world, x, y, z, previousMetadata);
+		FertilizationEvent.Fertilized event = new FertilizationEvent.Fertilized(block, world, pos, state, previousMetadata);
 		MinecraftForge.EVENT_BUS.post(event);
 	}
 

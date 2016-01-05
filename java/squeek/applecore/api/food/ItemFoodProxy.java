@@ -29,24 +29,24 @@ public class ItemFoodProxy extends ItemFood
 	 */
 	public void onEaten(ItemStack itemStack, EntityPlayer player)
 	{
-		player.getFoodStats().func_151686_a(this, itemStack);
+		player.getFoodStats().addStats(this, itemStack);
 	}
 
 	/**
 	 * @return The hunger value of the edible item
 	 */
 	@Override
-	public int func_150905_g(ItemStack itemStack)
+	public int getHealAmount(ItemStack stack)
 	{
-		return proxyEdible.getFoodValues(itemStack).hunger;
+		return proxyEdible.getFoodValues(stack).hunger;
 	}
 
 	/**
 	 * @return The saturation modifier of the edible item
 	 */
 	@Override
-	public float func_150906_h(ItemStack itemStack)
+	public float getSaturationModifier(ItemStack stack)
 	{
-		return proxyEdible.getFoodValues(itemStack).saturationModifier;
+		return proxyEdible.getFoodValues(stack).saturationModifier;
 	}
 }

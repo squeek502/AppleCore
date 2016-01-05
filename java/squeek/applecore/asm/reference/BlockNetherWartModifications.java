@@ -1,32 +1,35 @@
 package squeek.applecore.asm.reference;
 
-import java.util.Random;
 import net.minecraft.block.BlockNetherWart;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import squeek.applecore.asm.Hooks;
-import cpw.mods.fml.common.eventhandler.Event.Result;
+
+import java.util.Random;
 
 public class BlockNetherWartModifications extends BlockNetherWart
 {
 	@Override
-	public void updateTick(World p_149674_1_, int p_149674_2_, int p_149674_3_, int p_149674_4_, Random p_149674_5_)
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)
 	{
 		// added line
-		Result allowGrowthResult = Hooks.fireAllowPlantGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, p_149674_5_);
-		int l = p_149674_1_.getBlockMetadata(p_149674_2_, p_149674_3_, p_149674_4_);
+		Result allowGrowthResult = Hooks.fireAllowPlantGrowthEvent(this, world, pos, state, rand);
+		int i = (state.getValue(AGE)).intValue();
 		// added var
-		int previousMetadata = l;
+		int previousMetadata = i;
 		
 		// changed if
-		if (l < 3 && (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && p_149674_5_.nextInt(10) == 0)))
+		if (i < 3 && (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && rand.nextInt(10) == 0)))
 		{
-			++l;
-			p_149674_1_.setBlockMetadataWithNotify(p_149674_2_, p_149674_3_, p_149674_4_, l, 2);
+			state = state.withProperty(AGE, Integer.valueOf(i + 1));
+			world.setBlockState(pos, state, 2);
 
 			// added line
-			Hooks.fireOnGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, previousMetadata);
+			Hooks.fireOnGrowthEvent(this, world, pos, state, previousMetadata);
 		}
 
-		super.updateTick(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, p_149674_5_);
+		super.updateTick(world, pos, state, rand);
 	}
 }

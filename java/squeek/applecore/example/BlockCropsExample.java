@@ -2,27 +2,29 @@ package squeek.applecore.example;
 
 import java.util.Random;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import squeek.applecore.api.AppleCoreAPI;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Optional;
-import cpw.mods.fml.common.eventhandler.Event;
-import cpw.mods.fml.common.eventhandler.Event.Result;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 
 public class BlockCropsExample extends BlockCrops
 {
 	// abstract the AppleCoreAPI reference into an Optional.Method so that AppleCore is not a hard dependency
 	@Optional.Method(modid = "AppleCore")
-	public Event.Result validateAppleCoreGrowthTick(World world, int x, int y, int z, Random random)
+	public Event.Result validateAppleCoreGrowthTick(World world, BlockPos pos, IBlockState state, Random random)
 	{
-		return AppleCoreAPI.dispatcher.validatePlantGrowth(this, world, x, y, z, random);
+		return AppleCoreAPI.dispatcher.validatePlantGrowth(this, world, pos, state, random);
 	}
 
 	// abstract the AppleCoreAPI reference into an Optional.Method so that AppleCore is not a hard dependency
 	@Optional.Method(modid = "AppleCore")
-	public void announceAppleCoreGrowthTick(World world, int x, int y, int z, int previousMetadata)
+	public void announceAppleCoreGrowthTick(World world, BlockPos pos, IBlockState state, int previousMetadata)
 	{
-		AppleCoreAPI.dispatcher.announcePlantGrowth(this, world, x, y, z, previousMetadata);
+		AppleCoreAPI.dispatcher.announcePlantGrowth(this, world, pos, state, previousMetadata);
 	}
 
 	/**
@@ -31,13 +33,13 @@ public class BlockCropsExample extends BlockCrops
 	 * which means that the custom implementation will need to fire and handle them
 	 */
 	@Override
-	public void updateTick(World world, int x, int y, int z, Random random)
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random random)
 	{
 		// get the result of the event
 		Event.Result allowGrowthResult = Event.Result.DEFAULT;
 		if (Loader.isModLoaded("AppleCore"))
 		{
-			allowGrowthResult = validateAppleCoreGrowthTick(world, x, y, z, random);
+			allowGrowthResult = validateAppleCoreGrowthTick(world, pos, state, random);
 		}
 
 		// note: you could return early here if plant growth is the only thing
@@ -52,9 +54,9 @@ public class BlockCropsExample extends BlockCrops
 		//  - Event.Result.ALLOW means to always allow the growth tick without condition
 		//  - Event.Result.DEFAULT means to continue with the conditionals as normal
 		//  - Event.Result.DENY means to always disallow the growth tick
-		if (allowGrowthResult == Event.Result.ALLOW || (allowGrowthResult == Event.Result.DEFAULT && world.getBlockLightValue(x, y + 1, z) >= 9))
+		if (allowGrowthResult == Event.Result.ALLOW || (allowGrowthResult == Event.Result.DEFAULT && world.getLightFromNeighbors(pos.up()) >= 9))
 		{
-			int meta = world.getBlockMetadata(x, y, z);
+			int meta = (state.getValue(AGE)).intValue();
 			int previousMetadata = meta;
 
 			if (meta < 7)
@@ -64,13 +66,12 @@ public class BlockCropsExample extends BlockCrops
 				boolean defaultGrowthCondition = random.nextInt(50) == 0;
 				if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && defaultGrowthCondition))
 				{
-					++meta;
-					world.setBlockMetadataWithNotify(x, y, z, meta, 2);
+					world.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(meta + 1)), 2);
 
 					// *After* the actual growth occurs, we simply let everyone know that it happened
 					if (Loader.isModLoaded("AppleCore"))
 					{
-						announceAppleCoreGrowthTick(world, x, y, z, previousMetadata);
+						announceAppleCoreGrowthTick(world, pos, state, previousMetadata);
 					}
 				}
 			}

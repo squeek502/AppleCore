@@ -1,10 +1,11 @@
 package squeek.applecore.example;
 
-import java.util.List;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+
+import java.util.List;
 
 /**
  * An example implementation of a metadata-based food item
@@ -28,7 +29,7 @@ public class ItemMetadataFood extends ItemFood
 	 * @return The hunger value of the ItemStack
 	 */
 	@Override
-	public int func_150905_g(ItemStack itemStack)
+	public int getHealAmount(ItemStack itemStack)
 	{
 		return hungerValues[itemStack.getItemDamage()];
 	}
@@ -37,7 +38,7 @@ public class ItemMetadataFood extends ItemFood
 	 * @return The saturation modifier of the ItemStack
 	 */
 	@Override
-	public float func_150906_h(ItemStack itemStack)
+	public float getSaturationModifier(ItemStack itemStack)
 	{
 		return saturationModifiers[itemStack.getItemDamage()];
 	}

@@ -9,8 +9,8 @@ import net.minecraft.item.ItemStack;
  * Intended for use by classes that don't extend ItemFood.<br>
  * <br>
  * When extending ItemFood, 
- * {@link ItemFood#func_150905_g} (for hunger values) and
- * {@link ItemFood#func_150906_h} (for saturation modifiers)
+ * {@link ItemFood#getHealAmount} (for hunger values) and
+ * {@link ItemFood#getSaturationModifier} (for saturation modifiers)
  * should be used instead.<br>
  * <br>
  * Note: {@link IEdible#getFoodValues} will take precedence over the

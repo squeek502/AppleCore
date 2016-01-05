@@ -1,5 +1,7 @@
 # Builds & binaries
 build/
+out/
+run/
 bin/
 target/
 lib/
@@ -21,6 +23,9 @@ libs/
 .project
 .settings
 .pydevproject
+*.iml
+*.ipr
+*.iws
 
 # MCP Files
 docs/

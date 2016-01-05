@@ -1,44 +1,47 @@
 package squeek.applecore.asm.reference;
 
-import java.util.Random;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import squeek.applecore.asm.Hooks;
-import cpw.mods.fml.common.eventhandler.Event.Result;
+
+import java.util.Random;
 
 public class BlockCropsModifications extends BlockCrops
 {
 	@Override
-	public void updateTick(World p_149674_1_, int p_149674_2_, int p_149674_3_, int p_149674_4_, Random p_149674_5_)
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)
 	{
-		super.updateTick(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, p_149674_5_);
+		super.updateTick(world, pos, state, rand);
 
 		// added line and changed if
-		Result allowGrowthResult = Hooks.fireAllowPlantGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, p_149674_5_);
-		if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && p_149674_1_.getBlockLightValue(p_149674_2_, p_149674_3_ + 1, p_149674_4_) >= 9))
+		Result allowGrowthResult = Hooks.fireAllowPlantGrowthEvent(this, world, pos, state, rand);
+		if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && world.getLightFromNeighbors(pos.up()) >= 9))
 		{
-			int l = p_149674_1_.getBlockMetadata(p_149674_2_, p_149674_3_, p_149674_4_);
+			int i = (state.getValue(AGE)).intValue();
 			// added var
-			int previousMetadata = l;
+			int previousMetadata = i;
 
-			if (l < 7)
+			if (i < 7)
 			{
-				float f = this.func_149864_n(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_);
+				float f = this.getGrowthChance(this, world, pos);
 
 				// changed if
-				if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && p_149674_5_.nextInt((int) (25.0F / f) + 1) == 0))
+				if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && rand.nextInt((int) (25.0F / f) + 1) == 0))
 				{
-					++l;
-					p_149674_1_.setBlockMetadataWithNotify(p_149674_2_, p_149674_3_, p_149674_4_, l, 2);
+					world.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(i + 1)), 2);
 					// added line
-					Hooks.fireOnGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, previousMetadata);
+					Hooks.fireOnGrowthEvent(this, world, pos, state, previousMetadata);
 				}
 			}
 		}
 	}
 
 	// dummy to avoid compilation error
-	public float func_149864_n(World world, int x, int y, int z)
+	protected static float getGrowthChance(Block blockIn, World worldIn, BlockPos pos)
 	{
 		return 0f;
 	};

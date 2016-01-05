@@ -7,13 +7,13 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import squeek.applecore.ModInfo;
 import squeek.applecore.api.AppleCoreAPI;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.WorldTickEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class SyncHandler
 {
@@ -25,9 +25,7 @@ public class SyncHandler
 		channel.registerMessage(MessageExhaustionSync.class, MessageExhaustionSync.class, 1, Side.CLIENT);
 		channel.registerMessage(MessageSaturationSync.class, MessageSaturationSync.class, 2, Side.CLIENT);
 
-		SyncHandler syncHandler = new SyncHandler();
-		FMLCommonHandler.instance().bus().register(syncHandler);
-		MinecraftForge.EVENT_BUS.register(syncHandler);
+		MinecraftForge.EVENT_BUS.register(new SyncHandler());
 	}
 
 	/*
@@ -69,10 +67,10 @@ public class SyncHandler
 
 		if (event.world instanceof WorldServer)
 		{
-			if (this.lastDifficultySetting != event.world.difficultySetting)
+			if (this.lastDifficultySetting != event.world.getDifficulty())
 			{
-				channel.sendToAll(new MessageDifficultySync(event.world.difficultySetting));
-				this.lastDifficultySetting = event.world.difficultySetting;
+				channel.sendToAll(new MessageDifficultySync(event.world.getDifficulty()));
+				this.lastDifficultySetting = event.world.getDifficulty();
 			}
 		}
 	}

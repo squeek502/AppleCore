@@ -1,70 +1,60 @@
 package squeek.applecore.asm.reference;
 
-import java.util.Random;
-import squeek.applecore.asm.Hooks;
-import cpw.mods.fml.common.eventhandler.Event.Result;
 import net.minecraft.block.BlockMushroom;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import squeek.applecore.asm.Hooks;
+
+import java.util.Random;
 
 public class BlockMushroomModifications extends BlockMushroom
 {
 	@Override
-	public void updateTick(World p_149674_1_, int p_149674_2_, int p_149674_3_, int p_149674_4_, Random p_149674_5_)
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)
 	{
 		// added line and changed if
-		Result allowGrowthResult = Hooks.fireAllowPlantGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, p_149674_5_);
-		if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && p_149674_5_.nextInt(25) == 0))
+		Result allowGrowthResult = Hooks.fireAllowPlantGrowthEvent(this, world, pos, state, rand);
+		if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && rand.nextInt(25) == 0))
 		{
-			byte b0 = 4;
-			int l = 5;
-			int i1;
-			int j1;
-			int k1;
-
-			for (i1 = p_149674_2_ - b0; i1 <= p_149674_2_ + b0; ++i1)
+			if (rand.nextInt(25) == 0)
 			{
-				for (j1 = p_149674_4_ - b0; j1 <= p_149674_4_ + b0; ++j1)
-				{
-					for (k1 = p_149674_3_ - 1; k1 <= p_149674_3_ + 1; ++k1)
-					{
-						if (p_149674_1_.getBlock(i1, k1, j1) == this)
-						{
-							--l;
+				int i = 5;
+				int j = 4;
 
-							if (l <= 0)
-							{
-								return;
-							}
+				for (BlockPos blockpos : BlockPos.getAllInBoxMutable(pos.add(-4, -1, -4), pos.add(4, 1, 4)))
+				{
+					if (world.getBlockState(blockpos).getBlock() == this)
+					{
+						--i;
+
+						if (i <= 0)
+						{
+							return;
 						}
 					}
 				}
-			}
 
-			i1 = p_149674_2_ + p_149674_5_.nextInt(3) - 1;
-			j1 = p_149674_3_ + p_149674_5_.nextInt(2) - p_149674_5_.nextInt(2);
-			k1 = p_149674_4_ + p_149674_5_.nextInt(3) - 1;
+				BlockPos blockpos1 = pos.add(rand.nextInt(3) - 1, rand.nextInt(2) - rand.nextInt(2), rand.nextInt(3) - 1);
 
-			for (int l1 = 0; l1 < 4; ++l1)
-			{
-				if (p_149674_1_.isAirBlock(i1, j1, k1) && this.canBlockStay(p_149674_1_, i1, j1, k1))
+				for (int k = 0; k < j; ++k)
 				{
-					p_149674_2_ = i1;
-					p_149674_3_ = j1;
-					p_149674_4_ = k1;
+					if (world.isAirBlock(blockpos1) && this.canBlockStay(world, blockpos1, this.getDefaultState()))
+					{
+						pos = blockpos1;
+					}
+
+					blockpos1 = pos.add(rand.nextInt(3) - 1, rand.nextInt(2) - rand.nextInt(2), rand.nextInt(3) - 1);
 				}
 
-				i1 = p_149674_2_ + p_149674_5_.nextInt(3) - 1;
-				j1 = p_149674_3_ + p_149674_5_.nextInt(2) - p_149674_5_.nextInt(2);
-				k1 = p_149674_4_ + p_149674_5_.nextInt(3) - 1;
+				if (world.isAirBlock(blockpos1) && this.canBlockStay(world, blockpos1, this.getDefaultState()))
+				{
+					world.setBlockState(blockpos1, this.getDefaultState(), 2);
+				}
 			}
-
-			if (p_149674_1_.isAirBlock(i1, j1, k1) && this.canBlockStay(p_149674_1_, i1, j1, k1))
-			{
-				p_149674_1_.setBlock(i1, j1, k1, this, 0, 2);
-			}
-
 			// added line
-			Hooks.fireOnGrowthWithoutMetadataChangeEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_);
+			Hooks.fireOnGrowthWithoutMetadataChangeEvent(this, world, pos, state);
 		}
 	}
 }

@@ -6,12 +6,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.Hooks;
-import cpw.mods.fml.common.eventhandler.Event.Result;
 
 /*
  * The end result of the changes made by ModuleFoodStats
@@ -30,21 +30,21 @@ public class FoodStatsModifications extends FoodStats
 
 	// default code wrapped in a conditional
 	@Override
-	public void addStats(int p_75122_1_, float p_75122_2_)
+	public void addStats(int foodLevel, float foodSaturationModifier)
 	{
-		if (!Hooks.fireFoodStatsAdditionEvent(player, new FoodValues(p_75122_1_, p_75122_2_)))
+		if (!Hooks.fireFoodStatsAdditionEvent(player, new FoodValues(foodLevel, foodSaturationModifier)))
 		{
-			this.foodLevel = Math.min(p_75122_1_ + this.foodLevel, 20);
-			this.foodSaturationLevel = Math.min(this.foodSaturationLevel + p_75122_1_ * p_75122_2_ * 2.0F, this.foodLevel);
+			this.foodLevel = Math.min(foodLevel + this.foodLevel, 20);
+			this.foodSaturationLevel = Math.min(this.foodSaturationLevel + foodLevel * foodSaturationModifier * 2.0F, this.foodLevel);
 		}
 	}
 
 	// hooks injected into method
 	@Override
-	public void func_151686_a(ItemFood p_151686_1_, ItemStack p_151686_2_)
+	public void addStats(ItemFood food, ItemStack stack)
 	{
 		// added lines
-		FoodValues modifiedFoodValues = Hooks.onFoodStatsAdded(this, p_151686_1_, p_151686_2_, this.player);
+		FoodValues modifiedFoodValues = Hooks.onFoodStatsAdded(this, food, stack, this.player);
 		int prevFoodLevel = this.foodLevel;
 		float prevSaturationLevel = this.foodSaturationLevel;
 
@@ -52,7 +52,7 @@ public class FoodStatsModifications extends FoodStats
 		this.addStats(modifiedFoodValues.hunger, modifiedFoodValues.saturationModifier);
 
 		// added lines
-		Hooks.onPostFoodStatsAdded(this, p_151686_1_, p_151686_2_, modifiedFoodValues, this.foodLevel - prevFoodLevel, this.foodSaturationLevel - prevSaturationLevel, this.player);
+		Hooks.onPostFoodStatsAdded(this, food, stack, modifiedFoodValues, this.foodLevel - prevFoodLevel, this.foodSaturationLevel - prevSaturationLevel, this.player);
 	}
 
 	// heavily modified method
@@ -60,7 +60,7 @@ public class FoodStatsModifications extends FoodStats
 	@Override
 	public void onUpdate(EntityPlayer player)
 	{
-		EnumDifficulty enumdifficulty = player.worldObj.difficultySetting;
+		EnumDifficulty enumdifficulty = player.worldObj.getDifficulty();
 		this.prevFoodLevel = this.foodLevel;
 
 		Result allowExhaustionResult = Hooks.fireAllowExhaustionEvent(player);
@@ -78,7 +78,7 @@ public class FoodStatsModifications extends FoodStats
 		}
 
 		Result allowRegenResult = Hooks.fireAllowRegenEvent(player);
-		if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().getGameRuleBooleanValue("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
+		if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().hasRule("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
 		{
 			++this.foodTimer;
 

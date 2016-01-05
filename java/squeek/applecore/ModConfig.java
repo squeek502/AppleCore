@@ -41,7 +41,7 @@ public class ModConfig
 			"If true, shows the hunger (and saturation if " + SHOW_SATURATION_OVERLAY_NAME + " is true) that would be restored by food you are currently holding";
 
 	@Deprecated
-	private static final String SHOW_FOOD_EXHAUSTION_OVERLAY_NAME = "show.food.exhaustion.hud.overlay";
+	private static final String SHOW_FOOD_EXHAUSTION_OVERLAY_NAME = "show.food.exhaustion.hud.overlay"; //TODO Squuek
 
 	public static boolean SHOW_FOOD_EXHAUSTION_UNDERLAY = true;
 	private static final String SHOW_FOOD_EXHAUSTION_UNDERLAY_NAME = "show.food.exhaustion.hud.underlay";
@@ -64,7 +64,7 @@ public class ModConfig
 		 */
 		config.getCategory(CATEGORY_CLIENT).setComment(CATEGORY_CLIENT_COMMENT);
 
-		// rename overlay to underlay
+		// rename overlay to underlay //TODO Squuek
 		boolean foodExhaustionOverlayValue = config.get(CATEGORY_CLIENT, SHOW_FOOD_EXHAUSTION_OVERLAY_NAME, true).getBoolean(true);
 		config.getCategory(CATEGORY_CLIENT).remove(SHOW_FOOD_EXHAUSTION_OVERLAY_NAME);
 

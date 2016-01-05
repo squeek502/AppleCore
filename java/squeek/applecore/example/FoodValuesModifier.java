@@ -1,9 +1,9 @@
 package squeek.applecore.example;
 
 import net.minecraft.init.Items;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import squeek.applecore.api.food.FoodEvent;
 import squeek.applecore.api.food.FoodValues;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class FoodValuesModifier
 {

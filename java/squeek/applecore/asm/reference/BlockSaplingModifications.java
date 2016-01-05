@@ -1,27 +1,30 @@
 package squeek.applecore.asm.reference;
 
-import java.util.Random;
-import squeek.applecore.asm.Hooks;
-import cpw.mods.fml.common.eventhandler.Event.Result;
 import net.minecraft.block.BlockSapling;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import squeek.applecore.asm.Hooks;
+
+import java.util.Random;
 
 public class BlockSaplingModifications extends BlockSapling
 {
 	@Override
-	public void updateTick(World p_149674_1_, int p_149674_2_, int p_149674_3_, int p_149674_4_, Random p_149674_5_)
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)
 	{
-		if (!p_149674_1_.isRemote)
+		if (!world.isRemote)
 		{
-			super.updateTick(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, p_149674_5_);
+			super.updateTick(world, pos, state, rand);
 
 			// added line and changed if
-			Result allowGrowthResult = Hooks.fireAllowPlantGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, p_149674_5_);
-			if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && p_149674_1_.getBlockLightValue(p_149674_2_, p_149674_3_ + 1, p_149674_4_) >= 9 && p_149674_5_.nextInt(7) == 0))
+			Result allowGrowthResult = Hooks.fireAllowPlantGrowthEvent(this, world, pos, state, rand);
+			if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && world.getLightFromNeighbors(pos.up()) >= 9 && rand.nextInt(7) == 0))
 			{
-				this.func_149879_c(p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, p_149674_5_);
+				this.grow(world, pos, state, rand);
 				// added line
-				Hooks.fireOnGrowthWithoutMetadataChangeEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_);
+				Hooks.fireOnGrowthWithoutMetadataChangeEvent(this, world, pos,  state);
 			}
 		}
 	}

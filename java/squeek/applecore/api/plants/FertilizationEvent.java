@@ -1,20 +1,21 @@
 package squeek.applecore.api.plants;
 
-import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.IGrowable;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.eventhandler.Cancelable;
-import cpw.mods.fml.common.eventhandler.Event;
-import static cpw.mods.fml.common.eventhandler.Event.Result;
-import static cpw.mods.fml.common.eventhandler.Event.HasResult;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraftforge.fml.common.eventhandler.Event;
+
+import java.util.Random;
 
 public class FertilizationEvent extends Event
 {
 	/**
 	 * Fired when a block is about to be fertilized.
 	 * 
-	 * This event is fired in all {@link IGrowable#func_149853_b} implementations.<br>
+	 * This event is fired in all {@link IGrowable#canUseBonemeal} implementations.<br>
 	 * <br>
 	 * This event is not {@link Cancelable}.<br>
 	 * <br>
@@ -28,19 +29,17 @@ public class FertilizationEvent extends Event
 	{
 		public final Block block;
 		public final World world;
-		public final int x;
-		public final int y;
-		public final int z;
+		public final BlockPos pos;
+		public final IBlockState state;
 		public final Random random;
 		public final int metadata;
 
-		public Fertilize(Block block, World world, int x, int y, int z, Random random, int metadata)
+		public Fertilize(Block block, World world, BlockPos pos, IBlockState state, Random random, int metadata)
 		{
 			this.block = block;
 			this.world = world;
-			this.x = x;
-			this.y = y;
-			this.z = z;
+			this.pos = pos;
+			this.state = state;
 			this.random = random;
 			this.metadata = metadata;
 		}
@@ -49,7 +48,7 @@ public class FertilizationEvent extends Event
 	/**
 	 * Fired after a block is fertilized.
 	 * 
-	 * This event is fired in all {@link IGrowable#func_149853_b} implementations.<br>
+	 * This event is fired in all {@link IGrowable#canUseBonemeal} implementations.<br>
 	 * <br>
 	 * This event is not {@link Cancelable}.<br>
 	 * <br>
@@ -59,18 +58,16 @@ public class FertilizationEvent extends Event
 	{
 		public final Block block;
 		public final World world;
-		public final int x;
-		public final int y;
-		public final int z;
+		public final BlockPos pos;
+		public final IBlockState state;
 		public final int previousMetadata;
 
-		public Fertilized(Block block, World world, int x, int y, int z, int previousMetadata)
+		public Fertilized(Block block, World world, BlockPos pos, IBlockState state, int previousMetadata)
 		{
 			this.block = block;
 			this.world = world;
-			this.x = x;
-			this.y = y;
-			this.z = z;
+			this.pos = pos;
+			this.state = state;
 			this.previousMetadata = previousMetadata;
 		}
 	}

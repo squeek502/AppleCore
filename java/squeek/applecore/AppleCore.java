@@ -1,7 +1,15 @@
 package squeek.applecore;
 
-import java.io.InputStream;
-import java.util.Map;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.MetadataCollection;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import squeek.applecore.api_impl.AppleCoreAccessorMutatorImpl;
@@ -13,19 +21,12 @@ import squeek.applecore.client.TooltipOverlayHandler;
 import squeek.applecore.commands.Commands;
 import squeek.applecore.network.SyncHandler;
 import squeek.asmhelper.applecore.ObfHelper;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.MetadataCollection;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLInterModComms;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
-import cpw.mods.fml.relauncher.Side;
+
+import java.io.InputStream;
+import java.util.Map;
 
 @IFMLLoadingPlugin.SortingIndex(1100)
-@IFMLLoadingPlugin.MCVersion("1.7.10")
+@IFMLLoadingPlugin.MCVersion("1.8.9")
 @IFMLLoadingPlugin.TransformerExclusions({"squeek.applecore.asm", "squeek.asmhelper"})
 @Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, acceptableRemoteVersions="*")
 public class AppleCore implements IFMLLoadingPlugin

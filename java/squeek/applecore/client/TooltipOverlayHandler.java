@@ -1,7 +1,5 @@
 package squeek.applecore.client;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
@@ -11,6 +9,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import squeek.applecore.AppleCore;
@@ -20,15 +27,9 @@ import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.helpers.KeyHelper;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.RenderTickEvent;
-import cpw.mods.fml.relauncher.ReflectionHelper;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 @SideOnly(Side.CLIENT)
 public class TooltipOverlayHandler
@@ -37,7 +38,7 @@ public class TooltipOverlayHandler
 
 	public static void init()
 	{
-		FMLCommonHandler.instance().bus().register(new TooltipOverlayHandler());
+		MinecraftForge.EVENT_BUS.register(new TooltipOverlayHandler());
 	}
 	//private static final Field guiLeft = ReflectionHelper.findField(GuiContainer.class, ObfuscationReflectionHelper.remapFieldNames(GuiContainer.class.getName(), "guiLeft", "field_147003_i", "i"));
 	//private static final Field guiTop = ReflectionHelper.findField(GuiContainer.class, ObfuscationReflectionHelper.remapFieldNames(GuiContainer.class.getName(), "guiTop", "field_147009_r", "r"));
@@ -96,7 +97,7 @@ public class TooltipOverlayHandler
 			EntityPlayer player = mc.thePlayer;
 			GuiScreen curScreen = mc.currentScreen;
 
-			ScaledResolution scale = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+			ScaledResolution scale = new ScaledResolution(mc);
 
 			boolean isFoodJournalGui = foodJournalGui != null && foodJournalGui.isInstance(curScreen);
 			boolean isValidContainerGui = curScreen instanceof GuiContainer;
@@ -162,7 +163,7 @@ public class TooltipOverlayHandler
 					boolean shouldDrawBelow = toolTipBottomY + 20 < scale.getScaledHeight() - 3;
 
 					int rightX = toolTipRightX - 3;
-					int leftX = rightX - (Math.max(barsNeeded * 9, saturationBarsNeeded * 6 + (int) (mc.fontRenderer.getStringWidth(saturationText) * 0.75f))) - 4;
+					int leftX = rightX - (Math.max(barsNeeded * 9, saturationBarsNeeded * 6 + (int) (mc.fontRendererObj.getStringWidth(saturationText) * 0.75f))) - 4;
 					int topY = (shouldDrawBelow ? toolTipBottomY : Hooks.toolTipY - 20 + (needsCoordinateShift ? -4 : 0));
 					int bottomY = topY + 20;
 
@@ -240,7 +241,7 @@ public class TooltipOverlayHandler
 					}
 					if (saturationText != null)
 					{
-						mc.fontRenderer.drawStringWithShadow(saturationText, x * 4 / 3 - mc.fontRenderer.getStringWidth(saturationText) + 2, y * 4 / 3 + 1, 0xFFFF0000);
+						mc.fontRendererObj.drawStringWithShadow(saturationText, x * 4 / 3 - mc.fontRendererObj.getStringWidth(saturationText) + 2, y * 4 / 3 + 1, 0xFFFF0000);
 					}
 					GL11.glPopMatrix();
 

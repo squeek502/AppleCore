@@ -4,11 +4,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import squeek.applecore.api.AppleCoreAPI;
-import cpw.mods.fml.common.eventhandler.Cancelable;
-import cpw.mods.fml.common.eventhandler.Event;
-import static cpw.mods.fml.common.eventhandler.Event.Result;
-import static cpw.mods.fml.common.eventhandler.Event.HasResult;
 
 /**
  * Base class for all ExhaustionEvent events.<br>
@@ -104,7 +102,7 @@ public abstract class ExhaustionEvent extends Event
 			if (!shouldDecreaseSaturationLevel)
 				deltaSaturation = 0f;
 
-			EnumDifficulty difficulty = player.worldObj.difficultySetting;
+			EnumDifficulty difficulty = player.worldObj.getDifficulty();
 			boolean shouldDecreaseFoodLevel = !shouldDecreaseSaturationLevel && difficulty != EnumDifficulty.PEACEFUL;
 
 			if (!shouldDecreaseFoodLevel)

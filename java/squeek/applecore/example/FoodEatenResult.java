@@ -1,7 +1,7 @@
 package squeek.applecore.example;
 
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import squeek.applecore.api.food.FoodEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class FoodEatenResult
 {
