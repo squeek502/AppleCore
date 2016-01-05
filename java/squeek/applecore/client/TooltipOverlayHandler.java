@@ -5,6 +5,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -169,8 +170,8 @@ public class TooltipOverlayHandler
 
 					boolean wasLightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);
 					if (wasLightingEnabled)
-						GL11.glDisable(GL11.GL_LIGHTING);
-					GL11.glDisable(GL11.GL_DEPTH_TEST);
+					GlStateManager.disableLighting();
+					GlStateManager.disableDepth();
 
 					// bg
 					Gui.drawRect(leftX - 1, topY, rightX + 1, bottomY, 0xF0100010);
@@ -181,8 +182,7 @@ public class TooltipOverlayHandler
 					int startX = x;
 					int y = bottomY - 19;
 
-					GL11.glColor4f(1f, 1f, 1f, .25f);
-
+					GlStateManager.color(1.0F, 1.0F, 1.0F, .25F);
 					mc.getTextureManager().bindTexture(Gui.icons);
 
 					for (int i = 0; i < barsNeeded * 2; i += 2)
@@ -200,10 +200,10 @@ public class TooltipOverlayHandler
 						else
 							gui.drawTexturedModalRect(x, y, 34, 27, 9, 9);
 
-						GL11.glEnable(GL11.GL_BLEND);
-						GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+						GlStateManager.enableBlend();
+						GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 						gui.drawTexturedModalRect(x, y, defaultFoodValues.hunger - 1 == i ? 115 : 106, 27, 9, 9);
-						GL11.glDisable(GL11.GL_BLEND);
+						GlStateManager.disableBlend();
 
 						if (modifiedFoodValues.hunger > i)
 							gui.drawTexturedModalRect(x, y, modifiedFoodValues.hunger - 1 == i ? 61 : 52, 27, 9, 9);
@@ -214,9 +214,9 @@ public class TooltipOverlayHandler
 					float modifiedSaturationIncrement = modifiedFoodValues.getSaturationIncrement();
 					float absModifiedSaturationIncrement = Math.abs(modifiedSaturationIncrement);
 
-					GL11.glPushMatrix();
-					GL11.glScalef(0.75F, 0.75F, 0.75F);
-					GL11.glColor4f(1f, 1f, 1f, .5f);
+					GlStateManager.pushMatrix();
+					GlStateManager.scale(0.75F, 0.75F, 0.75F);
+					GlStateManager.color(1.0F, 1.0F, 1.0F, .5F);
 					for (int i = 0; i < saturationBarsNeeded * 2; i += 2)
 					{
 						float effectiveSaturationOfBar = (absModifiedSaturationIncrement - i) / 2f;
@@ -226,8 +226,8 @@ public class TooltipOverlayHandler
 						boolean shouldBeFaded = absModifiedSaturationIncrement <= i;
 						if (shouldBeFaded)
 						{
-							GL11.glEnable(GL11.GL_BLEND);
-							GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+							GlStateManager.enableBlend();
+							GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 						}
 
 						mc.getTextureManager().bindTexture(Gui.icons);
@@ -237,18 +237,18 @@ public class TooltipOverlayHandler
 						gui.drawTexturedModalRect(x * 4 / 3, y * 4 / 3, effectiveSaturationOfBar >= 1 ? 27 : effectiveSaturationOfBar > 0.5 ? 18 : effectiveSaturationOfBar > 0.25 ? 9 : effectiveSaturationOfBar > 0 ? 0 : 36, modifiedSaturationIncrement >= 0 ? 0 : 9, 9, 9);
 
 						if (shouldBeFaded)
-							GL11.glDisable(GL11.GL_BLEND);
+							GlStateManager.disableBlend();
 					}
 					if (saturationText != null)
 					{
 						mc.fontRendererObj.drawStringWithShadow(saturationText, x * 4 / 3 - mc.fontRendererObj.getStringWidth(saturationText) + 2, y * 4 / 3 + 1, 0xFFFF0000);
 					}
-					GL11.glPopMatrix();
+					GlStateManager.popMatrix();
 
-					GL11.glEnable(GL11.GL_DEPTH_TEST);
+					GlStateManager.enableDepth();
 					if (wasLightingEnabled)
-						GL11.glEnable(GL11.GL_LIGHTING);
-					GL11.glColor4f(1f, 1f, 1f, 1f);
+						GlStateManager.enableLighting();
+					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 				}
 			}
 		}

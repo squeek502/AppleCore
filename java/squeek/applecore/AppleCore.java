@@ -26,7 +26,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 @IFMLLoadingPlugin.SortingIndex(1100)
-@IFMLLoadingPlugin.MCVersion("1.8.9")
+@IFMLLoadingPlugin.MCVersion("[1.8.8,1.8.9]")
 @IFMLLoadingPlugin.TransformerExclusions({"squeek.applecore.asm", "squeek.asmhelper"})
 @Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, acceptableRemoteVersions="*")
 public class AppleCore implements IFMLLoadingPlugin
