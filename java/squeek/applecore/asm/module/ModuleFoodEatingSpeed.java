@@ -3,6 +3,7 @@ package squeek.applecore.asm.module;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
+import squeek.asmhelper.applecore.InsnComparator;
 import squeek.asmhelper.applecore.ObfHelper;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -47,7 +48,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		}
 		else if (transformedName.equals("net.minecraft.client.renderer.ItemRenderer"))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_78440_a", "renderItemInFirstPerson", "(F)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_178104_a", "(Lnet/minecraft/client/entity/AbstractClientPlayer;F)V");
 			if (methodNode != null)
 			{
 				patchRenderItemInFirstPerson(classNode, methodNode);
@@ -61,30 +62,21 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 
 	private void patchRenderItemInFirstPerson(ClassNode classNode, MethodNode method)
 	{
-		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionWithOpcode(method, INVOKEVIRTUAL);
-		while (targetNode != null && !((((MethodInsnNode) targetNode).name.equals("getMaxItemUseDuration") || ((MethodInsnNode) targetNode).name.equals("func_77988_m"))
-				&& ((MethodInsnNode) targetNode).desc.equals("()I")
-				&& ((MethodInsnNode) targetNode).owner.equals(ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"))))
-		{
-			targetNode = ASMHelper.findNextInstructionWithOpcode(targetNode, INVOKEVIRTUAL);
-		}
-		if (targetNode == null)
-			throw new RuntimeException("ItemRenderer.renderItemInFirstPerson: INVOKEVIRTUAL getMaxItemUseDuration instruction not found");
+		InsnList needle = new InsnList();
+		needle.add(new VarInsnNode(ALOAD, 0));
+		needle.add(new FieldInsnNode(GETFIELD, "net/minecraft/client/renderer/ItemRenderer", InsnComparator.WILDCARD, ASMHelper.toDescriptor("net.minecraft.item.ItemStack")));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName("net.minecraft.item.ItemStack"), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", "()I", false));
 
-		MethodInsnNode getItemInUseCountNode = (MethodInsnNode) ASMHelper.findPreviousInstructionWithOpcode(targetNode, INVOKEVIRTUAL);
-		if (getItemInUseCountNode == null)
-			throw new RuntimeException("ItemRenderer.renderItemInFirstPerson: INVOKEVIRTUAL getItemInUseCount instruction not found");
+		int playerParamIndex = 1;
+		String playerInternalName = ASMHelper.toInternalClassName("net.minecraft.entity.player.EntityPlayer");
 
-		int entityclientplayermpIndex = ((VarInsnNode) getItemInUseCountNode.getPrevious()).var;
-		String entityclientplayermpInternalName = getItemInUseCountNode.owner;
+		InsnList replacement = new InsnList();
+		replacement.add(new VarInsnNode(ALOAD, playerParamIndex));
+		replacement.add(new FieldInsnNode(GETFIELD, playerInternalName, "itemInUseMaxDuration", "I"));
 
-		// f7 = 1.0F - f6 / (float) entityclientplayermp.itemInUseMaxDuration;
-		((VarInsnNode) targetNode.getPrevious()).var = entityclientplayermpIndex;
-		FieldInsnNode getFieldNode = new FieldInsnNode(GETFIELD, entityclientplayermpInternalName, "itemInUseMaxDuration", "I");
-
-		method.instructions.insert(targetNode, getFieldNode);
-
-		ASMHelper.removeFromInsnListUntil(method.instructions, targetNode, getFieldNode);
+		boolean replaced = ASMHelper.findAndReplace(method.instructions, needle, replacement) != null;
+		if (!replaced)
+			throw new RuntimeException("ItemRenderer.func_178104_a: no replacements made");
 	}
 
 	private void patchGetItemInUseDuration(ClassNode classNode, MethodNode method)

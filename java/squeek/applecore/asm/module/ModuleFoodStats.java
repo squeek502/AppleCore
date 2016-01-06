@@ -195,7 +195,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		InsnList hungerNeedle = new InsnList();
 		hungerNeedle.add(new VarInsnNode(ALOAD, 1));
 		hungerNeedle.add(new VarInsnNode(ALOAD, 2));
-		hungerNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemFood"), "func_150905_g", "(" + ObfHelper.getDescriptor("net.minecraft.item.ItemStack") + ")I", false)); //getHealAmount
+		hungerNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemFood"), ObfHelper.isObfuscated() ? "func_150905_g" : "getHealAmount" , "(" + ObfHelper.getDescriptor("net.minecraft.item.ItemStack") + ")I", false));
 
 		InsnList hungerReplacement = new InsnList();
 		hungerReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
@@ -204,7 +204,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		InsnList saturationNeedle = new InsnList();
 		saturationNeedle.add(new VarInsnNode(ALOAD, 1));
 		saturationNeedle.add(new VarInsnNode(ALOAD, 2));
-		saturationNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemFood"), "func_150906_h", "(" + ObfHelper.getDescriptor("net.minecraft.item.ItemStack") + ")F", false)); //getSaturationModifier
+		saturationNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemFood"), ObfHelper.isObfuscated() ? "func_150906_h" : "getSaturationModifier", "(" + ObfHelper.getDescriptor("net.minecraft.item.ItemStack") + ")F", false));
 
 		InsnList saturationReplacement = new InsnList();
 		saturationReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));

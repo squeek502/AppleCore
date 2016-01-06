@@ -22,7 +22,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180682_b", "(Lnet/minecraft/world/World;IIILnet/minecraft/entity/player/EntityPlayer;)V");
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180682_b", "eatCake", "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;)V");
 
 		if (methodNode != null)
 		{
@@ -30,7 +30,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 			return ASMHelper.writeClassToBytes(classNode);
 		}
 		else
-			throw new RuntimeException("BlockCake: eatCakeSlice (func_180682_b) method not found");
+			throw new RuntimeException("BlockCake: eatCake (func_180682_b) method not found");
 	}
 
 	private void addOnBlockFoodEatenHook(ClassNode classNode, MethodNode method)

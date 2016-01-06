@@ -37,10 +37,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V");
 
 		if (methodNode == null)
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V");
 
 		if (methodNode == null)
 			throw new RuntimeException(classNode.name + ": updateTick method not found");
