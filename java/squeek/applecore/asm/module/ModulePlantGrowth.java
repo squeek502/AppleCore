@@ -344,7 +344,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		needle.add(new VarInsnNode(ALOAD, 2)); // pos
 		String getBlockStateName = ObfHelper.isObfuscated() ? "func_180495_p" : "getBlockState";
 		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), getBlockStateName, "(Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;", false));
-		needle.add(new VarInsnNode(ISTORE, InsnComparator.INT_WILDCARD));
+		needle.add(new VarInsnNode(ASTORE, InsnComparator.INT_WILDCARD));
 
 		InsnList foundInsns = ASMHelper.findAndGetFoundInsnList(method.instructions.getFirst(), needle);
 		if (foundInsns.getFirst() == null)
