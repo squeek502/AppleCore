@@ -414,7 +414,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		// health regen block replaced with:
 		/*
 		Result allowRegenResult = Hooks.fireAllowRegenEvent(player);
-		if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().hasRule("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
+		if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().getGameRules("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
 		{
 			++this.foodTimer;
 
@@ -460,7 +460,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ASTORE, allowRegenResult.index));
 		toInject.add(allowRegenResultStart);
 
-		// if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().hasRule("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
+		// if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().getGameRules("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
 		toInject.add(new VarInsnNode(ALOAD, allowRegenResult.index));
 		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "ALLOW", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
 		LabelNode ifAllowed = new LabelNode();
@@ -473,7 +473,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), ObfHelper.isObfuscated() ? "field_70170_p" : "worldObj", "Lnet/minecraft/world/World;"));
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), ObfHelper.isObfuscated() ? "func_82736_K" : "getGameRules", "()Lnet/minecraft/world/GameRules;", false));
 		toInject.add(new LdcInsnNode("naturalRegeneration"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.GameRules"), ObfHelper.isObfuscated() ? "func_82766_b" : "hasRule", "(Ljava/lang/String;)Z", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.GameRules"), ObfHelper.isObfuscated() ? "func_82766_b" : "getGameRules", "(Ljava/lang/String;)Z", false));
 		toInject.add(new JumpInsnNode(IFEQ, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, ObfHelper.isObfuscated() ? "field_75127_a" : "foodLevel", "I"));

@@ -56,7 +56,7 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 		}
 
 		// modified
-		if (this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL && this.getHealth() < this.getMaxHealth() && this.worldObj.getGameRules().hasRule("naturalRegeneration") && this.ticksExisted % 20 * 12 == 0)
+		if (this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL && this.getHealth() < this.getMaxHealth() && this.worldObj.getGameRules().getBoolean("naturalRegeneration") && this.ticksExisted % 20 * 12 == 0)
 		{
 			// added event and if statement
 			HealthRegenEvent.PeacefulRegen peacefulRegenEvent = Hooks.firePeacefulRegenEvent(this);

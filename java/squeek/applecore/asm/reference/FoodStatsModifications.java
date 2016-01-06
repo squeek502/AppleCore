@@ -78,7 +78,7 @@ public class FoodStatsModifications extends FoodStats
 		}
 
 		Result allowRegenResult = Hooks.fireAllowRegenEvent(player);
-		if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().hasRule("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
+		if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().getBoolean("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
 		{
 			++this.foodTimer;
 
