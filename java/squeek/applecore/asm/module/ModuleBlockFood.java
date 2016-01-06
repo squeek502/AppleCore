@@ -30,7 +30,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 			return ASMHelper.writeClassToBytes(classNode);
 		}
 		else
-			throw new RuntimeException("BlockCake: eatCake (func_180682_b) method not found");
+			throw new RuntimeException("BlockCake: eatCakeSlice (func_180682_b) method not found");
 	}
 
 	private void addOnBlockFoodEatenHook(ClassNode classNode, MethodNode method)
@@ -68,7 +68,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		// FoodValues modifiedFoodValues = Hooks.onBlockFoodEaten(this, p_150036_1_, p_150036_5_);
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new VarInsnNode(ALOAD, 5));
+		toInject.add(new VarInsnNode(ALOAD, 4));
 		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, "onBlockFoodEaten", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/food/FoodValues;", false));
 		toInject.add(new VarInsnNode(ASTORE, modifiedFoodValues.index));
 		toInject.add(modifiedFoodValuesStart);
@@ -80,7 +80,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		method.localVariables.add(prevFoodLevel);
 
 		// int prevFoodLevel = p_150036_5_.getFoodStats().getFoodLevel();
-		toInject.add(new VarInsnNode(ALOAD, 5));
+		toInject.add(new VarInsnNode(ALOAD, 4));
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", "()Lnet/minecraft/util/FoodStats;", false));
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), ObfHelper.isObfuscated() ? "func_75116_a" : "getFoodLevel", "()I", false));
 		toInject.add(new VarInsnNode(ISTORE, prevFoodLevel.index));
@@ -93,7 +93,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		method.localVariables.add(prevSaturationLevel);
 
 		// float prevSaturationLevel = p_150036_5_.getFoodStats().getSaturationLevel();
-		toInject.add(new VarInsnNode(ALOAD, 5));
+		toInject.add(new VarInsnNode(ALOAD, 4));
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", "()Lnet/minecraft/util/FoodStats;", false));
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), ObfHelper.isObfuscated() ? "func_75115_e" : "getSaturationLevel", "()F", false));
 		toInject.add(new VarInsnNode(FSTORE, prevSaturationLevel.index));
@@ -124,8 +124,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		/*
 		 * onPostBlockFoodEaten
 		 */
-		AbstractInsnNode targetNodeAfter = ASMHelper.find(targetNode, new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), InsnComparator.WILDCARD, "(III)I", false));
-		targetNodeAfter = ASMHelper.findPreviousLabelOrLineNumber(targetNodeAfter).getNext();
+		AbstractInsnNode targetNodeAfter = ASMHelper.find(targetNode, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/util/FoodStats", InsnComparator.WILDCARD, "(IF)V", false));
 		InsnList toInjectAfter = new InsnList();
 
 		// Hooks.onPostBlockFoodEaten(this, modifiedFoodValues, prevFoodLevel, prevSaturationLevel, p_150036_5_);
@@ -133,9 +132,9 @@ public class ModuleBlockFood implements IClassTransformerModule
 		toInjectAfter.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
 		toInjectAfter.add(new VarInsnNode(ILOAD, prevFoodLevel.index));
 		toInjectAfter.add(new VarInsnNode(FLOAD, prevSaturationLevel.index));
-		toInjectAfter.add(new VarInsnNode(ALOAD, 5));
+		toInjectAfter.add(new VarInsnNode(ALOAD, 4));
 		toInjectAfter.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "onPostBlockFoodEaten", "(Lnet/minecraft/block/Block;Lsqueek/applecore/api/food/FoodValues;IFLnet/minecraft/entity/player/EntityPlayer;)V", false));
 
-		method.instructions.insertBefore(targetNodeAfter, toInjectAfter);
+		method.instructions.insert(targetNodeAfter, toInjectAfter);
 	}
 }

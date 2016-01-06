@@ -341,11 +341,9 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 1)); // world
-		needle.add(new VarInsnNode(ILOAD, 2)); // x
-		needle.add(new VarInsnNode(ILOAD, 3)); // y
-		needle.add(new VarInsnNode(ILOAD, 4)); // z
+		needle.add(new VarInsnNode(ALOAD, 2)); // pos
 		String getBlockStateName = ObfHelper.isObfuscated() ? "func_180495_p" : "getBlockState";
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), getBlockStateName, "(III)I", false));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), getBlockStateName, "(Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;", false));
 		needle.add(new VarInsnNode(ISTORE, InsnComparator.INT_WILDCARD));
 
 		InsnList foundInsns = ASMHelper.findAndGetFoundInsnList(method.instructions.getFirst(), needle);
@@ -385,10 +383,8 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 1)); // world
-		toInject.add(new VarInsnNode(ILOAD, 2)); // x
-		toInject.add(new VarInsnNode(ILOAD, 3)); // y
-		toInject.add(new VarInsnNode(ILOAD, 4)); // z
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), ObfHelper.isObfuscated() ? "func_180495_p" : "getBlockState", "(III)I", false));
+		toInject.add(new VarInsnNode(ALOAD, 2)); // pos
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), ObfHelper.isObfuscated() ? "func_180495_p" : "getBlockState", "(Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;", false));
 		toInject.add(new VarInsnNode(ISTORE, previousMetadata.index));
 		toInject.add(previousMetadataStart);
 
@@ -420,11 +416,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		insnList.add(new VarInsnNode(ALOAD, 0));
 		insnList.add(new VarInsnNode(ALOAD, 1));
-		insnList.add(new VarInsnNode(ILOAD, 2));
-		insnList.add(new VarInsnNode(ILOAD, 3));
-		insnList.add(new VarInsnNode(ILOAD, 4));
-		insnList.add(new VarInsnNode(ALOAD, 5));
-		insnList.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAllowPlantGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", false));
+		insnList.add(new VarInsnNode(ALOAD, 2));
+		insnList.add(new VarInsnNode(ALOAD, 3));
+		insnList.add(new VarInsnNode(ALOAD, 4));
+		insnList.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAllowPlantGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", false));
 	}
 
 	private void injectAllowedOrDefaultCheckBefore(MethodNode method, AbstractInsnNode injectPoint, int resultIndex, LabelNode ifAllowedLabel, LabelNode ifFailedLabel)
@@ -458,11 +453,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new VarInsnNode(ILOAD, 2));
-		toInject.add(new VarInsnNode(ILOAD, 3));
-		toInject.add(new VarInsnNode(ILOAD, 4));
+		toInject.add(new VarInsnNode(ALOAD, 2));
+		toInject.add(new VarInsnNode(ALOAD, 3));
 		toInject.add(new VarInsnNode(ILOAD, previousMetadataVarIndex));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIII)V", false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;I)V", false));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}
@@ -473,10 +467,9 @@ public class ModulePlantGrowth implements IClassTransformerModule
 
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new VarInsnNode(ILOAD, 2));
-		toInject.add(new VarInsnNode(ILOAD, 3));
-		toInject.add(new VarInsnNode(ILOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthWithoutMetadataChangeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;III)V", false));
+		toInject.add(new VarInsnNode(ALOAD, 2));
+		toInject.add(new VarInsnNode(ALOAD, 3));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthWithoutMetadataChangeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;)V", false));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}
