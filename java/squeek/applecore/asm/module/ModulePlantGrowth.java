@@ -419,7 +419,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		insnList.add(new VarInsnNode(ALOAD, 2));
 		insnList.add(new VarInsnNode(ALOAD, 3));
 		insnList.add(new VarInsnNode(ALOAD, 4));
-		insnList.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAllowPlantGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", false));
+		insnList.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAllowPlantGrowthEvent", ASMHelper.toMethodDescriptor(ASMConstants.EventResult, ASMConstants.Block, ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Random), false));
 	}
 
 	private void injectAllowedOrDefaultCheckBefore(MethodNode method, AbstractInsnNode injectPoint, int resultIndex, LabelNode ifAllowedLabel, LabelNode ifFailedLabel)
@@ -456,7 +456,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 2));
 		toInject.add(new VarInsnNode(ALOAD, 3));
 		toInject.add(new VarInsnNode(ILOAD, previousMetadataVarIndex));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;I)V", false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthEvent", ASMHelper.toMethodDescriptor("V", ASMConstants.Block, ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, "I"), false));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}
@@ -469,7 +469,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, 2));
 		toInject.add(new VarInsnNode(ALOAD, 3));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthWithoutMetadataChangeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;)V", false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthWithoutMetadataChangeEvent", ASMHelper.toMethodDescriptor("V", ASMConstants.Block, ASMConstants.World, ASMConstants.Block, ASMConstants.IBlockState), false));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}
