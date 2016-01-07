@@ -26,7 +26,6 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 
 		if (transformedName.equals("net.minecraft.client.gui.GuiScreen"))
 		{
-
 			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", "(Ljava/util/List;IILnet/minecraft/client/gui/FontRenderer;)V");
 
 			if (methodNode != null)

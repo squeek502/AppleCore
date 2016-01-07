@@ -27,4 +27,11 @@ public class ASMConstants
 		public static final String BlockPamFruit = "com.pam.harvestcraft.BlockPamFruit";
 		public static final String BlockPamSapling = "com.pam.harvestcraft.BlockPamSapling";
 	}
+
+	public static final String FoodStats = "net.minecraft.util.FoodStats";
+	public static final String Block = "net.minecraft.block.Block";
+	public static final String World = "net.minecraft.world.World";
+	public static final String BlockPos = "net.minecraft.util.BlockPos";
+	public static final String IBlockState = "net.minecraft.block.state.IBlockState";
+	public static final String Player = "net.minecraft.entity.player.EntityPlayer";
 }
