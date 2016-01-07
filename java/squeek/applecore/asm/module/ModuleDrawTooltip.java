@@ -14,7 +14,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 	public String[] getClassesToTransform()
 	{
 		return new String[]{
-		"net.minecraft.client.gui.GuiScreen",
+		ASMConstants.GuiScreen,
 		"codechicken.lib.gui.GuiDraw"
 		};
 	}
@@ -24,24 +24,24 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
 
-		if (transformedName.equals("net.minecraft.client.gui.GuiScreen"))
+		if (transformedName.equals(ASMConstants.GuiScreen))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", "(Ljava/util/List;IILnet/minecraft/client/gui/FontRenderer;)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", ASMHelper.toMethodDescriptor("V", ASMConstants.List, "I", "I", ASMConstants.FontRenderer));
 
 			if (methodNode != null)
 			{
-				addDrawHoveringTextHook(methodNode, "onDrawHoveringText", "(IIII)V");
+				addDrawHoveringTextHook(methodNode, "onDrawHoveringText", ASMHelper.toMethodDescriptor("V", "I", "I", "I", "I"));
 			}
 			else
 				throw new RuntimeException("GuiScreen.drawHoveringText not found");
 		}
 		else if (name.equals("codechicken.lib.gui.GuiDraw"))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawTooltipBox", "(IIII)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawTooltipBox", ASMHelper.toMethodDescriptor("V", "I", "I", "I", "I"));
 
 			if (methodNode != null)
 			{
-				addCodeChickenDrawHoveringTextHook(methodNode, "onDrawHoveringText", "(IIII)V");
+				addCodeChickenDrawHoveringTextHook(methodNode, "onDrawHoveringText", ASMHelper.toMethodDescriptor("V", "I", "I", "I", "I"));
 			}
 			else
 				AppleCore.Log.error("drawTooltipBox method in codechicken.lib.gui.GuiDraw not found");
@@ -61,7 +61,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 			{
 				MethodInsnNode methodInsn = (MethodInsnNode) instruction;
 
-				if (methodInsn.desc.equals("(IIIIII)V"))
+				if (methodInsn.desc.equals(ASMHelper.toMethodDescriptor("V", "I", "I", "I", "I", "I", "I")))
 					targetNode = instruction;
 			}
 		}

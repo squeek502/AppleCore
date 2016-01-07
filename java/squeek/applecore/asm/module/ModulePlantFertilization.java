@@ -26,9 +26,9 @@ public class ModulePlantFertilization implements IClassTransformerModule
 
 	public static enum FertilizeMethodInfo
 	{
-		IGROWABLE_BLOCK("grow", "(Lnet/minecraft/world/World;Ljava/util/Random;III)V", 1, 3, 4, 5, 2),
-		BLOCK_PAM_FRUIT("fertilize", "(Lnet/minecraft/world/World;III)V", 1, 2, 3, 4, FertilizeMethodInfo.NULL_PARAM),
-		BLOCK_PAM_SAPLING("markOrGrowMarked", "(Lnet/minecraft/world/World;IIILjava/util/Random;)V", 1, 2, 3, 4, 5);
+		IGROWABLE_BLOCK("grow", ASMHelper.toMethodDescriptor("V", ASMConstants.World, ASMConstants.Random, "I", "I", "I"), 1, 3, 4, 5, 2),
+		BLOCK_PAM_FRUIT("fertilize", ASMHelper.toMethodDescriptor("V", ASMConstants.World, "I", "I", "I"), 1, 2, 3, 4, FertilizeMethodInfo.NULL_PARAM),
+		BLOCK_PAM_SAPLING("markOrGrowMarked", ASMHelper.toMethodDescriptor("V", ASMConstants.World, "I", "I", "I", ASMConstants.Random), 1, 2, 3, 4, 5);
 
 		public static final int NULL_PARAM = -1;
 		public final String name;
@@ -90,7 +90,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 	public byte[] transform(String name, String transformedName, byte[] bytes)
 	{
 		ClassReader classReader = new ClassReader(bytes);
-		if (ASMHelper.doesClassImplement(classReader, ObfHelper.getInternalClassName("net.minecraft.block.IGrowable")))
+		if (ASMHelper.doesClassImplement(classReader, ObfHelper.getInternalClassName(ASMConstants.IGrowable)))
 		{
 			FertilizeMethodInfo methodInfo = FertilizeMethodInfo.IGROWABLE_BLOCK;
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes, ClassReader.EXPAND_FRAMES);
@@ -134,7 +134,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		toInjectAtStart.add(methodInfo.getLoadWorldInsns());
 		toInjectAtStart.add(methodInfo.getLoadCoordinatesInsns());
 		toInjectAtStart.add(methodInfo.getLoadRandomInsns());
-		toInjectAtStart.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAppleCoreFertilizeEvent", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;IIILjava/util/Random;)V", false));
+		toInjectAtStart.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAppleCoreFertilizeEvent", ASMHelper.toMethodDescriptor("V", ASMConstants.Block, ASMConstants.World, "I", "I", "I", ASMConstants.Random), false));
 		// just return, we're done here
 		toInjectAtStart.add(new InsnNode(RETURN));
 		method.instructions.insertBefore(ASMHelper.findFirstInstruction(method), toInjectAtStart);

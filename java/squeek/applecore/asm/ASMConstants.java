@@ -28,10 +28,39 @@ public class ASMConstants
 		public static final String BlockPamSapling = "com.pam.harvestcraft.BlockPamSapling";
 	}
 
-	public static final String FoodStats = "net.minecraft.util.FoodStats";
+	//Java
+	public static final String List = "java.util.List";
+	public static final String Random = "java.util.Random";
+	public static final String string = "java.lang.String";
+
+	//Minecraft
+	public static final String AbstractClientPlayer = "net.minecraft.client.entity.AbstractClientPlayer";
 	public static final String Block = "net.minecraft.block.Block";
-	public static final String World = "net.minecraft.world.World";
 	public static final String BlockPos = "net.minecraft.util.BlockPos";
+	public static final String DamageSource = "net.minecraft.util.DamageSource";
+	public static final String FontRenderer = "net.minecraft.client.gui.FontRenderer";
+	public static final String FoodStats = "net.minecraft.util.FoodStats";
+	public static final String GameRules = "net.minecraft.world.GameRules";
+	public static final String GuiScreen = "net.minecraft.client.gui.GuiScreen";
 	public static final String IBlockState = "net.minecraft.block.state.IBlockState";
+	public static final String IGrowable = "net.minecraft.block.IGrowable";
+	public static final String ItemFood = "net.minecraft.item.ItemFood";
+	public static final String ItemRenderer = "net.minecraft.client.renderer.ItemRenderer";
 	public static final String Player = "net.minecraft.entity.player.EntityPlayer";
+	public static final String Stack = "net.minecraft.item.ItemStack";
+	public static final String World = "net.minecraft.world.World";
+
+	//FML
+	public static final String EventResult = "net.minecraftforge.fml.common.eventhandler.Event$Result";
+
+	//Blocks
+	public static final String Cactus =	"net.minecraft.block.BlockCactus";
+	public static final String Cake = "net.minecraft.block.BlockCake";
+	public static final String Cocoa = "net.minecraft.block.BlockCocoa";
+	public static final String Crops = "net.minecraft.block.BlockCrops";
+	public static final String Mushroom = "net.minecraft.block.BlockMushroom";
+	public static final String NetherWart = "net.minecraft.block.BlockNetherWart";
+	public static final String Reed = "net.minecraft.block.BlockReed";
+	public static final String Sapling = "net.minecraft.block.BlockSapling";
+	public static final String Stem = "net.minecraft.block.BlockStem";
 }

@@ -1,6 +1,7 @@
 package squeek.applecore.asm.module;
 
 import org.objectweb.asm.tree.*;
+import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
 import squeek.asmhelper.applecore.InsnComparator;
@@ -14,8 +15,8 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	public String[] getClassesToTransform()
 	{
 		return new String[]{
-		"net.minecraft.entity.player.EntityPlayer",
-		"net.minecraft.client.renderer.ItemRenderer"
+		ASMConstants.Player,
+		ASMConstants.ItemRenderer
 		};
 	}
 
@@ -27,11 +28,11 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		if (transformedName.equals("net.minecraft.entity.player.EntityPlayer"))
+		if (transformedName.equals(ASMConstants.Player))
 		{
 			addItemInUseMaxDurationField(classNode);
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_71008_a", "setItemInUse", "(Lnet/minecraft/item/ItemStack;I)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_71008_a", "setItemInUse", ASMHelper.toMethodDescriptor("V", ASMConstants.Stack, "I"));
 			if (methodNode != null)
 			{
 				patchSetItemInUse(classNode, methodNode);
@@ -40,15 +41,15 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 				throw new RuntimeException(classNode.name + ": setItemInUse method not found");
 
 			// this is client-only, so don't throw an error if it's not found
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_71057_bx", "getItemInUseDuration", "()I");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_71057_bx", "getItemInUseDuration", ASMHelper.toMethodDescriptor("I"));
 			if (methodNode != null)
 			{
 				patchGetItemInUseDuration(classNode, methodNode);
 			}
 		}
-		else if (transformedName.equals("net.minecraft.client.renderer.ItemRenderer"))
+		else if (transformedName.equals(ASMConstants.ItemRenderer))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_178104_a", "(Lnet/minecraft/client/entity/AbstractClientPlayer;F)V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_178104_a", ASMHelper.toMethodDescriptor("V", ASMConstants.AbstractClientPlayer, "F"));
 			if (methodNode != null)
 			{
 				patchRenderItemInFirstPerson(classNode, methodNode);
@@ -64,11 +65,11 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	{
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 0));
-		needle.add(new FieldInsnNode(GETFIELD, "net/minecraft/client/renderer/ItemRenderer", InsnComparator.WILDCARD, ASMHelper.toDescriptor("net.minecraft.item.ItemStack")));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName("net.minecraft.item.ItemStack"), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", "()I", false));
+		needle.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(ASMConstants.ItemRenderer), InsnComparator.WILDCARD, ASMHelper.toDescriptor(ASMConstants.Stack)));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.Stack), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
 
 		int playerParamIndex = 1;
-		String playerInternalName = ASMHelper.toInternalClassName("net.minecraft.entity.player.EntityPlayer");
+		String playerInternalName = ASMHelper.toInternalClassName(ASMConstants.Player);
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, playerParamIndex));
@@ -83,14 +84,14 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	{
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 0));
-		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), ObfHelper.isObfuscated() ? "field_71074_e" : "itemInUse", ObfHelper.getDescriptor("net.minecraft.item.ItemStack")));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemStack"), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", "()I", false));
+		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.Player), ObfHelper.isObfuscated() ? "field_71074_e" : "itemInUse", ASMHelper.toDescriptor(ASMConstants.Stack)));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.Stack), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(classNode.name), "itemInUseMaxDuration", "I"));
-		replacement.add(new MethodInsnNode(INVOKESTATIC, "squeek/applecore/asm/Hooks", "getItemInUseMaxDuration", "(Lnet/minecraft/entity/player/EntityPlayer;I)I", false));
+		replacement.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "getItemInUseMaxDuration", ASMHelper.toMethodDescriptor("I", ASMConstants.Player, "I"), false));
 
 		int numReplacementsMade = ASMHelper.findAndReplaceAll(method.instructions, needle, replacement);
 		if (numReplacementsMade == 0)

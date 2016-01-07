@@ -15,14 +15,14 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	public String[] getClassesToTransform()
 	{
 		return new String[]{
-		"net.minecraft.block.BlockCrops",
-		"net.minecraft.block.BlockReed",
-		"net.minecraft.block.BlockCactus",
-		"net.minecraft.block.BlockCocoa",
-		"net.minecraft.block.BlockMushroom",
-		"net.minecraft.block.BlockNetherWart",
-		"net.minecraft.block.BlockSapling",
-		"net.minecraft.block.BlockStem",
+		ASMConstants.Crops,
+		ASMConstants.Reed,
+		ASMConstants.Cactus,
+		ASMConstants.Cocoa,
+		ASMConstants.Mushroom,
+		ASMConstants.NetherWart,
+		ASMConstants.Sapling,
+		ASMConstants.Stem,
 		"com.pam.harvestcraft.BlockPamFruit",
 		"com.pam.harvestcraft.BlockPamSapling",
 		"mods.natura.blocks.crops.BerryBush",
@@ -37,29 +37,29 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V");
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", ASMHelper.toMethodDescriptor("V", ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Random));
 
 		if (methodNode == null)
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V");
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", ASMHelper.toMethodDescriptor("V", ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Random));
 
 		if (methodNode == null)
 			throw new RuntimeException(classNode.name + ": updateTick method not found");
 
-		if (transformedName.equals("net.minecraft.block.BlockCrops"))
+		if (transformedName.equals(ASMConstants.Crops))
 			hookBlockCrops(classNode, methodNode);
-		else if (transformedName.equals("net.minecraft.block.BlockReed"))
+		else if (transformedName.equals(ASMConstants.Reed))
 			hookBlockReed(classNode, methodNode);
-		else if (transformedName.equals("net.minecraft.block.BlockCactus"))
+		else if (transformedName.equals(ASMConstants.Cactus))
 			hookBlockCactus(classNode, methodNode);
-		else if (transformedName.equals("net.minecraft.block.BlockCocoa"))
+		else if (transformedName.equals(ASMConstants.Cocoa))
 			hookBlockCocoa(classNode, methodNode);
-		else if (transformedName.equals("net.minecraft.block.BlockMushroom"))
+		else if (transformedName.equals(ASMConstants.Mushroom))
 			hookBlockMushroom(classNode, methodNode);
-		else if (transformedName.equals("net.minecraft.block.BlockNetherWart"))
+		else if (transformedName.equals(ASMConstants.NetherWart))
 			hookBlockNetherWart(classNode, methodNode);
-		else if (transformedName.equals("net.minecraft.block.BlockSapling"))
+		else if (transformedName.equals(ASMConstants.Sapling))
 			hookBlockSapling(classNode, methodNode);
-		else if (transformedName.equals("net.minecraft.block.BlockStem"))
+		else if (transformedName.equals(ASMConstants.Stem))
 			hookBlockStem(classNode, methodNode);
 		else if (transformedName.equals("com.pam.harvestcraft.BlockPamFruit"))
 			hookBlockPamFruit(classNode, methodNode);
@@ -343,7 +343,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		needle.add(new VarInsnNode(ALOAD, 1)); // world
 		needle.add(new VarInsnNode(ALOAD, 2)); // pos
 		String getBlockStateName = ObfHelper.isObfuscated() ? "func_180495_p" : "getBlockState";
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), getBlockStateName, "(Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;", false));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.World), getBlockStateName, ASMHelper.toMethodDescriptor(ASMConstants.IBlockState, ASMConstants.BlockPos), false));
 		needle.add(new VarInsnNode(ASTORE, InsnComparator.INT_WILDCARD));
 
 		InsnList foundInsns = ASMHelper.findAndGetFoundInsnList(method.instructions.getFirst(), needle);
@@ -384,7 +384,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 1)); // world
 		toInject.add(new VarInsnNode(ALOAD, 2)); // pos
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.World"), ObfHelper.isObfuscated() ? "func_180495_p" : "getBlockState", "(Lnet/minecraft/util/BlockPos;)Lnet/minecraft/block/state/IBlockState;", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.World), ObfHelper.isObfuscated() ? "func_180495_p" : "getBlockState", ASMHelper.toMethodDescriptor(ASMConstants.IBlockState, ASMConstants.BlockPos), false));
 		toInject.add(new VarInsnNode(ISTORE, previousMetadata.index));
 		toInject.add(previousMetadataStart);
 
@@ -396,7 +396,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		// create allowGrowthResult variable
 		LabelNode allowGrowthResultStart = new LabelNode();
-		LocalVariableNode allowGrowthResult = new LocalVariableNode("allowGrowthResult", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;", null, allowGrowthResultStart, endLabel, method.maxLocals);
+		LocalVariableNode allowGrowthResult = new LocalVariableNode("allowGrowthResult", ASMHelper.toDescriptor(ASMConstants.EventResult), null, allowGrowthResultStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(allowGrowthResult);
 
@@ -427,10 +427,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 
 		toInject.add(new VarInsnNode(ALOAD, resultIndex));
-		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "ALLOW", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EventResult), "ALLOW", ASMHelper.toDescriptor(ASMConstants.EventResult)));
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowedLabel));
 		toInject.add(new VarInsnNode(ALOAD, resultIndex));
-		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "DEFAULT", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EventResult), "DEFAULT", ASMHelper.toDescriptor(ASMConstants.EventResult)));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, ifFailedLabel));
 
 		method.instructions.insertBefore(injectPoint, toInject);
@@ -441,7 +441,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 
 		addFireGrowthEventInsnsToList(toInject);
-		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "DENY", "Lnet/minecraftforge/fml/common/eventhandler/Event$Result;"));
+		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EventResult), "DENY", ASMHelper.toDescriptor(ASMConstants.EventResult)));
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifDeniedLabel));
 
 		method.instructions.insertBefore(injectPoint, toInject);

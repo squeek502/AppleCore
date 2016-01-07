@@ -12,17 +12,17 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 	@Override
 	public String[] getClassesToTransform()
 	{
-		return new String[]{"net.minecraft.entity.player.EntityPlayer"};
+		return new String[]{ASMConstants.Player};
 	}
 
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
 	{
-		if (transformedName.equals("net.minecraft.entity.player.EntityPlayer"))
+		if (transformedName.equals(ASMConstants.Player))
 		{
 			ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_70636_d", "onLivingUpdate", "()V");
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_70636_d", "onLivingUpdate", ASMHelper.toMethodDescriptor("V"));
 			if (methodNode != null)
 			{
 				addPeacefulRegenHook(classNode, methodNode);
@@ -59,7 +59,7 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 		LabelNode ifNotCanceled = new LabelNode();
 
 		ifNotCanceledBlock.add(new VarInsnNode(ALOAD, peacefulRegenEventIndex));
-		ifNotCanceledBlock.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.HealthRegenEvent.PeacefulRegen), "isCanceled", "()Z", false));
+		ifNotCanceledBlock.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.HealthRegenEvent.PeacefulRegen), "isCanceled", ASMHelper.toMethodDescriptor("Z"), false));
 		ifNotCanceledBlock.add(new JumpInsnNode(IFNE, ifNotCanceled));
 		method.instructions.insertBefore(targetNode, ifNotCanceledBlock);
 
@@ -78,7 +78,7 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 
 		// HealthRegenEvent.PeacefulRegen peacefulRegenEvent = Hooks.firePeacefulRegenEvent(this);
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "firePeacefulRegenEvent", "(Lnet/minecraft/entity/player/EntityPlayer;)Lsqueek/applecore/api/hunger/HealthRegenEvent$PeacefulRegen;", false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "firePeacefulRegenEvent", ASMHelper.toMethodDescriptor(ASMConstants.HealthRegenEvent.PeacefulRegen, ASMConstants.Player), false));
 		toInject.add(new VarInsnNode(ASTORE, peacefulRegenEvent.index));
 		toInject.add(peacefulRegenEventStart);
 

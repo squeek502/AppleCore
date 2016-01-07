@@ -14,7 +14,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 	@Override
 	public String[] getClassesToTransform()
 	{
-		return new String[]{"net.minecraft.block.BlockCake"};
+		return new String[]{ASMConstants.Cake};
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180682_b", "eatCake", "(" + ASMHelper.toDescriptor(ASMConstants.World) + ASMHelper.toDescriptor(ASMConstants.BlockPos) + ASMHelper.toDescriptor(ASMConstants.IBlockState) + ASMHelper.toDescriptor(ASMConstants.Player) + ")V");
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180682_b", "eatCake", ASMHelper.toMethodDescriptor("V", ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Player));
 
 		if (methodNode != null)
 		{
@@ -35,16 +35,6 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 	private void addOnBlockFoodEatenHook(ClassNode classNode, MethodNode method)
 	{
-		// default p_150036_5_.getFoodStats().addStats call replaced with:
-		/*
-		FoodValues modifiedFoodValues = Hooks.onBlockFoodEaten(this, p_150036_1_, p_150036_5_);
-		int prevFoodLevel = p_150036_5_.getFoodStats().getFoodLevel();
-		float prevSaturationLevel = p_150036_5_.getFoodStats().getSaturationLevel();
-
-		p_150036_5_.getFoodStats().addStats(modifiedFoodValues.hunger, modifiedFoodValues.saturationModifier);
-
-		Hooks.onPostBlockFoodEaten(this, modifiedFoodValues, prevFoodLevel, prevSaturationLevel, p_150036_5_);
-		*/
 
 		AbstractInsnNode ifCanEat = ASMHelper.findFirstInstructionWithOpcode(method, IFEQ);
 
@@ -69,7 +59,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, "onBlockFoodEaten", "(" + ASMHelper.toDescriptor(ASMConstants.Block) + ASMHelper.toDescriptor(ASMConstants.World) + ASMHelper.toDescriptor(ASMConstants.Player) + ")" + ASMHelper.toDescriptor(ASMConstants.FoodValues), false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, "onBlockFoodEaten",  ASMHelper.toMethodDescriptor(ASMConstants.FoodValues, ASMConstants.Block, ASMConstants.World, ASMConstants.Player), false));
 		toInject.add(new VarInsnNode(ASTORE, modifiedFoodValues.index));
 		toInject.add(modifiedFoodValuesStart);
 
@@ -81,8 +71,8 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// int prevFoodLevel = p_150036_5_.getFoodStats().getFoodLevel();
 		toInject.add(new VarInsnNode(ALOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.Player), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", "()" + ASMHelper.toDescriptor(ASMConstants.FoodStats), false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.FoodStats), ObfHelper.isObfuscated() ? "func_75116_a" : "getFoodLevel", "()I", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.Player), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", ASMHelper.toMethodDescriptor(ASMConstants.FoodStats), false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.FoodStats), ObfHelper.isObfuscated() ? "func_75116_a" : "getFoodLevel", ASMHelper.toMethodDescriptor("I"), false));
 		toInject.add(new VarInsnNode(ISTORE, prevFoodLevel.index));
 		toInject.add(prevFoodLevelStart);
 
@@ -94,8 +84,8 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// float prevSaturationLevel = p_150036_5_.getFoodStats().getSaturationLevel();
 		toInject.add(new VarInsnNode(ALOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.Player), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", "()" + ASMHelper.toDescriptor(ASMConstants.FoodStats), false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.FoodStats), ObfHelper.isObfuscated() ? "func_75115_e" : "getSaturationLevel", "()F", false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.Player), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", ASMHelper.toMethodDescriptor(ASMConstants.FoodStats), false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.FoodStats), ObfHelper.isObfuscated() ? "func_75115_e" : "getSaturationLevel", ASMHelper.toMethodDescriptor("F"), false));
 		toInject.add(new VarInsnNode(FSTORE, prevSaturationLevel.index));
 		toInject.add(prevSaturationLevelStart);
 
@@ -124,7 +114,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		/*
 		 * onPostBlockFoodEaten
 		 */
-		AbstractInsnNode targetNodeAfter = ASMHelper.find(targetNode, new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toDescriptor(ASMConstants.FoodStats), InsnComparator.WILDCARD, "(IF)V", false));
+		AbstractInsnNode targetNodeAfter = ASMHelper.find(targetNode, new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.FoodStats), InsnComparator.WILDCARD, ASMHelper.toMethodDescriptor("V", "I", "F"), false));
 		InsnList toInjectAfter = new InsnList();
 
 		// Hooks.onPostBlockFoodEaten(this, modifiedFoodValues, prevFoodLevel, prevSaturationLevel, p_150036_5_);
@@ -133,7 +123,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		toInjectAfter.add(new VarInsnNode(ILOAD, prevFoodLevel.index));
 		toInjectAfter.add(new VarInsnNode(FLOAD, prevSaturationLevel.index));
 		toInjectAfter.add(new VarInsnNode(ALOAD, 4));
-		toInjectAfter.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "onPostBlockFoodEaten", "(" + ASMHelper.toDescriptor(ASMConstants.Block) + ASMHelper.toDescriptor(ASMConstants.FoodValues) + "IF" + ASMHelper.toDescriptor(ASMConstants.Player) + ")V", false));
+		toInjectAfter.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "onPostBlockFoodEaten", ASMHelper.toMethodDescriptor("V", ASMConstants.Block, ASMConstants.FoodValues, "I", "F", ASMConstants.Player), false));
 
 		method.instructions.insert(targetNodeAfter, toInjectAfter);
 	}
