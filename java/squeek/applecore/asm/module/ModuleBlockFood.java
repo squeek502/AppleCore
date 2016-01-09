@@ -30,24 +30,28 @@ public class ModuleBlockFood implements IClassTransformerModule
 			return ASMHelper.writeClassToBytes(classNode);
 		}
 		else
-			throw new RuntimeException("BlockCake: eatCakeSlice (func_180682_b) method not found");
+			throw new RuntimeException("BlockCake: eatCake (func_180682_b) method not found");
 	}
 
 	private void addOnBlockFoodEatenHook(ClassNode classNode, MethodNode method)
 	{
+		AbstractInsnNode firstUniqueInsnInsideIf = ASMHelper.find(method.instructions, new FieldInsnNode(GETSTATIC, ASMHelper.toDescriptor(ASMConstants) "net/minecraft/stats/StatList", InsnComparator.WILDCARD, "Lnet/minecraft/stats/StatBase;"));
 
-		AbstractInsnNode ifCanEat = ASMHelper.findFirstInstructionWithOpcode(method, IFEQ);
+		if (firstUniqueInsnInsideIf == null)
+			throw new RuntimeException("Target instruction not found in " + classNode.name + "." + method.name);
 
-		if (ifCanEat == null)
-			throw new RuntimeException("IFEQ instruction not found in " + classNode.name + "." + method.name);
+		AbstractInsnNode returnInsn = ASMHelper.findPreviousInstructionWithOpcode(method.instructions.getLast(), RETURN);
+		AbstractInsnNode prevLabel = ASMHelper.findPreviousLabelOrLineNumber(returnInsn);
+		while (prevLabel != null && prevLabel.getType() != AbstractInsnNode.LABEL)
+			prevLabel = ASMHelper.findPreviousLabelOrLineNumber(prevLabel);
 
-		LabelNode ifEndLabel = ((JumpInsnNode) ifCanEat).label;
+		LabelNode ifEndLabel = (LabelNode) prevLabel;
 
 		/*
 		 * Modify food values
 		 */
 		InsnList toInject = new InsnList();
-		AbstractInsnNode targetNode = ASMHelper.findNextInstruction(ifCanEat);
+		AbstractInsnNode targetNode = firstUniqueInsnInsideIf.getPrevious();
 
 		// create modifiedFoodValues variable
 		LabelNode modifiedFoodValuesStart = new LabelNode();

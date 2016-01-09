@@ -17,6 +17,9 @@ minecraft {
 	version = minecraft_version + "-" + forge_version
 	mappings = mappings_version
 	runDir = "run"
+
+	replace "\${version}", project.version
+	replaceIn "ModInfo.java"
 }
 
 group = project.projectDir.name.toLowerCase()
@@ -63,7 +66,7 @@ task apiArtifact(type: Jar, dependsOn: compileJava) {
 }
 
 task sourcesArtifact(type: Jar, dependsOn: compileJava) {
-	from project.buildDir.getPath()+"/sources/java"
+	from project.buildDir.getPath()+"/sources/"+SourceSet.MAIN_SOURCE_SET_NAME+"/java"
 	classifier = 'sources'
 }
 
@@ -84,21 +87,9 @@ processResources {
 	}
 }
 
-// variable substitution in java files
-task processSourceMainJava(type:Copy) {
-	inputs.property "vars", project.version + project.minecraft.version + api_version
-	from('java')
-	{
-		include '**/ModInfo.java'
-		include '**/package-info.java'
-		expand 'version':project.version, 'mcversion':project.minecraft.version, 'apiversion':api_version
-	}
-	into project.buildDir.getPath()+"/sources/java"
-}
-
 task removeExampleAndReferenceSources(type:Delete) {
-	delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/example"
-	delete += project.buildDir.getPath()+"/sources/java"+"/squeek/applecore/asm/reference"
+	delete += project.buildDir.getPath()+"/sources/"+SourceSet.MAIN_SOURCE_SET_NAME+"/java"+"/squeek/applecore/example"
+	delete += project.buildDir.getPath()+"/sources/"+SourceSet.MAIN_SOURCE_SET_NAME+"/java"+"/squeek/applecore/asm/reference"
 }
 
 task removeExampleAndReferenceResources(type:Delete) {
@@ -107,7 +98,6 @@ task removeExampleAndReferenceResources(type:Delete) {
 
 // insert custom tasks
 afterEvaluate { project ->
-	sourceMainJava.finalizedBy(processSourceMainJava)
 	if (!project.hasProperty('buildexample'))
 	{
 		sourceMainJava.finalizedBy(removeExampleAndReferenceSources)
