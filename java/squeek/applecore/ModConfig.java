@@ -5,18 +5,12 @@ import net.minecraftforge.common.config.Configuration;
 
 public class ModConfig
 {
-	public static final ModConfig instance = new ModConfig();
-
-	protected ModConfig()
-	{
-	}
-
-	private static Configuration config;
+	public static Configuration config;
 
 	/*
 	 * CLIENT
 	 */
-	private static final String CATEGORY_CLIENT = "client";
+	public static final String CATEGORY_CLIENT = "client";
 	private static final String CATEGORY_CLIENT_COMMENT =
 			"These config settings are client-side only";
 
