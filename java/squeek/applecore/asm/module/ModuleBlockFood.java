@@ -35,7 +35,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 	private void addOnBlockFoodEatenHook(ClassNode classNode, MethodNode method)
 	{
-		AbstractInsnNode firstUniqueInsnInsideIf = ASMHelper.find(method.instructions, new FieldInsnNode(GETSTATIC, ASMHelper.toDescriptor(ASMConstants) "net/minecraft/stats/StatList", InsnComparator.WILDCARD, "Lnet/minecraft/stats/StatBase;"));
+		AbstractInsnNode firstUniqueInsnInsideIf = ASMHelper.find(method.instructions, new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.StatList), InsnComparator.WILDCARD,ASMHelper.toDescriptor(ASMConstants.StatBase)));
 
 		if (firstUniqueInsnInsideIf == null)
 			throw new RuntimeException("Target instruction not found in " + classNode.name + "." + method.name);

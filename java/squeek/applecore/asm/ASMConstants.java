@@ -48,6 +48,8 @@ public class ASMConstants
 	public static final String ItemRenderer = "net.minecraft.client.renderer.ItemRenderer";
 	public static final String Player = "net.minecraft.entity.player.EntityPlayer";
 	public static final String Stack = "net.minecraft.item.ItemStack";
+	public static final String StatBase = "net.minecraft.stats.StatBase";
+	public static final String StatList = "net.minecraft.stats.StatList";
 	public static final String World = "net.minecraft.world.World";
 
 	//FML
