@@ -6,19 +6,13 @@ import java.io.File;
 
 public class ModConfig
 {
-	public static final ModConfig instance = new ModConfig();
-
-	protected ModConfig()
-	{
-	}
-
-	private static Configuration config;
+	public static Configuration config;
 
 	/*
 	 * CLIENT
 	 */
-	private static final String CATEGORY_CLIENT = "client";
-	private static final String CATEGORY_CLIENT_COMMENT =
+	public static final String CATEGORY_CLIENT = "client";
+	public static final String CATEGORY_CLIENT_COMMENT =
 			"These config settings are client-side only";
 
 	public static boolean SHOW_FOOD_VALUES_IN_TOOLTIP = true;
