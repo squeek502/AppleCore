@@ -2,6 +2,9 @@ package squeek.applecore;
 
 import java.io.File;
 import net.minecraftforge.common.config.Configuration;
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class ModConfig
 {
@@ -52,7 +55,20 @@ public class ModConfig
 		config = new Configuration(file);
 
 		load();
+		sync();
 
+		FMLCommonHandler.instance().bus().register(new ModConfig());
+	}
+
+	@SubscribeEvent
+	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
+	{
+		if (event.modID.equals(ModInfo.MODID))
+			ModConfig.sync();
+	}
+
+	public static void sync()
+	{
 		/*
 		 * CLIENT
 		 */
@@ -69,7 +85,8 @@ public class ModConfig
 		SHOW_FOOD_EXHAUSTION_UNDERLAY = config.get(CATEGORY_CLIENT, SHOW_FOOD_EXHAUSTION_UNDERLAY_NAME, foodExhaustionOverlayValue, SHOW_FOOD_EXHAUSTION_UNDERLAY_COMMENT).getBoolean(foodExhaustionOverlayValue);
 		SHOW_FOOD_DEBUG_INFO = config.get(CATEGORY_CLIENT, SHOW_FOOD_DEBUG_INFO_NAME, true, SHOW_FOOD_DEBUG_INFO_COMMENT).getBoolean(true);
 
-		save();
+		if (config.hasChanged())
+			save();
 	}
 
 	public static void save()
