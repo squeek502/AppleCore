@@ -233,7 +233,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	static final Field foodSaturationLevel = ReflectionHelper.findField(FoodStats.class, "foodSaturationLevel", "field_75125_b", "b");
 	static final Field foodExhaustion = ReflectionHelper.findField(FoodStats.class, "foodExhaustionLevel", "field_75126_c", "c");
 	static final Field foodTimer = ReflectionHelper.findField(FoodStats.class, "foodTimer", "field_75123_d", "d");
-	static final Field starveTimer = ReflectionHelper.findField(FoodStats.class, "prevFoodLevel"); //was starveTimer
+	static final Field starveTimer = ReflectionHelper.findField(FoodStats.class, "starveTimer");
 	static
 	{
 		foodLevel.setAccessible(true);

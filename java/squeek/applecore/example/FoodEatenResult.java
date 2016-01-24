@@ -8,6 +8,8 @@ public class FoodEatenResult
 	@SubscribeEvent
 	public void onFoodEaten(FoodEvent.FoodEaten event)
 	{
+		AppleCoreExample.Log.info(event.player.getDisplayNameString() + " ate " + event.food.toString());
+
 		if (event.hungerAdded >= 1)
 			event.player.heal(1);
 	}

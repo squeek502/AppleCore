@@ -25,7 +25,6 @@ public class PlantGrowthModifier
 	@SubscribeEvent
 	public void onGrowthTick(PlantGrowthEvent.GrowthTick event)
 	{
-		int currentMetadata = event.state.getBlock().getMetaFromState(event.state);
-		AppleCoreExample.Log.info(event.block + " grew from a growth tick (from meta " + event.previousMetadata + " to " + currentMetadata + ")");
+		AppleCoreExample.Log.info(event.block + " grew from a growth tick (from " + event.previousState.toString() + " to " + event.currentState.toString() + ")");
 	}
 }

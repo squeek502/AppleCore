@@ -71,6 +71,7 @@ public class AppleCoreExample
 			MinecraftForge.EVENT_BUS.register(new FoodStatsAdditionCanceler());
 			MinecraftForge.EVENT_BUS.register(new FoodValuesModifier());
 			MinecraftForge.EVENT_BUS.register(new HealthRegenModifier());
+			MinecraftForge.EVENT_BUS.register(new HungerRegenModifier());
 			MinecraftForge.EVENT_BUS.register(new StarvationModifier());
 			MinecraftForge.EVENT_BUS.register(new PlantGrowthModifier());
 			MinecraftForge.EVENT_BUS.register(new FertilizationModifier());

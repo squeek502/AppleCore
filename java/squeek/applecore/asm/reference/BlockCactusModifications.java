@@ -41,7 +41,7 @@ public class BlockCactusModifications extends BlockCactus
 				}
 
 				// added line
-				Hooks.fireOnGrowthEvent(this, world, pos, state, j);
+				Hooks.fireOnGrowthEvent(this, world, pos, state);
 			}
 		}
 	}

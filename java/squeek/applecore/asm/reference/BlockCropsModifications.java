@@ -34,7 +34,7 @@ public class BlockCropsModifications extends BlockCrops
 				{
 					world.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(i + 1)), 2);
 					// added line
-					Hooks.fireOnGrowthEvent(this, world, pos, state, previousMetadata);
+					Hooks.fireOnGrowthEvent(this, world, pos, state);
 				}
 			}
 		}

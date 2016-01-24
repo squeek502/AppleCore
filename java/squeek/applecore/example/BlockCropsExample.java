@@ -22,9 +22,9 @@ public class BlockCropsExample extends BlockCrops
 
 	// abstract the AppleCoreAPI reference into an Optional.Method so that AppleCore is not a hard dependency
 	@Optional.Method(modid = "AppleCore")
-	public void announceAppleCoreGrowthTick(World world, BlockPos pos, IBlockState state, int previousMetadata)
+	public void announceAppleCoreGrowthTick(World world, BlockPos pos, IBlockState previousState)
 	{
-		AppleCoreAPI.dispatcher.announcePlantGrowth(this, world, pos, state, previousMetadata);
+		AppleCoreAPI.dispatcher.announcePlantGrowth(this, world, pos, previousState);
 	}
 
 	/**
@@ -56,22 +56,23 @@ public class BlockCropsExample extends BlockCrops
 		//  - Event.Result.DENY means to always disallow the growth tick
 		if (allowGrowthResult == Event.Result.ALLOW || (allowGrowthResult == Event.Result.DEFAULT && world.getLightFromNeighbors(pos.up()) >= 9))
 		{
-			int meta = (state.getValue(AGE)).intValue();
-			int previousMetadata = meta;
+			int age = (state.getValue(AGE)).intValue();
 
-			if (meta < 7)
+			if (age < 7)
 			{
 				// same template as above is applied here, but the default conditional is
 				// moved into a variable for clarity
 				boolean defaultGrowthCondition = random.nextInt(50) == 0;
 				if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && defaultGrowthCondition))
 				{
-					world.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(meta + 1)), 2);
+					world.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(age + 1)), 2);
 
 					// *After* the actual growth occurs, we simply let everyone know that it happened
 					if (Loader.isModLoaded("AppleCore"))
 					{
-						announceAppleCoreGrowthTick(world, pos, state, previousMetadata);
+						// note: if the state variable is changed in the method, then the original state instance
+						// should be stored and passed to this method instead
+						announceAppleCoreGrowthTick(world, pos, state);
 					}
 				}
 			}

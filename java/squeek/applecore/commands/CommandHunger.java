@@ -6,7 +6,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.StatCollector;
 import squeek.applecore.api.AppleCoreAPI;
-
 import java.util.List;
 
 public class CommandHunger extends CommandBase
@@ -30,7 +29,8 @@ public class CommandHunger extends CommandBase
 	}
 
 	@Override
-	public void processCommand(ICommandSender commandSender, String[] args) throws CommandException {
+	public void processCommand(ICommandSender commandSender, String[] args) throws CommandException
+	{
 		if (args.length > 0)
 		{
 			EntityPlayerMP playerToActOn = args.length >= 2 ? getPlayer(commandSender, args[1]) : getCommandSenderAsPlayer(commandSender);
@@ -48,34 +48,12 @@ public class CommandHunger extends CommandBase
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+	public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
 	{
 		if (args.length == 1)
 			return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
 		else
 			return null;
-	}
-
-	@Override
-	public int compareTo(ICommand iCommand)
-	{
-		if (iCommand instanceof ICommand)
-			return super.compareTo(iCommand);
-		else
-			return 0;
-	}
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		return super.equals(obj) || (obj instanceof ICommand && compareTo((ICommand) obj) == 0);
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return getCommandName().hashCode();
 	}
 }

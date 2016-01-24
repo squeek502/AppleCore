@@ -1,33 +1,17 @@
 package squeek.applecore.asm.reference;
 
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.util.MathHelper;
 
 public class ItemRendererModifications
 {
-	// changed itemstack.getMaxItemUseDuration() to entityclientplayermp.itemInUseMaxDuration
-	@SuppressWarnings({"null", "unused"})
-	public void renderItemInFirstPerson(float f)
+	// changed itemToRender.getMaxItemUseDuration() to clientPlayer.itemInUseMaxDuration
+	private void func_178104_a(AbstractClientPlayer clientPlayer, float p_178104_2_)
 	{
-		// dummies to avoid compilation errors
-		ItemStack itemstack = null;
-		EntityPlayerModifications entityclientplayermp = null;
-		float f6;
-		float f7;
-
-		// ...
-
-		EnumAction enumaction = itemstack.getItemUseAction();
-
-		// this block is deep in the method
-		if (enumaction == EnumAction.EAT || enumaction == EnumAction.DRINK)
-		{
-			f6 = entityclientplayermp.getItemInUseCount() - f + 1.0F;
-			f7 = 1.0F - f6 / entityclientplayermp.itemInUseMaxDuration;
-
-			// ...
-		}
-
-		// ...
+		Object entityclientplayermp = null;
+		float f = (float) clientPlayer.getItemInUseCount() - p_178104_2_ + 1.0F;
+		// this is actually the first parameter; a dummy is used here to show which field we are accessing
+		float f1 = f / (float) ((EntityPlayerModifications) entityclientplayermp).itemInUseMaxDuration;
+		float f2 = MathHelper.abs(MathHelper.cos(f / 4.0F * 3.1415927F) * 0.1F);
 	}
 }

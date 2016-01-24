@@ -24,7 +24,7 @@ public class BlockSaplingModifications extends BlockSapling
 			{
 				this.grow(world, pos, state, rand);
 				// added line
-				Hooks.fireOnGrowthWithoutMetadataChangeEvent(this, world, pos,  state);
+				Hooks.fireOnGrowthEvent(this, world, pos, state);
 			}
 		}
 	}

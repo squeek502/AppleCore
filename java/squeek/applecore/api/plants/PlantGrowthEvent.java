@@ -1,13 +1,14 @@
 package squeek.applecore.api.plants;
 
+import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
-
-import java.util.Random;
+import static net.minecraftforge.fml.common.eventhandler.Event.Result;
+import static net.minecraftforge.fml.common.eventhandler.Event.HasResult;
 
 public class PlantGrowthEvent extends Event
 {
@@ -43,8 +44,12 @@ public class PlantGrowthEvent extends Event
 	}
 
 	/**
-	 * Fired after a plant grows from a growth tick.
-	 * 
+	 * Fired after a plant grows from a growth tick.<br>
+	 * <br>
+	 * Note: {@code currentState.getBlock()} can differ from {@code block}
+	 * (e.g. when sapling grows into a tree, {@code currentState.getBlock()} will
+	 * return BlockLog while {@code block} will store the sapling that grew.<br>
+	 * <br>
 	 * This event is fired in various {@link Block#updateTick} overrides.<br>
 	 * <br>
 	 * This event is not {@link Cancelable}.<br>
@@ -56,21 +61,21 @@ public class PlantGrowthEvent extends Event
 		public final Block block;
 		public final World world;
 		public final BlockPos pos;
-		public final IBlockState state;
-		public final int previousMetadata;
+		public final IBlockState currentState;
+		public final IBlockState previousState;
 
-		public GrowthTick(Block block, World world, BlockPos pos, IBlockState state, int previousMetadata)
+		public GrowthTick(Block block, World world, BlockPos pos, IBlockState currentState, IBlockState previousState)
 		{
 			this.block = block;
 			this.world = world;
 			this.pos = pos;
-			this.state = state;
-			this.previousMetadata = previousMetadata;
+			this.currentState = currentState;
+			this.previousState = previousState;
 		}
 
-		public GrowthTick(Block block, World world, BlockPos pos, IBlockState state)
+		public GrowthTick(Block block, World world, BlockPos pos, IBlockState previousState)
 		{
-			this(block, world, pos, state, state.getBlock().getMetaFromState(state));
+			this(block, world, pos, world.getBlockState(pos), previousState);
 		}
 	}
 }

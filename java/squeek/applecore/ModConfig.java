@@ -1,10 +1,10 @@
 package squeek.applecore;
 
 import java.io.File;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ModConfig
 {
@@ -38,7 +38,7 @@ public class ModConfig
 			"If true, shows the hunger (and saturation if " + SHOW_SATURATION_OVERLAY_NAME + " is true) that would be restored by food you are currently holding";
 
 	@Deprecated
-	private static final String SHOW_FOOD_EXHAUSTION_OVERLAY_NAME = "show.food.exhaustion.hud.overlay"; //TODO Squuek
+	private static final String SHOW_FOOD_EXHAUSTION_OVERLAY_NAME = "show.food.exhaustion.hud.overlay";
 
 	public static boolean SHOW_FOOD_EXHAUSTION_UNDERLAY = true;
 	private static final String SHOW_FOOD_EXHAUSTION_UNDERLAY_NAME = "show.food.exhaustion.hud.underlay";
@@ -57,7 +57,7 @@ public class ModConfig
 		load();
 		sync();
 
-		FMLCommonHandler.instance().bus().register(new ModConfig());
+		MinecraftForge.EVENT_BUS.register(new ModConfig());
 	}
 
 	@SubscribeEvent
@@ -74,7 +74,7 @@ public class ModConfig
 		 */
 		config.getCategory(CATEGORY_CLIENT).setComment(CATEGORY_CLIENT_COMMENT);
 
-		// rename overlay to underlay //TODO Squuek
+		// rename overlay to underlay
 		boolean foodExhaustionOverlayValue = config.get(CATEGORY_CLIENT, SHOW_FOOD_EXHAUSTION_OVERLAY_NAME, true).getBoolean(true);
 		config.getCategory(CATEGORY_CLIENT).remove(SHOW_FOOD_EXHAUSTION_OVERLAY_NAME);
 

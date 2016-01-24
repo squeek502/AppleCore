@@ -19,11 +19,11 @@ public interface IAppleCoreDispatcher {
 	/**
 	 * Fires a {@link squeek.applecore.api.plants.PlantGrowthEvent.GrowthTick} event.
 	 */
-	public void announcePlantGrowth(Block block, World world, BlockPos pos, IBlockState state, int previousMetadata);
+	public void announcePlantGrowth(Block block, World world, BlockPos pos, IBlockState currentState, IBlockState previousState);
 
 	/**
 	 * Fires a {@link squeek.applecore.api.plants.PlantGrowthEvent.GrowthTick} event.
-	 * Use only when the growth did not cause a metadata change.
+	 * Use to automatically retrieve the current state.
 	 */
-	public void announcePlantGrowthWithoutMetadataChange(Block block, World world, BlockPos pos, IBlockState state);
+	public void announcePlantGrowth(Block block, World world, BlockPos pos, IBlockState previousState);
 }

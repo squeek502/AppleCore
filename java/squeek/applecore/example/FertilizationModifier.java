@@ -31,14 +31,13 @@ public class FertilizationModifier
 		}
 		else
 		{
-			AppleCoreExample.Log.info(event.block + " is about to be fertilized (current meta: " + event.metadata + ")");
+			AppleCoreExample.Log.info(event.block + " is about to be fertilized (" + event.state.toString() + ")");
 		}
 	}
 
 	@SubscribeEvent
 	public void onFertilized(FertilizationEvent.Fertilized event)
 	{
-		int currentMetadata = event.state.getBlock().getMetaFromState(event.state);
-		AppleCoreExample.Log.info(event.block + " was fertilized from meta " + event.previousMetadata + " to " + currentMetadata);
+		AppleCoreExample.Log.info(event.block + " was fertilized from " + event.previousState.toString() + " to " + event.currentState.toString());
 	}
 }

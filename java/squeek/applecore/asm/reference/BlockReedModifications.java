@@ -42,7 +42,7 @@ public class BlockReedModifications extends BlockReed
 					}
 
 					// added line
-					Hooks.fireOnGrowthEvent(this, world, pos, state, j);
+					Hooks.fireOnGrowthEvent(this, world, pos, state);
 				}
 			}
 		}

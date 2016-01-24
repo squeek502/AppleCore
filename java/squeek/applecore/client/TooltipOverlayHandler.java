@@ -1,11 +1,14 @@
 package squeek.applecore.client;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -29,9 +32,6 @@ import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.helpers.KeyHelper;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 @SideOnly(Side.CLIENT)
 public class TooltipOverlayHandler
 {
@@ -41,16 +41,75 @@ public class TooltipOverlayHandler
 	{
 		MinecraftForge.EVENT_BUS.register(new TooltipOverlayHandler());
 	}
-	//private static final Field guiLeft = ReflectionHelper.findField(GuiContainer.class, ObfuscationReflectionHelper.remapFieldNames(GuiContainer.class.getName(), "guiLeft", "field_147003_i", "i"));
-	//private static final Field guiTop = ReflectionHelper.findField(GuiContainer.class, ObfuscationReflectionHelper.remapFieldNames(GuiContainer.class.getName(), "guiTop", "field_147009_r", "r"));
+
 	public static final Field theSlot = ReflectionHelper.findField(GuiContainer.class, ObfuscationReflectionHelper.remapFieldNames(GuiContainer.class.getName(), "theSlot", "field_147006_u", "u"));
 	private static Method getStackMouseOver = null;
 	private static Field itemPanel = null;
 	private static boolean neiLoaded = false;
+	private static Class<?> JustEnoughItems = null;
+	private static Field jeiProxy = null;
+	private static Field jeiGuiEventHandler = null;
+	private static Field jeiItemListOverlay = null;
+	private static Method jeiGetFocusUnderMouse = null;
+	private static Field jeiRecipesGui = null;
+	private static Method jeiRecipesGetFocusUnderMouse = null;
+	private static Method jeiRecipesIsOpen = null;
+	private static Field jeiFocus_itemStack = null;
+	private static Field jeiHoveredRecipeLayout = null;
+	private static Field jeiRecipeLayoutPosX = null;
+	private static Field jeiRecipeLayoutPosY = null;
+	private static boolean jeiLoaded = false;
 	private static Class<?> foodJournalGui = null;
 	private static Field foodJournalHoveredStack = null;
 	static
 	{
+		try
+		{
+			jeiLoaded = Loader.isModLoaded("JEI");
+			if (jeiLoaded)
+			{
+				JustEnoughItems = Class.forName("mezz.jei.JustEnoughItems");
+				jeiProxy = JustEnoughItems.getDeclaredField("proxy");
+				jeiProxy.setAccessible(true);
+				Class<?> ProxyCommonClient = Class.forName("mezz.jei.ProxyCommonClient");
+				jeiGuiEventHandler = ProxyCommonClient.getDeclaredField("guiEventHandler");
+				jeiGuiEventHandler.setAccessible(true);
+				Class<?> GuiEventHandler = Class.forName("mezz.jei.GuiEventHandler");
+
+				jeiItemListOverlay = GuiEventHandler.getDeclaredField("itemListOverlay");
+				jeiItemListOverlay.setAccessible(true);
+				Class<?> ItemListOverlay = Class.forName("mezz.jei.gui.ItemListOverlay");
+				jeiGetFocusUnderMouse = ItemListOverlay.getDeclaredMethod("getFocusUnderMouse", int.class, int.class);
+
+				jeiRecipesGui = GuiEventHandler.getDeclaredField("recipesGui");
+				jeiRecipesGui.setAccessible(true);
+				Class<?> RecipesGui = Class.forName("mezz.jei.gui.RecipesGui");
+				jeiRecipesGetFocusUnderMouse = RecipesGui.getDeclaredMethod("getFocusUnderMouse", int.class, int.class);
+				jeiRecipesIsOpen = RecipesGui.getDeclaredMethod("isOpen");
+
+				jeiHoveredRecipeLayout = RecipesGui.getDeclaredField("hovered");
+				jeiHoveredRecipeLayout.setAccessible(true);
+				Class<?> RecipeLayout = Class.forName("mezz.jei.gui.RecipeLayout");
+				jeiRecipeLayoutPosX = RecipeLayout.getDeclaredField("posX");
+				jeiRecipeLayoutPosX.setAccessible(true);
+				jeiRecipeLayoutPosY = RecipeLayout.getDeclaredField("posY");
+				jeiRecipeLayoutPosY.setAccessible(true);
+
+				Class<?> Focus = Class.forName("mezz.jei.gui.Focus");
+				jeiFocus_itemStack = Focus.getDeclaredField("stack");
+				jeiFocus_itemStack.setAccessible(true);
+			}
+		}
+		catch (RuntimeException e)
+		{
+			throw e;
+		}
+		catch (Exception e)
+		{
+			AppleCore.Log.error("Unable to integrate the food values tooltip overlay with JEI: ");
+			e.printStackTrace();
+		}
+
 		try
 		{
 			neiLoaded = Loader.isModLoaded("NotEnoughItems");
@@ -112,12 +171,53 @@ public class TooltipOverlayHandler
 				// get the hovered stack from the active container
 				try
 				{
-					// try regular container
-					Slot hoveredSlot = (Slot) TooltipOverlayHandler.theSlot.get(gui);
+					// try JEI recipe handler
+					if (jeiFocus_itemStack != null)
+					{
+						Object guiEventHandler = jeiGuiEventHandler.get(jeiProxy.get(null));
 
-					// get the stack
-					if (hoveredSlot != null)
-						hoveredStack = hoveredSlot.getStack();
+						// try to get the hovered stack from the current recipe if possible
+						Object recipesGui = jeiRecipesGui.get(guiEventHandler);
+						Object recipesFocus = jeiRecipesGetFocusUnderMouse.invoke(recipesGui, mouseX, mouseY);
+						if (recipesFocus != null)
+							hoveredStack = (ItemStack) jeiFocus_itemStack.get(recipesFocus);
+
+						// next try to get the hovered stack from the right-hand item list
+						if (hoveredStack == null)
+						{
+							Object itemList = jeiItemListOverlay.get(guiEventHandler);
+							Object listFocus = jeiGetFocusUnderMouse.invoke(itemList, mouseX, mouseY);
+							if (listFocus != null)
+								hoveredStack = (ItemStack) jeiFocus_itemStack.get(listFocus);
+						}
+						else
+						{
+							// when the hoveredStack is in the RecipesGui,
+							// tooltips are drawn using a translated Gl matrix, so
+							// we need to turn the relative x/y coords back into absolute ones
+							Object hoveredLayout = jeiHoveredRecipeLayout.get(recipesGui);
+							if (hoveredLayout != null)
+							{
+								Hooks.toolTipX += jeiRecipeLayoutPosX.getInt(hoveredLayout);
+								Hooks.toolTipY += jeiRecipeLayoutPosY.getInt(hoveredLayout);
+							}
+						}
+
+						// if JEI has a recipe open, then we should just return here, as curScreen.theSlot will
+						// contain the itemStack that was hovered when the recipe screen was opened
+						if (hoveredStack == null && (Boolean) jeiRecipesIsOpen.invoke(recipesGui))
+							return;
+					}
+
+					// try regular container
+					if (hoveredStack == null)
+					{
+						Slot hoveredSlot = (Slot) TooltipOverlayHandler.theSlot.get(gui);
+
+						// get the stack
+						if (hoveredSlot != null)
+							hoveredStack = hoveredSlot.getStack();
+					}
 
 					// try NEI
 					if (hoveredStack == null && getStackMouseOver != null)
@@ -168,8 +268,6 @@ public class TooltipOverlayHandler
 					int topY = (shouldDrawBelow ? toolTipBottomY : Hooks.toolTipY - 20 + (needsCoordinateShift ? -4 : 0));
 					int bottomY = topY + 20;
 
-					boolean wasLightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);
-					if (wasLightingEnabled)
 					GlStateManager.disableLighting();
 					GlStateManager.disableDepth();
 
@@ -178,11 +276,15 @@ public class TooltipOverlayHandler
 					Gui.drawRect(leftX, (shouldDrawBelow ? bottomY : topY - 1), rightX, (shouldDrawBelow ? bottomY + 1 : topY), 0xF0100010);
 					Gui.drawRect(leftX, topY, rightX, bottomY, 0x66FFFFFF);
 
+					// drawRect disables blending and modifies color, so reset them
+					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+					GlStateManager.enableBlend();
+					GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
 					int x = rightX - 2;
 					int startX = x;
 					int y = bottomY - 19;
 
-					GlStateManager.color(1.0F, 1.0F, 1.0F, .25F);
 					mc.getTextureManager().bindTexture(Gui.icons);
 
 					for (int i = 0; i < barsNeeded * 2; i += 2)
@@ -200,10 +302,9 @@ public class TooltipOverlayHandler
 						else
 							gui.drawTexturedModalRect(x, y, 34, 27, 9, 9);
 
-						GlStateManager.enableBlend();
-						GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+						GlStateManager.color(1.0F, 1.0F, 1.0F, .25F);
 						gui.drawTexturedModalRect(x, y, defaultFoodValues.hunger - 1 == i ? 115 : 106, 27, 9, 9);
-						GlStateManager.disableBlend();
+						GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
 						if (modifiedFoodValues.hunger > i)
 							gui.drawTexturedModalRect(x, y, modifiedFoodValues.hunger - 1 == i ? 61 : 52, 27, 9, 9);
@@ -216,7 +317,7 @@ public class TooltipOverlayHandler
 
 					GlStateManager.pushMatrix();
 					GlStateManager.scale(0.75F, 0.75F, 0.75F);
-					GlStateManager.color(1.0F, 1.0F, 1.0F, .5F);
+					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 					for (int i = 0; i < saturationBarsNeeded * 2; i += 2)
 					{
 						float effectiveSaturationOfBar = (absModifiedSaturationIncrement - i) / 2f;
@@ -225,10 +326,7 @@ public class TooltipOverlayHandler
 
 						boolean shouldBeFaded = absModifiedSaturationIncrement <= i;
 						if (shouldBeFaded)
-						{
-							GlStateManager.enableBlend();
-							GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-						}
+							GlStateManager.color(1.0F, 1.0F, 1.0F, .5F);
 
 						mc.getTextureManager().bindTexture(Gui.icons);
 						gui.drawTexturedModalRect(x * 4 / 3, y * 4 / 3, 16, 27, 9, 9);
@@ -237,7 +335,7 @@ public class TooltipOverlayHandler
 						gui.drawTexturedModalRect(x * 4 / 3, y * 4 / 3, effectiveSaturationOfBar >= 1 ? 27 : effectiveSaturationOfBar > 0.5 ? 18 : effectiveSaturationOfBar > 0.25 ? 9 : effectiveSaturationOfBar > 0 ? 0 : 36, modifiedSaturationIncrement >= 0 ? 0 : 9, 9, 9);
 
 						if (shouldBeFaded)
-							GlStateManager.disableBlend();
+							GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 					}
 					if (saturationText != null)
 					{
@@ -245,9 +343,9 @@ public class TooltipOverlayHandler
 					}
 					GlStateManager.popMatrix();
 
+					GlStateManager.disableBlend();
 					GlStateManager.enableDepth();
-					if (wasLightingEnabled)
-						GlStateManager.enableLighting();
+					GlStateManager.enableLighting();
 					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 				}
 			}

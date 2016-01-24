@@ -17,6 +17,9 @@ public class BlockStemModifications extends BlockStem
 	@Override
 	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)
 	{
+		// added var
+		IBlockState previousState = state;
+
 		super.updateTick(world, pos, state, rand);
 
 		// added line and changed if
@@ -29,15 +32,13 @@ public class BlockStemModifications extends BlockStem
 			if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && rand.nextInt((int) (25.0F / f) + 1) == 0))
 			{
 				int i = (state.getValue(AGE)).intValue();
-				// added var
-				int previousMetadata = i;
 
 				if (i < 7)
 				{
 					state = state.withProperty(AGE, Integer.valueOf(i + 1));
 					world.setBlockState(pos, state, 2);
 					// added line
-					Hooks.fireOnGrowthEvent(this, world, pos, state, previousMetadata);
+					Hooks.fireOnGrowthEvent(this, world, pos, previousState);
 				}
 				else
 				{

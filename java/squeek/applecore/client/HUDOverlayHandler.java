@@ -187,20 +187,22 @@ public class HUDOverlayHandler
 
 	public static void enableAlpha(float alpha)
 	{
+		GlStateManager.enableBlend();
+
 		if (alpha == 1f)
 			return;
 
 		GlStateManager.color(1.0F, 1.0F, 1.0F, alpha);
-		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	public static void disableAlpha(float alpha)
 	{
+		GlStateManager.disableBlend();
+
 		if (alpha == 1f)
 			return;
 
-		GlStateManager.disableBlend();
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 	}
 

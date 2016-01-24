@@ -10,6 +10,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import squeek.applecore.api.hunger.HealthRegenEvent;
+import squeek.applecore.api.hunger.HungerRegenEvent;
 import squeek.applecore.asm.Hooks;
 
 public abstract class EntityPlayerModifications extends EntityPlayer
@@ -56,29 +57,41 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 		}
 
 		// modified
-		if (this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL && this.getHealth() < this.getMaxHealth() && this.worldObj.getGameRules().hasRule("naturalRegeneration") && this.ticksExisted % 20 * 12 == 0)
+		if (this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL && this.worldObj.getGameRules().getBoolean("naturalRegeneration"))
 		{
-			// added event and if statement
-			HealthRegenEvent.PeacefulRegen peacefulRegenEvent = Hooks.firePeacefulRegenEvent(this);
-			if (!peacefulRegenEvent.isCanceled())
+			if (this.getHealth() < this.getMaxHealth() && this.ticksExisted % 20 == 0)
 			{
-				// modified from this.heal(1.0F);
-				this.heal(peacefulRegenEvent.deltaHealth);
+				// added event and if statement
+				HealthRegenEvent.PeacefulRegen peacefulRegenEvent = Hooks.firePeacefulRegenEvent(this);
+				if (!peacefulRegenEvent.isCanceled())
+				{
+					// modified from this.heal(1.0F);
+					this.heal(peacefulRegenEvent.deltaHealth);
+				}
 			}
-		}
 
-		// ...
+			if (this.foodStats.needFood() && this.ticksExisted % 10 == 0)
+			{
+				HungerRegenEvent.PeacefulRegen peacefulHungerRegenEvent = Hooks.firePeacefulHungerRegenEvent(this);
+				if (!peacefulHungerRegenEvent.isCanceled())
+				{
+					this.foodStats.setFoodLevel(this.foodStats.getFoodLevel() + peacefulHungerRegenEvent.deltaHunger);
+				}
+			}
+
+			// ...
+		}
 	}
 
 	/*
 	 * everything below is unmodified
 	 * it is only required to avoid compilation errors
 	 */
-	public ItemStack itemInUse;
-	public int itemInUseCount;
+		public ItemStack itemInUse;
+		public int itemInUseCount;
 
-	public EntityPlayerModifications(World world, GameProfile gameProfile)
-	{
-		super(world, gameProfile);
+		public EntityPlayerModifications(World world, GameProfile gameProfile)
+		{
+			super(world, gameProfile);
+		}
 	}
-}

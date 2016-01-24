@@ -14,11 +14,12 @@ public class BlockNetherWartModifications extends BlockNetherWart
 	@Override
 	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)
 	{
+		// added var
+		IBlockState previousState = state;
 		// added line
 		Result allowGrowthResult = Hooks.fireAllowPlantGrowthEvent(this, world, pos, state, rand);
+
 		int i = (state.getValue(AGE)).intValue();
-		// added var
-		int previousMetadata = i;
 		
 		// changed if
 		if (i < 3 && (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && rand.nextInt(10) == 0)))
@@ -27,7 +28,7 @@ public class BlockNetherWartModifications extends BlockNetherWart
 			world.setBlockState(pos, state, 2);
 
 			// added line
-			Hooks.fireOnGrowthEvent(this, world, pos, state, previousMetadata);
+			Hooks.fireOnGrowthEvent(this, world, pos, previousState);
 		}
 
 		super.updateTick(world, pos, state, rand);

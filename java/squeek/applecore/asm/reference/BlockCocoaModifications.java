@@ -33,7 +33,7 @@ public class BlockCocoaModifications extends BlockCocoa
 				world.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(i + 1)), 2);
 
 				// added line
-				Hooks.fireOnGrowthEvent(this, world, pos, state, i);
+				Hooks.fireOnGrowthEvent(this, world, pos, state);
 			}
 		}
 	}

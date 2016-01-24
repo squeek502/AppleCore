@@ -7,6 +7,8 @@ import net.minecraft.util.FoodStats;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
+import static net.minecraftforge.fml.common.eventhandler.Event.Result;
+import static net.minecraftforge.fml.common.eventhandler.Event.HasResult;
 import squeek.applecore.api.AppleCoreAPI;
 
 /**

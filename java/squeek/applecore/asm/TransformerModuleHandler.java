@@ -1,9 +1,10 @@
 package squeek.applecore.asm;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.launchwrapper.IClassTransformer;
 import squeek.applecore.asm.module.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransformerModuleHandler implements IClassTransformer
 {
