@@ -1,17 +1,13 @@
 package squeek.applecore.asm.module;
 
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.commons.Remapper;
-import org.objectweb.asm.commons.RemappingMethodAdapter;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.applecore.asm.TransformerModuleHandler;
 import squeek.asmhelper.applecore.ASMHelper;
 import squeek.asmhelper.applecore.ObfHelper;
-import java.util.HashMap;
-import java.util.Random;
+
 import static org.objectweb.asm.Opcodes.*;
 
 public class ModulePlantFertilization implements IClassTransformerModule
@@ -90,35 +86,31 @@ public class ModulePlantFertilization implements IClassTransformerModule
 			MethodNode method = ASMHelper.findMethodNodeOfClass(classNode, methodInfo.name, methodInfo.desc);
 			if (method != null)
 			{
-				copyAndRenameMethod(classNode, method, methodInfo);
-				wrapFertilizeMethod(method, methodInfo);
+				ASMHelper.copyAndRenameMethod(classNode, method, "AppleCore_fertilize");
+				replaceFertilizeMethod(method, methodInfo);
 				return ASMHelper.writeClassToBytes(classNode);
 			}
 		}
 		return bytes;
 	}
 
-	private void copyAndRenameMethod(ClassNode classNode, MethodNode method, FertilizeMethodInfo methodInfo)
-	{
-		MethodVisitor methodCopyVisitor = classNode.visitMethod(method.access, "AppleCore_fertilize", method.desc, method.signature, method.exceptions.toArray(new String[method.exceptions.size()]));
-		method.accept(new RemappingMethodAdapter(method.access, method.desc, methodCopyVisitor, new Remapper(){}));
-	}
-
-	private void wrapFertilizeMethod(MethodNode method, FertilizeMethodInfo methodInfo)
+	private void replaceFertilizeMethod(MethodNode method, FertilizeMethodInfo methodInfo)
 	{
 		if (ASMHelper.isMethodAbstract(method))
 			return;
 
-		InsnList toInjectAtStart = new InsnList();
-		// fire event
-		toInjectAtStart.add(new VarInsnNode(ALOAD, 0));
-		toInjectAtStart.add(methodInfo.getLoadWorldInsns());
-		toInjectAtStart.add(methodInfo.getLoadCoordinatesInsns());
-		toInjectAtStart.add(methodInfo.getLoadBlockStateInsns());
-		toInjectAtStart.add(methodInfo.getLoadRandomInsns());
-		toInjectAtStart.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAppleCoreFertilizeEvent", ASMHelper.toMethodDescriptor("V", ASMConstants.Block, ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Random), false));
-		// just return, we're done here
-		toInjectAtStart.add(new InsnNode(RETURN));
-		method.instructions.insertBefore(ASMHelper.findFirstInstruction(method), toInjectAtStart);
+		if (method.localVariables != null)
+			method.localVariables.clear();
+		if (method.tryCatchBlocks != null)
+			method.tryCatchBlocks.clear();
+
+		method.instructions.clear();
+		method.instructions.add(new VarInsnNode(ALOAD, 0));
+		method.instructions.add(methodInfo.getLoadWorldInsns());
+		method.instructions.add(methodInfo.getLoadCoordinatesInsns());
+		method.instructions.add(methodInfo.getLoadBlockStateInsns());
+		method.instructions.add(methodInfo.getLoadRandomInsns());
+		method.instructions.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAppleCoreFertilizeEvent", ASMHelper.toMethodDescriptor("V", ASMConstants.Block, ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Random), false));
+		method.instructions.add(new InsnNode(RETURN));
 	}
 }
