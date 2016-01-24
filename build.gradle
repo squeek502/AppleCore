@@ -42,7 +42,7 @@ sourceSets.main{
 }
 
 dependencies {
-	compile fileTree(dir: 'libs', include: '*.jar,*.zip')
+	compile project(':ASMHelper')
 }
 
 jar {
