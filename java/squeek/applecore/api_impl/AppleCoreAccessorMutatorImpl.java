@@ -1,6 +1,5 @@
 package squeek.applecore.api_impl;
 
-import java.lang.reflect.Field;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
@@ -9,6 +8,7 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreAccessor;
 import squeek.applecore.api.IAppleCoreMutator;
@@ -18,7 +18,8 @@ import squeek.applecore.api.food.IEdible;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
-import cpw.mods.fml.relauncher.ReflectionHelper;
+
+import java.lang.reflect.Field;
 
 public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCoreMutator
 {
@@ -49,7 +50,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 			return true;
 
 		EnumAction useAction = food.getItem().getItemUseAction(food);
-		return useAction == EnumAction.eat || useAction == EnumAction.drink;
+		return useAction == EnumAction.EAT || useAction == EnumAction.DRINK;
 	}
 
 	@Override
@@ -69,7 +70,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 
 	private FoodValues getItemFoodValues(ItemFood itemFood, ItemStack itemStack)
 	{
-		return new FoodValues(itemFood.func_150905_g(itemStack), itemFood.func_150906_h(itemStack));
+		return new FoodValues(itemFood.getHealAmount(itemStack), itemFood.getSaturationModifier(itemStack));
 	}
 
 	@Override
@@ -232,7 +233,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	static final Field foodSaturationLevel = ReflectionHelper.findField(FoodStats.class, "foodSaturationLevel", "field_75125_b", "b");
 	static final Field foodExhaustion = ReflectionHelper.findField(FoodStats.class, "foodExhaustionLevel", "field_75126_c", "c");
 	static final Field foodTimer = ReflectionHelper.findField(FoodStats.class, "foodTimer", "field_75123_d", "d");
-	static final Field starveTimer = ReflectionHelper.findField(FoodStats.class, "starveTimer");
+	static final Field starveTimer = ReflectionHelper.findField(FoodStats.class, "prevFoodLevel"); //was starveTimer
 	static
 	{
 		foodLevel.setAccessible(true);

@@ -1,14 +1,13 @@
 package squeek.applecore.commands;
 
-import java.util.List;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
+import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.StatCollector;
 import squeek.applecore.api.AppleCoreAPI;
+
+import java.util.List;
 
 public class CommandHunger extends CommandBase
 {
@@ -31,18 +30,17 @@ public class CommandHunger extends CommandBase
 	}
 
 	@Override
-	public void processCommand(ICommandSender commandSender, String[] args)
-	{
+	public void processCommand(ICommandSender commandSender, String[] args) throws CommandException {
 		if (args.length > 0)
 		{
 			EntityPlayerMP playerToActOn = args.length >= 2 ? getPlayer(commandSender, args[1]) : getCommandSenderAsPlayer(commandSender);
-			int newHunger = args.length >= 2 ? parseIntBounded(commandSender, args[1], 0, 20) : parseIntBounded(commandSender, args[0], 0, 20);
+			int newHunger = args.length >= 2 ? parseInt(args[1], 0, 20) : parseInt(args[0], 0, 20);
 
 			AppleCoreAPI.mutator.setHunger(playerToActOn, newHunger);
 			if (playerToActOn.getFoodStats().getSaturationLevel() > newHunger)
 				AppleCoreAPI.mutator.setSaturation(playerToActOn, newHunger);
 
-			func_152374_a(commandSender, this, 1, StatCollector.translateToLocalFormatted("applecore.commands.hunger.set.hunger.to", playerToActOn.getDisplayName(), newHunger));
+			notifyOperators(commandSender, this, 1, StatCollector.translateToLocalFormatted("applecore.commands.hunger.set.hunger.to", playerToActOn.getDisplayName(), newHunger));
 		}
 		else
 		{
@@ -52,19 +50,19 @@ public class CommandHunger extends CommandBase
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public List addTabCompletionOptions(ICommandSender commandSender, String[] curArgs)
+	public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
 	{
-		if (curArgs.length == 1)
-			return getListOfStringsMatchingLastWord(curArgs, MinecraftServer.getServer().getAllUsernames());
+		if (args.length == 1)
+			return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
 		else
 			return null;
 	}
 
 	@Override
-	public int compareTo(Object obj)
+	public int compareTo(ICommand iCommand)
 	{
-		if (obj instanceof ICommand)
-			return super.compareTo((ICommand) obj);
+		if (iCommand instanceof ICommand)
+			return super.compareTo(iCommand);
 		else
 			return 0;
 	}
@@ -72,7 +70,7 @@ public class CommandHunger extends CommandBase
 	@Override
 	public boolean equals(Object obj)
 	{
-		return super.equals(obj) || (obj instanceof ICommand && compareTo(obj) == 0);
+		return super.equals(obj) || (obj instanceof ICommand && compareTo((ICommand) obj) == 0);
 	}
 
 	@Override

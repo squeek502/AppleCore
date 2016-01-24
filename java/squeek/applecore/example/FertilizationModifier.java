@@ -1,10 +1,12 @@
 package squeek.applecore.example;
 
 import net.minecraft.block.BlockCocoa;
+import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockStem;
+import net.minecraft.block.state.IBlockState;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import squeek.applecore.api.plants.FertilizationEvent;
-import cpw.mods.fml.common.eventhandler.Event.Result;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class FertilizationModifier
 {
@@ -22,7 +24,8 @@ public class FertilizationModifier
 		{
 			// randomize the meta
 			AppleCoreExample.Log.info("randomizing meta of " + event.block + " using custom fertilization handling");
-			event.world.setBlockMetadataWithNotify(event.x, event.y, event.z, event.random.nextInt(7), 1);
+			IBlockState state = event.state.withProperty(BlockCrops.AGE, Integer.valueOf(event.random.nextInt(7)));
+			event.world.setBlockState(event.pos, state, 1);
 			// mark as handled
 			event.setResult(Result.ALLOW);
 		}
@@ -35,7 +38,7 @@ public class FertilizationModifier
 	@SubscribeEvent
 	public void onFertilized(FertilizationEvent.Fertilized event)
 	{
-		int currentMetadata = event.world.getBlockMetadata(event.x, event.y, event.z);
+		int currentMetadata = event.state.getBlock().getMetaFromState(event.state);
 		AppleCoreExample.Log.info(event.block + " was fertilized from meta " + event.previousMetadata + " to " + currentMetadata);
 	}
 }

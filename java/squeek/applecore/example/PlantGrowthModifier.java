@@ -2,9 +2,9 @@ package squeek.applecore.example;
 
 import net.minecraft.block.BlockCocoa;
 import net.minecraft.block.BlockStem;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import squeek.applecore.api.plants.PlantGrowthEvent;
-import cpw.mods.fml.common.eventhandler.Event.Result;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class PlantGrowthModifier
 {
@@ -25,7 +25,7 @@ public class PlantGrowthModifier
 	@SubscribeEvent
 	public void onGrowthTick(PlantGrowthEvent.GrowthTick event)
 	{
-		int currentMetadata = event.world.getBlockMetadata(event.x, event.y, event.z);
+		int currentMetadata = event.state.getBlock().getMetaFromState(event.state);
 		AppleCoreExample.Log.info(event.block + " grew from a growth tick (from meta " + event.previousMetadata + " to " + currentMetadata + ")");
 	}
 }

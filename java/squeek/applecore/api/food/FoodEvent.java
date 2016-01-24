@@ -1,14 +1,13 @@
 package squeek.applecore.api.food;
 
-import squeek.applecore.api.AppleCoreAPI;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.eventhandler.Cancelable;
-import cpw.mods.fml.common.eventhandler.Event;
-import static cpw.mods.fml.common.eventhandler.Event.HasResult;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import squeek.applecore.api.AppleCoreAPI;
 
 /**
  * Base class for all FoodEvent events.<br>
@@ -20,7 +19,7 @@ public abstract class FoodEvent extends Event
 	/**
 	 * Fired every time food values are retrieved to allow player-independent control over their values.
 	 * 
-	 * This event is fired in {@link FoodStats#func_151686_a(ItemFood, ItemStack)} and in {@link AppleCoreAPI}.<br>
+	 * This event is fired in {@link FoodStats#addStats(ItemFood, ItemStack)} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #foodValues} contains the values of the {@link #food}.<br>
 	 * {@link #unmodifiedFoodValues} contains the food values of the {@link #food} before the GetFoodValues event was fired.<br>
@@ -48,7 +47,7 @@ public abstract class FoodEvent extends Event
 	 * Fired every time food values are retrieved to allow player-dependent control over their values.
 	 * This event will always be preceded by {@link GetFoodValues} being fired.
 	 * 
-	 * This event is fired in {@link FoodStats#func_151686_a(ItemFood, ItemStack)} and in {@link AppleCoreAPI}.<br>
+	 * This event is fired in {@link FoodStats#addStats(ItemFood, ItemStack)} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #player} contains the player.<br>
 	 * {@link #foodValues} contains the values of the {@link #food}.<br>
@@ -78,7 +77,7 @@ public abstract class FoodEvent extends Event
 	/**
 	 * Fired after {@link FoodStats#addStats}, containing the effects and context for the food that was eaten.
 	 * 
-	 * This event is fired in {@link FoodStats#func_151686_a(ItemFood, ItemStack)}.<br>
+	 * This event is fired in {@link FoodStats#addStats(ItemFood, ItemStack)}.<br>
 	 * <br>
 	 * This event is not {@link Cancelable}.<br>
 	 * <br>

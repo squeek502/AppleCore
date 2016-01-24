@@ -1,13 +1,16 @@
 package squeek.applecore.api_impl;
 
-import java.util.Random;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreDispatcher;
 import squeek.applecore.api.plants.PlantGrowthEvent;
-import cpw.mods.fml.common.eventhandler.Event;
+
+import java.util.Random;
 
 public enum AppleCoreDispatcherImpl implements IAppleCoreDispatcher
 {
@@ -19,30 +22,23 @@ public enum AppleCoreDispatcherImpl implements IAppleCoreDispatcher
 	}
 
 	@Override
-	public Event.Result validatePlantGrowth(Block block, World world, int x, int y, int z, Random random)
+	public Event.Result validatePlantGrowth(Block block, World world, BlockPos pos, IBlockState state, Random random)
 	{
-		PlantGrowthEvent.AllowGrowthTick event = new PlantGrowthEvent.AllowGrowthTick(block, world, x, y, z, random);
+		PlantGrowthEvent.AllowGrowthTick event = new PlantGrowthEvent.AllowGrowthTick(block, world, pos, state, random);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getResult();
 	}
 
 	@Override
-	public void announcePlantGrowth(Block block, World world, int x, int y, int z, int previousMetadata)
+	public void announcePlantGrowth(Block block, World world, BlockPos pos, IBlockState state, int previousMetadata)
 	{
-		PlantGrowthEvent.GrowthTick event = new PlantGrowthEvent.GrowthTick(block, world, x, y, z, previousMetadata);
+		PlantGrowthEvent.GrowthTick event = new PlantGrowthEvent.GrowthTick(block, world, pos, state, previousMetadata);
 		MinecraftForge.EVENT_BUS.post(event);
 	}
 
 	@Override
-	public void announcePlantGrowthWithoutMetadataChange(Block block, World world, int x, int y, int z)
+	public void announcePlantGrowthWithoutMetadataChange(Block block, World world, BlockPos pos, IBlockState state)
 	{
-		announcePlantGrowth(block, world, x, y, z, world.getBlockMetadata(x, y, z));
-	}
-
-	@Override
-	@Deprecated
-	public void announcePlantGrowth(Block block, World world, int x, int y, int z)
-	{
-		announcePlantGrowth(block, world, x, y, z, Math.max(0, world.getBlockMetadata(x, y, z) - 1));
+		announcePlantGrowth(block, world, pos, state, state.getBlock().getMetaFromState(state));
 	}
 }

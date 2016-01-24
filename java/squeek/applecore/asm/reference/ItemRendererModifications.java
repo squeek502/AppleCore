@@ -7,7 +7,7 @@ public class ItemRendererModifications
 {
 	// changed itemstack.getMaxItemUseDuration() to entityclientplayermp.itemInUseMaxDuration
 	@SuppressWarnings({"null", "unused"})
-	public void renderItemInFirstPerson(float p_78440_1_)
+	public void renderItemInFirstPerson(float f)
 	{
 		// dummies to avoid compilation errors
 		ItemStack itemstack = null;
@@ -20,9 +20,9 @@ public class ItemRendererModifications
 		EnumAction enumaction = itemstack.getItemUseAction();
 
 		// this block is deep in the method
-		if (enumaction == EnumAction.eat || enumaction == EnumAction.drink)
+		if (enumaction == EnumAction.EAT || enumaction == EnumAction.DRINK)
 		{
-			f6 = entityclientplayermp.getItemInUseCount() - p_78440_1_ + 1.0F;
+			f6 = entityclientplayermp.getItemInUseCount() - f + 1.0F;
 			f7 = 1.0F - f6 / entityclientplayermp.itemInUseMaxDuration;
 
 			// ...

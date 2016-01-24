@@ -1,12 +1,13 @@
 package squeek.applecore.api.plants;
 
-import java.util.Random;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.eventhandler.Cancelable;
-import cpw.mods.fml.common.eventhandler.Event;
-import static cpw.mods.fml.common.eventhandler.Event.Result;
-import static cpw.mods.fml.common.eventhandler.Event.HasResult;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraftforge.fml.common.eventhandler.Event;
+
+import java.util.Random;
 
 public class PlantGrowthEvent extends Event
 {
@@ -27,18 +28,16 @@ public class PlantGrowthEvent extends Event
 	{
 		public final Block block;
 		public final World world;
-		public final int x;
-		public final int y;
-		public final int z;
+		public final BlockPos pos;
+		public final IBlockState state;
 		public final Random random;
 
-		public AllowGrowthTick(Block block, World world, int x, int y, int z, Random random)
+		public AllowGrowthTick(Block block, World world, BlockPos pos, IBlockState state, Random random)
 		{
 			this.block = block;
 			this.world = world;
-			this.x = x;
-			this.y = y;
-			this.z = z;
+			this.pos = pos;
+			this.state = state;
 			this.random = random;
 		}
 	}
@@ -56,24 +55,22 @@ public class PlantGrowthEvent extends Event
 	{
 		public final Block block;
 		public final World world;
-		public final int x;
-		public final int y;
-		public final int z;
+		public final BlockPos pos;
+		public final IBlockState state;
 		public final int previousMetadata;
 
-		public GrowthTick(Block block, World world, int x, int y, int z, int previousMetadata)
+		public GrowthTick(Block block, World world, BlockPos pos, IBlockState state, int previousMetadata)
 		{
 			this.block = block;
 			this.world = world;
-			this.x = x;
-			this.y = y;
-			this.z = z;
+			this.pos = pos;
+			this.state = state;
 			this.previousMetadata = previousMetadata;
 		}
 
-		public GrowthTick(Block block, World world, int x, int y, int z)
+		public GrowthTick(Block block, World world, BlockPos pos, IBlockState state)
 		{
-			this(block, world, x, y, z, world.getBlockMetadata(x, y, z));
+			this(block, world, pos, state, state.getBlock().getMetaFromState(state));
 		}
 	}
 }

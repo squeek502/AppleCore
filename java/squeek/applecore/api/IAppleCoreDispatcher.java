@@ -1,34 +1,29 @@
 package squeek.applecore.api;
 
-import java.util.Random;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.Event;
 
-public interface IAppleCoreDispatcher
-{
+import java.util.Random;
+
+public interface IAppleCoreDispatcher {
 	/**
 	 * Fires a {@link squeek.applecore.api.plants.PlantGrowthEvent.AllowGrowthTick} event and returns the result.
-	 * 
+	 * <p/>
 	 * See {@link squeek.applecore.api.plants.PlantGrowthEvent.AllowGrowthTick} for how to use the result.
 	 */
-	public Event.Result validatePlantGrowth(Block block, World world, int x, int y, int z, Random random);
+	public Event.Result validatePlantGrowth(Block block, World world, BlockPos pos, IBlockState state, Random random);
 
 	/**
 	 * Fires a {@link squeek.applecore.api.plants.PlantGrowthEvent.GrowthTick} event.
 	 */
-	public void announcePlantGrowth(Block block, World world, int x, int y, int z, int previousMetadata);
+	public void announcePlantGrowth(Block block, World world, BlockPos pos, IBlockState state, int previousMetadata);
 
 	/**
 	 * Fires a {@link squeek.applecore.api.plants.PlantGrowthEvent.GrowthTick} event.
 	 * Use only when the growth did not cause a metadata change.
 	 */
-	public void announcePlantGrowthWithoutMetadataChange(Block block, World world, int x, int y, int z);
-
-	/**
-	 * Deprecated in favor of {@link #announcePlantGrowth(Block, World, int, int, int, int)}
-	 * and {@link #announcePlantGrowthWithoutMetadataChange(Block, World, int, int, int)}
-	 */
-	@Deprecated
-	public void announcePlantGrowth(Block block, World world, int x, int y, int z);
+	public void announcePlantGrowthWithoutMetadataChange(Block block, World world, BlockPos pos, IBlockState state);
 }

@@ -1,14 +1,12 @@
 package squeek.applecore.api.hunger;
 
-import squeek.applecore.api.AppleCoreAPI;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.eventhandler.Cancelable;
-import cpw.mods.fml.common.eventhandler.Event;
-import static cpw.mods.fml.common.eventhandler.Event.Result;
-import static cpw.mods.fml.common.eventhandler.Event.HasResult;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import squeek.applecore.api.AppleCoreAPI;
 
 /**
  * Base class for all StarvationEvent events.<br>
@@ -88,7 +86,7 @@ public abstract class StarvationEvent extends Event
 		{
 			super(player);
 
-			EnumDifficulty difficulty = player.worldObj.difficultySetting;
+			EnumDifficulty difficulty = player.worldObj.getDifficulty();
 			boolean shouldDoDamage = player.getHealth() > 10.0F || difficulty == EnumDifficulty.HARD || player.getHealth() > 1.0F && difficulty == EnumDifficulty.NORMAL;
 
 			if (!shouldDoDamage)

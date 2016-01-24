@@ -1,15 +1,16 @@
 package squeek.applecore.client;
 
-import java.text.DecimalFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import squeek.applecore.ModConfig;
 import squeek.applecore.api.AppleCoreAPI;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.text.DecimalFormat;
 
 @SideOnly(Side.CLIENT)
 public class DebugInfoHandler

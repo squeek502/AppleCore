@@ -1,43 +1,47 @@
 package squeek.applecore.asm.reference;
 
-import java.util.Random;
 import net.minecraft.block.BlockCactus;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import squeek.applecore.asm.Hooks;
-import cpw.mods.fml.common.eventhandler.Event.Result;
+
+import java.util.Random;
 
 public class BlockCactusModifications extends BlockCactus
 {
 	@Override
-	public void updateTick(World p_149674_1_, int p_149674_2_, int p_149674_3_, int p_149674_4_, Random p_149674_5_)
+	public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)
 	{
-		if (p_149674_1_.isAirBlock(p_149674_2_, p_149674_3_ + 1, p_149674_4_))
+		if (world.isAirBlock(pos.up()))
 		{
-			int l;
+			int i;
 
-			for (l = 1; p_149674_1_.getBlock(p_149674_2_, p_149674_3_ - l, p_149674_4_) == this; ++l)
+			for (i = 1; world.getBlockState(pos.down(i)).getBlock() == this; ++i)
 			{
 				;
 			}
 
 			// added && ...
-			if (l < 3 && Hooks.fireAllowPlantGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, p_149674_5_) != Result.DENY)
+			if (i < 3 && Hooks.fireAllowPlantGrowthEvent(this, world, pos, state, rand) != Event.Result.DENY)
 			{
-				int i1 = p_149674_1_.getBlockMetadata(p_149674_2_, p_149674_3_, p_149674_4_);
+				int j = (state.getValue(AGE)).intValue();
 
-				if (i1 == 15)
+				if (j == 15)
 				{
-					p_149674_1_.setBlock(p_149674_2_, p_149674_3_ + 1, p_149674_4_, this);
-					p_149674_1_.setBlockMetadataWithNotify(p_149674_2_, p_149674_3_, p_149674_4_, 0, 4);
-					this.onNeighborBlockChange(p_149674_1_, p_149674_2_, p_149674_3_ + 1, p_149674_4_, this);
+					world.setBlockState(pos.up(), this.getDefaultState());
+					IBlockState iblockstate = state.withProperty(AGE, Integer.valueOf(0));
+					world.setBlockState(pos, iblockstate, 4);
+					this.onNeighborBlockChange(world, pos.up(), iblockstate, this);
 				}
 				else
 				{
-					p_149674_1_.setBlockMetadataWithNotify(p_149674_2_, p_149674_3_, p_149674_4_, i1 + 1, 4);
+					world.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(j + 1)), 4);
 				}
 
 				// added line
-				Hooks.fireOnGrowthEvent(this, p_149674_1_, p_149674_2_, p_149674_3_, p_149674_4_, i1);
+				Hooks.fireOnGrowthEvent(this, world, pos, state, j);
 			}
 		}
 	}

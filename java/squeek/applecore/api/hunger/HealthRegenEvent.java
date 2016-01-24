@@ -1,13 +1,11 @@
 package squeek.applecore.api.hunger;
 
-import squeek.applecore.api.AppleCoreAPI;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.eventhandler.Cancelable;
-import cpw.mods.fml.common.eventhandler.Event;
-import static cpw.mods.fml.common.eventhandler.Event.Result;
-import static cpw.mods.fml.common.eventhandler.Event.HasResult;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import squeek.applecore.api.AppleCoreAPI;
 
 /**
  * Base class for all HealthRegenEvent events.<br>

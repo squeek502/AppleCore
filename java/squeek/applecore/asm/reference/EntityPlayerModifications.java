@@ -1,16 +1,16 @@
 package squeek.applecore.asm.reference;
 
-import squeek.applecore.api.hunger.HealthRegenEvent;
-import squeek.applecore.asm.Hooks;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
-import com.mojang.authlib.GameProfile;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import squeek.applecore.api.hunger.HealthRegenEvent;
+import squeek.applecore.asm.Hooks;
 
 public abstract class EntityPlayerModifications extends EntityPlayer
 {
@@ -22,17 +22,17 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 
 	// a single line added
 	@Override
-	public void setItemInUse(ItemStack p_71008_1_, int p_71008_2_)
+	public void setItemInUse(ItemStack stack, int duration)
 	{
-		if (p_71008_1_ != this.itemInUse)
+		if (stack != this.itemInUse)
 		{
-			p_71008_2_ = ForgeEventFactory.onItemUseStart(this, p_71008_1_, p_71008_2_);
-			if (p_71008_2_ <= 0)
+			duration = ForgeEventFactory.onItemUseStart(this, stack, duration);
+			if (duration <= 0)
 				return;
-			this.itemInUse = p_71008_1_;
-			this.itemInUseCount = p_71008_2_;
+			this.itemInUse = stack;
+			this.itemInUseCount = duration;
 			// added:
-			this.itemInUseMaxDuration = p_71008_2_;
+			this.itemInUseMaxDuration = duration;
 
 			// ...
 		}
@@ -56,7 +56,7 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 		}
 
 		// modified
-		if (this.worldObj.difficultySetting == EnumDifficulty.PEACEFUL && this.getHealth() < this.getMaxHealth() && this.worldObj.getGameRules().getGameRuleBooleanValue("naturalRegeneration") && this.ticksExisted % 20 * 12 == 0)
+		if (this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL && this.getHealth() < this.getMaxHealth() && this.worldObj.getGameRules().hasRule("naturalRegeneration") && this.ticksExisted % 20 * 12 == 0)
 		{
 			// added event and if statement
 			HealthRegenEvent.PeacefulRegen peacefulRegenEvent = Hooks.firePeacefulRegenEvent(this);
@@ -77,8 +77,8 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 	public ItemStack itemInUse;
 	public int itemInUseCount;
 
-	public EntityPlayerModifications(World p_i45324_1_, GameProfile p_i45324_2_)
+	public EntityPlayerModifications(World world, GameProfile gameProfile)
 	{
-		super(p_i45324_1_, p_i45324_2_);
+		super(world, gameProfile);
 	}
 }

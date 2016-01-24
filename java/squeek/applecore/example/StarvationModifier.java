@@ -1,9 +1,9 @@
 package squeek.applecore.example;
 
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
-import cpw.mods.fml.common.eventhandler.Event.Result;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class StarvationModifier
 {
@@ -11,7 +11,7 @@ public class StarvationModifier
 	@SubscribeEvent
 	public void allowStarvation(StarvationEvent.AllowStarvation event)
 	{
-		event.setResult(Result.ALLOW);
+		event.setResult(Event.Result.ALLOW);
 	}
 
 	@SubscribeEvent
@@ -20,7 +20,7 @@ public class StarvationModifier
 		event.starveTickPeriod = 60;
 	}
 
-	@SubscribeEvent(priority=EventPriority.LOWEST)
+	@SubscribeEvent(priority= EventPriority.LOWEST)
 	public void onStarve(StarvationEvent.Starve event)
 	{
 		event.starveDamage = 1;
