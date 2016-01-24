@@ -29,7 +29,7 @@ public class IGrowableModifications extends Block implements IGrowable
 		return true;
 	}
 	
-	// copy/rename func_149853_b to this
+	// copy/rename the original func_149853_b implementation to here
 	public void AppleCore_fertilize(World world, Random random, int x, int y, int z)
 	{
 		// func_149853_b's implementation
@@ -39,11 +39,9 @@ public class IGrowableModifications extends Block implements IGrowable
 	@Override
 	public void func_149853_b(World p_149853_1_, Random p_149853_2_, int p_149853_3_, int p_149853_4_, int p_149853_5_)
 	{
-		// added at start
+		// method instructions replaced with only the following
 		Hooks.fireAppleCoreFertilizeEvent(this, p_149853_1_, p_149853_3_, p_149853_4_, p_149853_5_, p_149853_2_);
 		return;
-		
-		// default implementation, left alone but unused because of the inserted return above
 	}
 
 }
