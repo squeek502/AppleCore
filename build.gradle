@@ -41,10 +41,6 @@ sourceSets.main{
 	}
 }
 
-dependencies {
-	compile project(':ASMHelper')
-}
-
 jar {
 	manifest {
 		attributes 'FMLCorePlugin': 'squeek.applecore.AppleCore'
@@ -146,4 +142,13 @@ if (mavenUrl && !project.hasProperty('nopublish')) {
 	afterEvaluate { project ->
 		build.finalizedBy(uploadArchives)
 	}
+}
+
+task testPom << {
+	apply plugin: 'maven'
+	pom {
+		whenConfigured {pom ->
+			//pom.dependencies.removeAll {dep -> dep.groupId == "squeek.asmhelper" }
+		}
+	}.writeTo(new PrintWriter(System.out))
 }
