@@ -44,10 +44,6 @@ sourceSets.main{
 	}
 }
 
-dependencies {
-	compile project(':ASMHelper')
-}
-
 jar {
 	manifest {
 		attributes 'FMLCorePlugin': 'squeek.applecore.AppleCore'
