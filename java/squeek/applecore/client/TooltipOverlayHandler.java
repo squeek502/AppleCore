@@ -2,6 +2,8 @@ package squeek.applecore.client;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
@@ -50,14 +52,18 @@ public class TooltipOverlayHandler
 	private static Field jeiProxy = null;
 	private static Field jeiGuiEventHandler = null;
 	private static Field jeiItemListOverlay = null;
+	private static Class<?> RecipesGui = null;
 	private static Method jeiGetFocusUnderMouse = null;
+	private static Field jeiInputHandler = null;
 	private static Field jeiRecipesGui = null;
 	private static Method jeiRecipesGetFocusUnderMouse = null;
-	private static Method jeiRecipesIsOpen = null;
 	private static Field jeiFocus_itemStack = null;
-	private static Field jeiHoveredRecipeLayout = null;
+	private static Field jeiRecipeLayouts = null;
+	private static Field jeiRecipesGui_guiLeft = null;
+	private static Field jeiRecipesGui_guiTop = null;
 	private static Field jeiRecipeLayoutPosX = null;
 	private static Field jeiRecipeLayoutPosY = null;
+	private static Method jeiRecipeLayout_getFocusUnderMouse = null;
 	private static boolean jeiLoaded = false;
 	private static Class<?> foodJournalGui = null;
 	private static Field foodJournalHoveredStack = null;
@@ -81,19 +87,26 @@ public class TooltipOverlayHandler
 				Class<?> ItemListOverlay = Class.forName("mezz.jei.gui.ItemListOverlay");
 				jeiGetFocusUnderMouse = ItemListOverlay.getDeclaredMethod("getFocusUnderMouse", int.class, int.class);
 
-				jeiRecipesGui = GuiEventHandler.getDeclaredField("recipesGui");
+				jeiInputHandler = GuiEventHandler.getDeclaredField("inputHandler");
+				jeiInputHandler.setAccessible(true);
+				Class<?> InputHandler = Class.forName("mezz.jei.input.InputHandler");
+				jeiRecipesGui = InputHandler.getDeclaredField("recipesGui");
 				jeiRecipesGui.setAccessible(true);
-				Class<?> RecipesGui = Class.forName("mezz.jei.gui.RecipesGui");
+				RecipesGui = Class.forName("mezz.jei.gui.RecipesGui");
 				jeiRecipesGetFocusUnderMouse = RecipesGui.getDeclaredMethod("getFocusUnderMouse", int.class, int.class);
-				jeiRecipesIsOpen = RecipesGui.getDeclaredMethod("isOpen");
 
-				jeiHoveredRecipeLayout = RecipesGui.getDeclaredField("hovered");
-				jeiHoveredRecipeLayout.setAccessible(true);
+				jeiRecipeLayouts = RecipesGui.getDeclaredField("recipeLayouts");
+				jeiRecipeLayouts.setAccessible(true);
+				jeiRecipesGui_guiLeft = RecipesGui.getDeclaredField("guiLeft");
+				jeiRecipesGui_guiLeft.setAccessible(true);
+				jeiRecipesGui_guiTop = RecipesGui.getDeclaredField("guiTop");
+				jeiRecipesGui_guiTop.setAccessible(true);
 				Class<?> RecipeLayout = Class.forName("mezz.jei.gui.RecipeLayout");
 				jeiRecipeLayoutPosX = RecipeLayout.getDeclaredField("posX");
 				jeiRecipeLayoutPosX.setAccessible(true);
 				jeiRecipeLayoutPosY = RecipeLayout.getDeclaredField("posY");
 				jeiRecipeLayoutPosY.setAccessible(true);
+				jeiRecipeLayout_getFocusUnderMouse = RecipeLayout.getDeclaredMethod("getFocusUnderMouse", int.class, int.class);
 
 				Class<?> Focus = Class.forName("mezz.jei.gui.Focus");
 				jeiFocus_itemStack = Focus.getDeclaredField("stack");
@@ -160,8 +173,9 @@ public class TooltipOverlayHandler
 			ScaledResolution scale = new ScaledResolution(mc);
 
 			boolean isFoodJournalGui = foodJournalGui != null && foodJournalGui.isInstance(curScreen);
+			boolean isJEIRecipesGui = RecipesGui != null && RecipesGui.isInstance(curScreen);
 			boolean isValidContainerGui = curScreen instanceof GuiContainer;
-			if (isValidContainerGui)
+			if (isValidContainerGui || isJEIRecipesGui)
 			{
 				Gui gui = curScreen;
 				int mouseX = Mouse.getX() * scale.getScaledWidth() / mc.displayWidth;
@@ -175,9 +189,10 @@ public class TooltipOverlayHandler
 					if (jeiFocus_itemStack != null)
 					{
 						Object guiEventHandler = jeiGuiEventHandler.get(jeiProxy.get(null));
+						Object inputHandler = jeiInputHandler.get(guiEventHandler);
 
 						// try to get the hovered stack from the current recipe if possible
-						Object recipesGui = jeiRecipesGui.get(guiEventHandler);
+						Object recipesGui = jeiRecipesGui.get(inputHandler);
 						Object recipesFocus = jeiRecipesGetFocusUnderMouse.invoke(recipesGui, mouseX, mouseY);
 						if (recipesFocus != null)
 							hoveredStack = (ItemStack) jeiFocus_itemStack.get(recipesFocus);
@@ -192,22 +207,38 @@ public class TooltipOverlayHandler
 						}
 						else
 						{
+							// ::gross code alert::
 							// when the hoveredStack is in the RecipesGui,
 							// tooltips are drawn using a translated Gl matrix, so
 							// we need to turn the relative x/y coords back into absolute ones
-							Object hoveredLayout = jeiHoveredRecipeLayout.get(recipesGui);
+							// unfortunately, we have to recalculate which RecipeLayout is hovered
+							// in order to do this
+							Object hoveredLayout = null;
+							int guiLeft = jeiRecipesGui_guiLeft.getInt(recipesGui);
+							int guiTop = jeiRecipesGui_guiTop.getInt(recipesGui);
+							int recipeMouseX = mouseX - guiLeft;
+							int recipeMouseY = mouseY - guiTop;
+							List<Object> recipeLayouts = (List<Object>) jeiRecipeLayouts.get(recipesGui);
+							for (Object recipeLayout : recipeLayouts)
+							{
+								if (jeiRecipeLayout_getFocusUnderMouse.invoke(recipeLayout, recipeMouseX, recipeMouseY) != null)
+								{
+									hoveredLayout = recipeLayout;
+									break;
+								}
+							}
+
 							if (hoveredLayout != null)
 							{
-								Hooks.toolTipX += jeiRecipeLayoutPosX.getInt(hoveredLayout);
-								Hooks.toolTipY += jeiRecipeLayoutPosY.getInt(hoveredLayout);
+								Hooks.toolTipX += jeiRecipeLayoutPosX.getInt(hoveredLayout) + guiLeft;
+								Hooks.toolTipY += jeiRecipeLayoutPosY.getInt(hoveredLayout) + guiTop;
 							}
 						}
-
-						// if JEI has a recipe open, then we should just return here, as curScreen.theSlot will
-						// contain the itemStack that was hovered when the recipe screen was opened
-						if (hoveredStack == null && (Boolean) jeiRecipesIsOpen.invoke(recipesGui))
-							return;
 					}
+
+					// RecipesGui is not a GuiContainer, so any code beyond this point is not applicable
+					if (hoveredStack == null && isJEIRecipesGui)
+						return;
 
 					// try regular container
 					if (hoveredStack == null)
