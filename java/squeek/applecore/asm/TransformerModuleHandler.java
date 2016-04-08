@@ -30,6 +30,9 @@ public class TransformerModuleHandler implements IClassTransformer
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass)
 	{
+		if (basicClass == null)
+			return null;
+
 		for (IClassTransformerModule transformerModule : transformerModules)
 		{
 			for (String classToTransform : transformerModule.getClassesToTransform())
