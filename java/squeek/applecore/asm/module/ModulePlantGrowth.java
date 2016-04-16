@@ -4,8 +4,6 @@ import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
-import squeek.asmhelper.applecore.InsnComparator;
-import squeek.asmhelper.applecore.ObfHelper;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -40,28 +38,28 @@ public class ModulePlantGrowth implements IClassTransformerModule
 			throw new RuntimeException(classNode.name + ": updateTick method not found");
 
 		if (transformedName.equals(ASMConstants.Crops))
-			hookBlockCrops(classNode, methodNode);
+			hookBlockCrops(methodNode);
 		else if (transformedName.equals(ASMConstants.Reed))
-			hookBlockReed(classNode, methodNode);
+			hookBlockReed(methodNode);
 		else if (transformedName.equals(ASMConstants.Cactus))
-			hookBlockCactus(classNode, methodNode);
+			hookBlockCactus(methodNode);
 		else if (transformedName.equals(ASMConstants.Cocoa))
-			hookBlockCocoa(classNode, methodNode);
+			hookBlockCocoa(methodNode);
 		else if (transformedName.equals(ASMConstants.Mushroom))
-			hookBlockMushroom(classNode, methodNode);
+			hookBlockMushroom(methodNode);
 		else if (transformedName.equals(ASMConstants.NetherWart))
-			hookBlockNetherWart(classNode, methodNode);
+			hookBlockNetherWart(methodNode);
 		else if (transformedName.equals(ASMConstants.Sapling))
-			hookBlockSapling(classNode, methodNode);
+			hookBlockSapling(methodNode);
 		else if (transformedName.equals(ASMConstants.Stem))
-			hookBlockStem(classNode, methodNode);
+			hookBlockStem(methodNode);
 		else
 			throw new RuntimeException("Unexpected class passed to transformer : " + transformedName);
 
 		return ASMHelper.writeClassToBytes(classNode);
 	}
 
-	private void hookBlockCrops(ClassNode classNode, MethodNode method)
+	private void hookBlockCrops(MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
@@ -86,7 +84,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockReed(ClassNode classNode, MethodNode method)
+	private void hookBlockReed(MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPGE);
 		LabelNode ifDeniedLabel = ifJumpInsn.label;
@@ -103,7 +101,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	}
 
 	// TODO: same as hookBlockReed, should they use a shared method?
-	private void hookBlockCactus(ClassNode classNode, MethodNode method)
+	private void hookBlockCactus(MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPGE);
 		LabelNode ifDeniedLabel = ifJumpInsn.label;
@@ -119,7 +117,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifDeniedLabel);
 	}
 
-	private void hookBlockCocoa(ClassNode classNode, MethodNode method)
+	private void hookBlockCocoa(MethodNode method)
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
@@ -137,7 +135,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockMushroom(ClassNode classNode, MethodNode method)
+	private void hookBlockMushroom(MethodNode method)
 	{
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
 
@@ -154,7 +152,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockNetherWart(ClassNode classNode, MethodNode method)
+	private void hookBlockNetherWart(MethodNode method)
 	{
 		int previousStateIndex = storeBlockStateInNewVariable(method);
 		int resultIndex = fireAllowGrowthEventAndStoreResultBefore(method, ASMHelper.findFirstInstruction(method), ASMHelper.findEndLabel(method));
@@ -171,7 +169,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel, previousStateIndex);
 	}
 
-	private void hookBlockSapling(ClassNode classNode, MethodNode method)
+	private void hookBlockSapling(MethodNode method)
 	{
 		JumpInsnNode lightValueIf = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		JumpInsnNode randomIf = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(lightValueIf, IFNE);
@@ -187,7 +185,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		injectOnGrowthEventBefore(method, ifFailedLabel);
 	}
 
-	private void hookBlockStem(ClassNode classNode, MethodNode method)
+	private void hookBlockStem(MethodNode method)
 	{
 		int previousStateIndex = storeBlockStateInNewVariable(method);
 

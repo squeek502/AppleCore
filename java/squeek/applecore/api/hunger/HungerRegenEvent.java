@@ -4,8 +4,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
-import static net.minecraftforge.fml.common.eventhandler.Event.Result;
-import static net.minecraftforge.fml.common.eventhandler.Event.HasResult;
 
 /**
  * Base class for all HealthRegenEvent events.<br>

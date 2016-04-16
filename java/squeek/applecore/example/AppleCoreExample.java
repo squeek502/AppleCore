@@ -2,6 +2,7 @@ package squeek.applecore.example;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -33,13 +34,13 @@ public class AppleCoreExample
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		testFood = new ItemNonStandardFood().setUnlocalizedName("testNonStandardFood");
-		GameRegistry.registerItem(testFood, "testNonStandardFood");
+		GameRegistry.register(testFood, new ResourceLocation(ModInfo.MODID + "Example", "testNonStandardFood"));
 
 		testMetadataFood = new ItemMetadataFood(new int[]{1, 10}, new float[]{2f, 0.1f}).setUnlocalizedName("testMetadataFood");
-		GameRegistry.registerItem(testMetadataFood, "testMetadataFood");
+		GameRegistry.register(testMetadataFood, new ResourceLocation(ModInfo.MODID + "Example", "testMetadataFood"));
 
 		testBlockCrops = new BlockCropsExample();
-		GameRegistry.registerBlock(testBlockCrops, "testBlockCrops");
+		GameRegistry.register(testBlockCrops, new ResourceLocation(ModInfo.MODID + "Example", "testBlockCrops"));
 	}
 
 	@EventHandler

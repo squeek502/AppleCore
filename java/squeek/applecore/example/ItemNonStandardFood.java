@@ -1,9 +1,16 @@
 package squeek.applecore.example;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
@@ -38,21 +45,27 @@ public class ItemNonStandardFood extends Item implements IEdible
 	}
 
 	@Override
-	public ItemStack onItemUseFinish(ItemStack itemStack, World world, EntityPlayer player)
-	{
+	public ItemStack onItemUseFinish(ItemStack itemStack, World world, EntityLivingBase entityLiving) {
 		--itemStack.stackSize;
 
-		if (Loader.isModLoaded("AppleCore"))
+		if (entityLiving instanceof EntityPlayer)
 		{
-			onEatenCompatibility(itemStack, player);
-		}
-		else
-		{
-			// this method is not compatible with AppleCore
-			player.getFoodStats().addStats(1, 1f);
+			EntityPlayer player = (EntityPlayer)entityLiving;
+
+			if (Loader.isModLoaded("AppleCore"))
+			{
+				onEatenCompatibility(itemStack, player);
+			}
+			else
+			{
+				// this method is not compatible with AppleCore
+				player.getFoodStats().addStats(1, 1F);
+			}
+
+			player.addStat(StatList.getObjectUseStats(this));
+			world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.5F, world.rand.nextFloat() * 0.1F + 0.9F);
 		}
 
-		world.playSoundAtEntity(player, "random.burp", 0.5F, world.rand.nextFloat() * 0.1F + 0.9F);
 		return itemStack;
 	}
 
@@ -69,13 +82,14 @@ public class ItemNonStandardFood extends Item implements IEdible
 	}
 
 	@Override
-	public ItemStack onItemRightClick(ItemStack itemStack, World world, EntityPlayer player)
+	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand)
 	{
 		if (player.canEat(true))
 		{
-			player.setItemInUse(itemStack, getMaxItemUseDuration(itemStack));
+			player.setActiveHand(hand);
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
 		}
 
-		return itemStack;
+		return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
 	}
 }

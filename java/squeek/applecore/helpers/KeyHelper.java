@@ -9,7 +9,7 @@ public class KeyHelper
 	{
 		// prioritize CONTROL, but allow OPTION as well on Mac (note: GuiScreen's isCtrlKeyDown only checks for the OPTION key on Mac)
 		boolean isCtrlKeyDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
-		if (!isCtrlKeyDown && Minecraft.isRunningOnMac)
+		if (!isCtrlKeyDown && Minecraft.IS_RUNNING_ON_MAC)
 			isCtrlKeyDown = Keyboard.isKeyDown(Keyboard.KEY_LMETA) || Keyboard.isKeyDown(Keyboard.KEY_RMETA);
 
 		return isCtrlKeyDown;

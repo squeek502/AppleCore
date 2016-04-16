@@ -43,9 +43,8 @@ public class ItemMetadataFood extends ItemFood
 		return saturationModifiers[itemStack.getItemDamage()];
 	}
 
-	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
-	public void getSubItems(Item item, CreativeTabs creativeTabs, List subItems)
+	public void getSubItems(Item item, CreativeTabs creativeTabs, List<ItemStack> subItems)
 	{
 		for (int meta = 0; meta < Math.min(hungerValues.length, saturationModifiers.length); meta++)
 		{

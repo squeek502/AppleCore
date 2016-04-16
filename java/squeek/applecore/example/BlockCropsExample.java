@@ -1,15 +1,16 @@
 package squeek.applecore.example;
 
-import java.util.Random;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import squeek.applecore.api.AppleCoreAPI;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import squeek.applecore.api.AppleCoreAPI;
+
+import java.util.Random;
 
 public class BlockCropsExample extends BlockCrops
 {
@@ -56,7 +57,7 @@ public class BlockCropsExample extends BlockCrops
 		//  - Event.Result.DENY means to always disallow the growth tick
 		if (allowGrowthResult == Event.Result.ALLOW || (allowGrowthResult == Event.Result.DEFAULT && world.getLightFromNeighbors(pos.up()) >= 9))
 		{
-			int age = (state.getValue(AGE)).intValue();
+			int age = state.getValue(AGE);
 
 			if (age < 7)
 			{

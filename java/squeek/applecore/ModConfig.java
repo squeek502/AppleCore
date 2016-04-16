@@ -1,10 +1,11 @@
 package squeek.applecore;
 
-import java.io.File;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.io.File;
 
 public class ModConfig
 {
@@ -63,7 +64,7 @@ public class ModConfig
 	@SubscribeEvent
 	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
 	{
-		if (event.modID.equals(ModInfo.MODID))
+		if (event.getModID().equals(ModInfo.MODID))
 			ModConfig.sync();
 	}
 

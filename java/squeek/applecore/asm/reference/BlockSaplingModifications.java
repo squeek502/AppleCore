@@ -2,7 +2,7 @@ package squeek.applecore.asm.reference;
 
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import squeek.applecore.asm.Hooks;

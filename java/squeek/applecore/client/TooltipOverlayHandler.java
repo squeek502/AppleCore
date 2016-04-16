@@ -1,16 +1,11 @@
 package squeek.applecore.client;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -33,6 +28,10 @@ import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.asm.Hooks;
 import squeek.applecore.helpers.KeyHelper;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class TooltipOverlayHandler
@@ -316,7 +315,7 @@ public class TooltipOverlayHandler
 					int startX = x;
 					int y = bottomY - 19;
 
-					mc.getTextureManager().bindTexture(Gui.icons);
+					mc.getTextureManager().bindTexture(Gui.ICONS);
 
 					for (int i = 0; i < barsNeeded * 2; i += 2)
 					{
@@ -359,7 +358,7 @@ public class TooltipOverlayHandler
 						if (shouldBeFaded)
 							GlStateManager.color(1.0F, 1.0F, 1.0F, .5F);
 
-						mc.getTextureManager().bindTexture(Gui.icons);
+						mc.getTextureManager().bindTexture(Gui.ICONS);
 						gui.drawTexturedModalRect(x * 4 / 3, y * 4 / 3, 16, 27, 9, 9);
 
 						mc.getTextureManager().bindTexture(modIcons);
