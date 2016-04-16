@@ -14,7 +14,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 	public String[] getClassesToTransform()
 	{
 		return new String[]{
-		ASMConstants.GuiScreen,
+		ASMConstants.GuiUtils,
 		"codechicken.lib.gui.GuiDraw"
 		};
 	}
@@ -24,16 +24,16 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
 
-		if (transformedName.equals(ASMConstants.GuiScreen))
+		if (transformedName.equals(ASMConstants.GuiUtils))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", ASMHelper.toMethodDescriptor("V", ASMConstants.List, "I", "I", ASMConstants.FontRenderer));
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", ASMHelper.toMethodDescriptor("V", ASMConstants.List, "I", "I", "I", "I", "I", ASMConstants.FontRenderer));
 
 			if (methodNode != null)
 			{
 				addDrawHoveringTextHook(methodNode, "onDrawHoveringText", ASMHelper.toMethodDescriptor("V", "I", "I", "I", "I"));
 			}
 			else
-				throw new RuntimeException("GuiScreen.drawHoveringText not found");
+				throw new RuntimeException("GuiUtils.drawHoveringText not found");
 		}
 		else if (name.equals("codechicken.lib.gui.GuiDraw"))
 		{
@@ -50,28 +50,28 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		return ASMHelper.writeClassToBytes(classNode);
 	}
 
-	public void addDrawHoveringTextHook(MethodNode method, String hookMethod, String hookDesc)
+	private void addDrawHoveringTextHook(MethodNode method, String hookMethod, String hookDesc)
 	{
 		AbstractInsnNode targetNode = null;
 
 		// get last drawGradientRect call
 		for (AbstractInsnNode instruction : method.instructions.toArray())
 		{
-			if (instruction.getOpcode() == INVOKEVIRTUAL)
+			if (instruction.getOpcode() == INVOKESTATIC)
 			{
 				MethodInsnNode methodInsn = (MethodInsnNode) instruction;
 
-				if (methodInsn.desc.equals(ASMHelper.toMethodDescriptor("V", "I", "I", "I", "I", "I", "I")))
+				if (methodInsn.desc.equals(ASMHelper.toMethodDescriptor("V", "I", "I", "I", "I", "I", "I", "I")))
 					targetNode = instruction;
 			}
 		}
 		if (targetNode == null)
 			throw new RuntimeException("Unexpected instruction pattern encountered in " + method.name);
 
-		LocalVariableNode x = ASMHelper.findLocalVariableOfMethod(method, "l1", "I");
-		LocalVariableNode y = ASMHelper.findLocalVariableOfMethod(method, "i2", "I");
-		LocalVariableNode w = ASMHelper.findLocalVariableOfMethod(method, "i", "I");
-		LocalVariableNode h = ASMHelper.findLocalVariableOfMethod(method, "k", "I");
+		LocalVariableNode x = ASMHelper.findLocalVariableOfMethod(method, "tooltipX", "I");
+		LocalVariableNode y = ASMHelper.findLocalVariableOfMethod(method, "tooltipY", "I");
+		LocalVariableNode w = ASMHelper.findLocalVariableOfMethod(method, "tooltipTextWidth", "I");
+		LocalVariableNode h = ASMHelper.findLocalVariableOfMethod(method, "tooltipHeight", "I");
 
 		if (x == null || y == null || w == null || h == null)
 		{
