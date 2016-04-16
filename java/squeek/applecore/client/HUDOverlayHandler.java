@@ -5,8 +5,8 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
 import net.minecraft.util.FoodStats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.GuiIngameForge;
@@ -43,7 +43,7 @@ public class HUDOverlayHandler
 		if (event.isCanceled())
 			return;
 
-		if (event.type != RenderGameOverlayEvent.ElementType.FOOD)
+		if (event.getType() != RenderGameOverlayEvent.ElementType.FOOD)
 			return;
 
 		if (!ModConfig.SHOW_FOOD_EXHAUSTION_UNDERLAY)
@@ -52,7 +52,7 @@ public class HUDOverlayHandler
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayer player = mc.thePlayer;
 
-		ScaledResolution scale = event.resolution;
+		ScaledResolution scale = event.getResolution();
 
 		int left = scale.getScaledWidth() / 2 + 91;
 		int top = scale.getScaledHeight() - GuiIngameForge.right_height;
@@ -66,7 +66,7 @@ public class HUDOverlayHandler
 		if (event.isCanceled())
 			return;
 
-		if (event.type != RenderGameOverlayEvent.ElementType.FOOD)
+		if (event.getType() != RenderGameOverlayEvent.ElementType.FOOD)
 			return;
 
 		if (!ModConfig.SHOW_FOOD_VALUES_OVERLAY && !ModConfig.SHOW_SATURATION_OVERLAY)
@@ -74,10 +74,10 @@ public class HUDOverlayHandler
 
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayer player = mc.thePlayer;
-		ItemStack heldItem = player.getHeldItem();
+		ItemStack heldItem = player.getHeldItemMainhand();
 		FoodStats stats = player.getFoodStats();
 
-		ScaledResolution scale = event.resolution;
+		ScaledResolution scale = event.getResolution();
 
 		int left = scale.getScaledWidth() / 2 + 91;
 		int top = scale.getScaledHeight() - GuiIngameForge.right_height + 10;
@@ -130,7 +130,7 @@ public class HUDOverlayHandler
 		disableAlpha(alpha);
 
 		// rebind default icons
-		mc.getTextureManager().bindTexture(Gui.icons);
+		mc.getTextureManager().bindTexture(Gui.ICONS);
 	}
 
 	public static void drawHungerOverlay(int hungerRestored, int foodLevel, Minecraft mc, int left, int top, float alpha)
@@ -141,7 +141,7 @@ public class HUDOverlayHandler
 		int startBar = foodLevel / 2;
 		int endBar = (int) Math.ceil(Math.min(20, foodLevel + hungerRestored) / 2f);
 		int barsNeeded = endBar - startBar;
-		mc.getTextureManager().bindTexture(Gui.icons);
+		mc.getTextureManager().bindTexture(Gui.ICONS);
 
 		enableAlpha(alpha);
 		for (int i = startBar; i < startBar + barsNeeded; ++i)
@@ -152,7 +152,7 @@ public class HUDOverlayHandler
 			int icon = 16;
 			int background = 13;
 
-			if (mc.thePlayer.isPotionActive(Potion.hunger))
+			if (mc.thePlayer.isPotionActive(MobEffects.HUNGER))
 			{
 				icon += 36;
 				background = 13;
@@ -182,7 +182,7 @@ public class HUDOverlayHandler
 		disableAlpha(.75f);
 
 		// rebind default icons
-		mc.getTextureManager().bindTexture(Gui.icons);
+		mc.getTextureManager().bindTexture(Gui.ICONS);
 	}
 
 	public static void enableAlpha(float alpha)

@@ -27,7 +27,7 @@ public class DebugInfoHandler
 	@SubscribeEvent
 	public void onTextRender(RenderGameOverlayEvent.Text textEvent)
 	{
-		if (textEvent.type != RenderGameOverlayEvent.ElementType.TEXT)
+		if (textEvent.getType() != RenderGameOverlayEvent.ElementType.TEXT)
 			return;
 
 		if (!ModConfig.SHOW_FOOD_DEBUG_INFO)
@@ -39,7 +39,7 @@ public class DebugInfoHandler
 			FoodStats stats = mc.thePlayer.getFoodStats();
 			float curExhaustion = AppleCoreAPI.accessor.getExhaustion(mc.thePlayer);
 			float maxExhaustion = AppleCoreAPI.accessor.getMaxExhaustion(mc.thePlayer);
-			textEvent.left.add("hunger: " + stats.getFoodLevel() + ", sat: " + saturationDF.format(stats.getSaturationLevel()) + ", exh: " + exhaustionValDF.format(curExhaustion) + "/" + exhaustionMaxDF.format(maxExhaustion));
+			textEvent.getLeft().add("hunger: " + stats.getFoodLevel() + ", sat: " + saturationDF.format(stats.getSaturationLevel()) + ", exh: " + exhaustionValDF.format(curExhaustion) + "/" + exhaustionMaxDF.format(maxExhaustion));
 		}
 	}
 }

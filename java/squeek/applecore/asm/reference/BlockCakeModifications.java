@@ -4,7 +4,7 @@ import net.minecraft.block.BlockCake;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.stats.StatList;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.asm.Hooks;
@@ -26,13 +26,13 @@ public class BlockCakeModifications extends BlockCake
 			Hooks.onPostBlockFoodEaten(this, modifiedFoodValues, prevFoodLevel, prevSaturationLevel, player);
 			// end modifications
 
-			player.triggerAchievement(StatList.field_181724_H);
+			player.addStat(StatList.CAKE_SLICES_EATEN);
 
-			int i = (state.getValue(BITES)).intValue();
+			int i = state.getValue(BITES);
 
 			if (i < 6)
 			{
-				world.setBlockState(pos, state.withProperty(BITES, Integer.valueOf(i + 1)), 3);
+				world.setBlockState(pos, state.withProperty(BITES, i + 1), 3);
 			}
 			else
 			{

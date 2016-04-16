@@ -39,10 +39,10 @@ public class SyncHandler
 	@SubscribeEvent
 	public void onLivingUpdateEvent(LivingUpdateEvent event)
 	{
-		if (!(event.entity instanceof EntityPlayerMP))
+		if (!(event.getEntity() instanceof EntityPlayerMP))
 			return;
 
-		EntityPlayerMP player = (EntityPlayerMP) event.entity;
+		EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
 
 		if (this.lastSaturationLevel != player.getFoodStats().getSaturationLevel())
 		{

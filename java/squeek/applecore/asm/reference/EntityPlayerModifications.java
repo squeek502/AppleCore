@@ -3,12 +3,11 @@ package squeek.applecore.asm.reference;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.HungerRegenEvent;
 import squeek.applecore.asm.Hooks;
@@ -23,28 +22,39 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 
 	// a single line added
 	@Override
-	public void setItemInUse(ItemStack stack, int duration)
+	public void setActiveHand(EnumHand hand)
 	{
-		if (stack != this.itemInUse)
+		ItemStack stack = this.getHeldItem(hand);
+
+		if (stack != null && !this.isHandActive())
 		{
-			duration = ForgeEventFactory.onItemUseStart(this, stack, duration);
-			if (duration <= 0)
-				return;
-			this.itemInUse = stack;
-			this.itemInUseCount = duration;
+			int duration = ForgeEventFactory.onItemUseStart(this, stack, stack.getMaxItemUseDuration());
+			if (duration <= 0) return;
+			this.activeItemStack = stack;
+			this.activeItemStackUseCount = duration;
+
 			// added:
 			this.itemInUseMaxDuration = duration;
 
-			// ...
+			if (!this.worldObj.isRemote)
+			{
+				int i = 1;
+
+				if (hand == EnumHand.OFF_HAND)
+				{
+					i |= 2;
+				}
+
+				this.dataManager.set(HAND_STATES, (byte) i);
+			}
 		}
 	}
 
-	// changed this.itemInUse.getMaxItemUseDuration() to Hooks.getItemInUseMaxDuration()
+	// changed this.activeItemStack.getMaxItemUseDuration() to Hooks.getItemInUseMaxDuration()
 	@Override
-	@SideOnly(Side.CLIENT)
-	public int getItemInUseDuration()
+	public int getItemInUseMaxCount()
 	{
-		return this.isUsingItem() ? Hooks.getItemInUseMaxDuration(this, itemInUseMaxDuration) - this.itemInUseCount : 0;
+		return this.isHandActive() ? Hooks.getItemInUseMaxCount(this, itemInUseMaxDuration) - this.itemInUseCount : 0;
 	}
 
 	// add hook for peaceful health regen

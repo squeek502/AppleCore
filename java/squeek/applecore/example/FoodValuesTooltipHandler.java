@@ -15,16 +15,16 @@ public class FoodValuesTooltipHandler
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onItemTooltip(ItemTooltipEvent event)
 	{
-		if (AppleCoreAPI.accessor.isFood(event.itemStack))
+		if (AppleCoreAPI.accessor.isFood(event.getItemStack()))
 		{
-			FoodValues unmodifiedValues = AppleCoreAPI.accessor.getUnmodifiedFoodValues(event.itemStack);
-			FoodValues modifiedValues = AppleCoreAPI.accessor.getFoodValues(event.itemStack);
-			FoodValues playerValues = AppleCoreAPI.accessor.getFoodValuesForPlayer(event.itemStack, event.entityPlayer);
+			FoodValues unmodifiedValues = AppleCoreAPI.accessor.getUnmodifiedFoodValues(event.getItemStack());
+			FoodValues modifiedValues = AppleCoreAPI.accessor.getFoodValues(event.getItemStack());
+			FoodValues playerValues = AppleCoreAPI.accessor.getFoodValuesForPlayer(event.getItemStack(), event.getEntityPlayer());
 
-			event.toolTip.add("Food Values [hunger : satMod (+sat)]");
-			event.toolTip.add("- Player-specific: " + playerValues.hunger + " : " + playerValues.saturationModifier + " (+" + df.format(playerValues.getSaturationIncrement()) + ")");
-			event.toolTip.add("- Player-agnostic: " + modifiedValues.hunger + " : " + modifiedValues.saturationModifier + " (+" + df.format(modifiedValues.getSaturationIncrement()) + ")");
-			event.toolTip.add("- Unmodified: " + unmodifiedValues.hunger + " : " + unmodifiedValues.saturationModifier + " (+" + df.format(unmodifiedValues.getSaturationIncrement()) + ")");
+			event.getToolTip().add("Food Values [hunger : satMod (+sat)]");
+			event.getToolTip().add("- Player-specific: " + playerValues.hunger + " : " + playerValues.saturationModifier + " (+" + df.format(playerValues.getSaturationIncrement()) + ")");
+			event.getToolTip().add("- Player-agnostic: " + modifiedValues.hunger + " : " + modifiedValues.saturationModifier + " (+" + df.format(modifiedValues.getSaturationIncrement()) + ")");
+			event.getToolTip().add("- Unmodified: " + unmodifiedValues.hunger + " : " + unmodifiedValues.saturationModifier + " (+" + df.format(unmodifiedValues.getSaturationIncrement()) + ")");
 		}
 	}
 }

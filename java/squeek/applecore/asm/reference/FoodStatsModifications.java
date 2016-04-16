@@ -5,7 +5,6 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.FoodStats;
-import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.hunger.ExhaustionEvent;
@@ -56,11 +55,9 @@ public class FoodStatsModifications extends FoodStats
 	}
 
 	// heavily modified method
-	@SuppressWarnings("unused")
 	@Override
 	public void onUpdate(EntityPlayer player)
 	{
-		EnumDifficulty enumdifficulty = player.worldObj.getDifficulty();
 		this.prevFoodLevel = this.foodLevel;
 
 		Result allowExhaustionResult = Hooks.fireAllowExhaustionEvent(player);

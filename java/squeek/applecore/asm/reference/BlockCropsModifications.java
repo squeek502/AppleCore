@@ -3,7 +3,7 @@ package squeek.applecore.asm.reference;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import squeek.applecore.asm.Hooks;
@@ -21,18 +21,16 @@ public class BlockCropsModifications extends BlockCrops
 		Result allowGrowthResult = Hooks.fireAllowPlantGrowthEvent(this, world, pos, state, rand);
 		if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && world.getLightFromNeighbors(pos.up()) >= 9))
 		{
-			int i = (state.getValue(AGE)).intValue();
-			// added var
-			int previousMetadata = i;
+			int i = this.getAge(state);
 
-			if (i < 7)
+			if (i < this.getMaxAge())
 			{
-				float f = this.getGrowthChance(this, world, pos);
+				float f = getGrowthChance(this, world, pos);
 
 				// changed if
 				if (allowGrowthResult == Result.ALLOW || (allowGrowthResult == Result.DEFAULT && rand.nextInt((int) (25.0F / f) + 1) == 0))
 				{
-					world.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(i + 1)), 2);
+					world.setBlockState(pos, state.withProperty(AGE, i + 1), 2);
 					// added line
 					Hooks.fireOnGrowthEvent(this, world, pos, state);
 				}

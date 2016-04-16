@@ -29,16 +29,19 @@ public class ASMConstants
 	//Java
 	public static final String List = "java.util.List";
 	public static final String Random = "java.util.Random";
-	public static final String string = "java.lang.String";
+	public static final String String = "java.lang.String";
 
 	//Minecraft
 	public static final String AbstractClientPlayer = "net.minecraft.client.entity.AbstractClientPlayer";
 	public static final String Block = "net.minecraft.block.Block";
-	public static final String BlockPos = "net.minecraft.util.BlockPos";
+	public static final String BlockPos = "net.minecraft.util.math.BlockPos";
 	public static final String DamageSource = "net.minecraft.util.DamageSource";
+	public static final String EntityLiving = "net.minecraft.entity.EntityLivingBase";
 	public static final String FontRenderer = "net.minecraft.client.gui.FontRenderer";
 	public static final String FoodStats = "net.minecraft.util.FoodStats";
 	public static final String GameRules = "net.minecraft.world.GameRules";
+	public static final String Hand = "net.minecraft.util.EnumHand";
+	public static final String HandSide = "net.minecraft.util.EnumHandSide";
 	public static final String IBlockState = "net.minecraft.block.state.IBlockState";
 	public static final String IGrowable = "net.minecraft.block.IGrowable";
 	public static final String ItemFood = "net.minecraft.item.ItemFood";

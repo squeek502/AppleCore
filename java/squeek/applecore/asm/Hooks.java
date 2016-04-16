@@ -1,19 +1,16 @@
 package squeek.applecore.asm;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCake;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.FoodStats;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -27,6 +24,9 @@ import squeek.applecore.api.hunger.HungerRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.api.plants.FertilizationEvent;
 
+import java.lang.reflect.Method;
+import java.util.Random;
+
 public class Hooks
 {
 	public static FoodValues onFoodStatsAdded(FoodStats foodStats, ItemFood itemFood, ItemStack itemStack, EntityPlayer player)
@@ -39,20 +39,20 @@ public class Hooks
 		MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemStack, foodValues, hungerAdded, saturationAdded));
 	}
 
-	public static int getItemInUseMaxDuration(EntityPlayer player, int savedMaxDuration)
+	public static int getItemInUseMaxCount(EntityLivingBase entityLiving, int savedMaxDuration)
 	{
-		EnumAction useAction = player.getItemInUse().getItemUseAction();
+		EnumAction useAction = entityLiving.getActiveItemStack().getItemUseAction();
 		if (useAction == EnumAction.EAT || useAction == EnumAction.DRINK)
 			return savedMaxDuration;
 		else
-			return player.getItemInUse().getMaxItemUseDuration();
+			return entityLiving.getActiveItemStack().getMaxItemUseDuration();
 	}
 
 	// should this be moved elsewhere?
 	private static ItemStack getFoodFromBlock(Block block)
 	{
 		if (block instanceof BlockCake)
-			return new ItemStack(Items.cake);
+			return new ItemStack(Items.CAKE);
 
 		return null;
 	}

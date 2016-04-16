@@ -46,7 +46,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 			return false;
 
 		// assume Block-based foods are edible
-		if (food.getItem() == Items.cake || food.getItem() instanceof ItemBlock)
+		if (food.getItem() == Items.CAKE || food.getItem() instanceof ItemBlock)
 			return true;
 
 		EnumAction useAction = food.getItem().getItemUseAction(food);
@@ -62,7 +62,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 				return ((IEdible) food.getItem()).getFoodValues(food);
 			else if (food.getItem() instanceof ItemFood)
 				return getItemFoodValues((ItemFood) food.getItem(), food);
-			else if (food.getItem() == Items.cake)
+			else if (food.getItem() == Items.CAKE)
 				return new FoodValues(2, 0.1f);
 		}
 		return null;
