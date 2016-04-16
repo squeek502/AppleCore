@@ -30,8 +30,6 @@ public class ASMConstants
 	public static final String List = "java.util.List";
 	public static final String Random = "java.util.Random";
 	public static final String string = "java.lang.String";
-	public static final String Comparable = "java.lang.Comparable";
-	public static final String Integer = "java.lang.Integer";
 
 	//Minecraft
 	public static final String AbstractClientPlayer = "net.minecraft.client.entity.AbstractClientPlayer";
@@ -41,7 +39,6 @@ public class ASMConstants
 	public static final String FontRenderer = "net.minecraft.client.gui.FontRenderer";
 	public static final String FoodStats = "net.minecraft.util.FoodStats";
 	public static final String GameRules = "net.minecraft.world.GameRules";
-	public static final String GuiScreen = "net.minecraft.client.gui.GuiScreen";
 	public static final String IBlockState = "net.minecraft.block.state.IBlockState";
 	public static final String IGrowable = "net.minecraft.block.IGrowable";
 	public static final String ItemFood = "net.minecraft.item.ItemFood";
@@ -51,11 +48,10 @@ public class ASMConstants
 	public static final String StatBase = "net.minecraft.stats.StatBase";
 	public static final String StatList = "net.minecraft.stats.StatList";
 	public static final String World = "net.minecraft.world.World";
-	public static final String BlockIProperty = "net.minecraft.block.properties.IProperty";
-	public static final String BlockPropertyInteger = "net.minecraft.block.properties.PropertyInteger";
 
-	//FML
+	//FML & Forge
 	public static final String EventResult = "net.minecraftforge.fml.common.eventhandler.Event$Result";
+	public static final String GuiUtils = "net.minecraftforge.fml.client.config.GuiUtils";
 
 	//Blocks
 	public static final String Cactus =	"net.minecraft.block.BlockCactus";
