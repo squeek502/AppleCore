@@ -133,3 +133,12 @@ if (mavenUrl && !project.hasProperty('nopublish')) {
 		build.finalizedBy(uploadArchives)
 	}
 }
+
+task testPom << {
+	apply plugin: 'maven'
+	pom {
+		whenConfigured {pom ->
+			//pom.dependencies.removeAll {dep -> dep.groupId == "squeek.asmhelper" }
+		}
+	}.writeTo(new PrintWriter(System.out))
+}

@@ -193,6 +193,11 @@ public class Hooks
 				Method renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", World.class, Random.class, BlockPos.class, IBlockState.class);
 				renamedFertilize.invoke(block, world, random, pos, state);
 			}
+			catch (NoClassDefFoundError e)
+			{
+				// swallow this exception, as it can be triggered by @SideOnly annotation issues
+				// see https://github.com/squeek502/AppleCore/issues/48
+			}
 			catch (RuntimeException e)
 			{
 				throw e;
