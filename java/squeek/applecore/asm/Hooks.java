@@ -206,6 +206,11 @@ public class Hooks
 					renamedFertilize.invoke(block, world, random, x, y, z);
 				}
 			}
+			catch (NoClassDefFoundError e)
+			{
+				// swallow this exception, as it can be triggered by @SideOnly annotation issues
+				// see https://github.com/squeek502/AppleCore/issues/48
+			}
 			catch (RuntimeException e)
 			{
 				throw e;
