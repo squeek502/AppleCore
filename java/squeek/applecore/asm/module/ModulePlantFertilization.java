@@ -105,6 +105,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 			if (method != null)
 			{
 				ASMHelper.copyAndRenameMethod(classNode, method, "AppleCore_fertilize");
+				classNode.interfaces.add(ASMHelper.toInternalClassName("squeek.applecore.asm.util.IAppleCoreFertilizable"));
 				replaceFertilizeMethod(method, methodInfo);
 				return ASMHelper.writeClassToBytes(classNode);
 			}
@@ -117,6 +118,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 			if (method != null)
 			{
 				ASMHelper.copyAndRenameMethod(classNode, method, "AppleCore_fertilize");
+				classNode.interfaces.add(ASMHelper.toInternalClassName("squeek.applecore.asm.util.IAppleCoreFertilizable"));
 				replaceFertilizeMethod(method, methodInfo);
 				return ASMHelper.writeClassToBytes(classNode);
 			}

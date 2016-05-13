@@ -23,6 +23,7 @@ import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.api.plants.FertilizationEvent;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.Event.Result;
+import squeek.applecore.asm.util.IAppleCoreFertilizable;
 
 public class Hooks
 {
@@ -174,6 +175,10 @@ public class Hooks
 
 	public static void fireAppleCoreFertilizeEvent(Block block, World world, int x, int y, int z, Random random)
 	{
+		// if the block does not implement our dummy interface, then the transformation did occur
+		if (!(block instanceof IAppleCoreFertilizable))
+			return;
+
 		if (random == null)
 			random = fertilizeRandom;
 
@@ -188,28 +193,21 @@ public class Hooks
 
 		if (fertilizeResult == Event.Result.DEFAULT)
 		{
+			IAppleCoreFertilizable fertilizableBlock = (IAppleCoreFertilizable) block;
 			try
 			{
-				Method renamedFertilize;
 				if (fertilizeMethods.containsKey(block.getClass().getName()))
 				{
 					Class<?>[] argTypes = fertilizeMethods.get(block.getClass().getName());
-					renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", argTypes);
 					if (argTypes.length == 4)
-						renamedFertilize.invoke(block, world, x, y, z);
+						fertilizableBlock.AppleCore_fertilize(world, x, y, z);
 					else
-						renamedFertilize.invoke(block, world, x, y, z, random);
+						fertilizableBlock.AppleCore_fertilize(world, x, y, z, random);
 				}
 				else
 				{
-					renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", World.class, Random.class, int.class, int.class, int.class);
-					renamedFertilize.invoke(block, world, random, x, y, z);
+					fertilizableBlock.AppleCore_fertilize(world, random, x, y, z);
 				}
-			}
-			catch (NoClassDefFoundError e)
-			{
-				// swallow this exception, as it can be triggered by @SideOnly annotation issues
-				// see https://github.com/squeek502/AppleCore/issues/48
 			}
 			catch (RuntimeException e)
 			{
