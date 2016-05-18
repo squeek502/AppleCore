@@ -14,7 +14,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 	public String[] getClassesToTransform()
 	{
 		return new String[]{
-		ASMConstants.GuiUtils,
+		ASMConstants.GUI_UTILS,
 		"codechicken.lib.gui.GuiDraw"
 		};
 	}
@@ -24,9 +24,9 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(bytes);
 
-		if (transformedName.equals(ASMConstants.GuiUtils))
+		if (transformedName.equals(ASMConstants.GUI_UTILS))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", ASMHelper.toMethodDescriptor("V", ASMConstants.List, "I", "I", "I", "I", "I", ASMConstants.FontRenderer));
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "drawHoveringText", ASMHelper.toMethodDescriptor("V", ASMConstants.LIST, "I", "I", "I", "I", "I", ASMConstants.FONT_RENDERER));
 
 			if (methodNode != null)
 			{
@@ -90,7 +90,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, y.index));
 		toInject.add(new VarInsnNode(ILOAD, w.index));
 		toInject.add(new VarInsnNode(ILOAD, h.index));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, hookMethod, hookDesc, false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HOOKS_INTERNAL_CLASS, hookMethod, hookDesc, false));
 
 		method.instructions.insert(targetNode, toInject);
 	}
@@ -110,7 +110,7 @@ public class ModuleDrawTooltip implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ILOAD, 1));	// y
 		toInject.add(new VarInsnNode(ILOAD, 2));	// w
 		toInject.add(new VarInsnNode(ILOAD, 3));	// h
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, hookMethod, hookDesc, false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HOOKS_INTERNAL_CLASS, hookMethod, hookDesc, false));
 
 		method.instructions.insertBefore(targetNode, toInject);
 	}

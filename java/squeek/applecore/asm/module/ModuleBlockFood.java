@@ -14,7 +14,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 	@Override
 	public String[] getClassesToTransform()
 	{
-		return new String[]{ASMConstants.Cake};
+		return new String[]{ASMConstants.CAKE};
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180682_b", "eatCake", ASMHelper.toMethodDescriptor("V", ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Player));
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180682_b", "eatCake", ASMHelper.toMethodDescriptor("V", ASMConstants.WORLD, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE, ASMConstants.PLAYER));
 
 		if (methodNode != null)
 		{
@@ -35,7 +35,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 	private void addOnBlockFoodEatenHook(ClassNode classNode, MethodNode method)
 	{
-		AbstractInsnNode firstUniqueInsnInsideIf = ASMHelper.find(method.instructions, new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.StatList), InsnComparator.WILDCARD,ASMHelper.toDescriptor(ASMConstants.StatBase)));
+		AbstractInsnNode firstUniqueInsnInsideIf = ASMHelper.find(method.instructions, new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.STAT_LIST), InsnComparator.WILDCARD,ASMHelper.toDescriptor(ASMConstants.STAT_BASE)));
 
 		if (firstUniqueInsnInsideIf == null)
 			throw new RuntimeException("Target instruction not found in " + classNode.name + "." + method.name);
@@ -55,7 +55,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// create modifiedFoodValues variable
 		LabelNode modifiedFoodValuesStart = new LabelNode();
-		LocalVariableNode modifiedFoodValues = new LocalVariableNode("modifiedFoodValues", ASMHelper.toDescriptor(ASMConstants.FoodValues), null, modifiedFoodValuesStart, ifEndLabel, method.maxLocals);
+		LocalVariableNode modifiedFoodValues = new LocalVariableNode("modifiedFoodValues", ASMHelper.toDescriptor(ASMConstants.FOOD_VALUES), null, modifiedFoodValuesStart, ifEndLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(modifiedFoodValues);
 
@@ -63,7 +63,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HooksInternalClass, "onBlockFoodEaten",  ASMHelper.toMethodDescriptor(ASMConstants.FoodValues, ASMConstants.Block, ASMConstants.World, ASMConstants.Player), false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HOOKS_INTERNAL_CLASS, "onBlockFoodEaten",  ASMHelper.toMethodDescriptor(ASMConstants.FOOD_VALUES, ASMConstants.BLOCK, ASMConstants.WORLD, ASMConstants.PLAYER), false));
 		toInject.add(new VarInsnNode(ASTORE, modifiedFoodValues.index));
 		toInject.add(modifiedFoodValuesStart);
 
@@ -75,8 +75,8 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// int prevFoodLevel = p_150036_5_.getFoodStats().getFoodLevel();
 		toInject.add(new VarInsnNode(ALOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.Player), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", ASMHelper.toMethodDescriptor(ASMConstants.FoodStats), false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.FoodStats), ObfHelper.isObfuscated() ? "func_75116_a" : "getFoodLevel", ASMHelper.toMethodDescriptor("I"), false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.PLAYER), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", ASMHelper.toMethodDescriptor(ASMConstants.FOOD_STATS), false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.FOOD_STATS), ObfHelper.isObfuscated() ? "func_75116_a" : "getFoodLevel", ASMHelper.toMethodDescriptor("I"), false));
 		toInject.add(new VarInsnNode(ISTORE, prevFoodLevel.index));
 		toInject.add(prevFoodLevelStart);
 
@@ -88,8 +88,8 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		// float prevSaturationLevel = p_150036_5_.getFoodStats().getSaturationLevel();
 		toInject.add(new VarInsnNode(ALOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.Player), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", ASMHelper.toMethodDescriptor(ASMConstants.FoodStats), false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.FoodStats), ObfHelper.isObfuscated() ? "func_75115_e" : "getSaturationLevel", ASMHelper.toMethodDescriptor("F"), false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.PLAYER), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", ASMHelper.toMethodDescriptor(ASMConstants.FOOD_STATS), false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.FOOD_STATS), ObfHelper.isObfuscated() ? "func_75115_e" : "getSaturationLevel", ASMHelper.toMethodDescriptor("F"), false));
 		toInject.add(new VarInsnNode(FSTORE, prevSaturationLevel.index));
 		toInject.add(prevSaturationLevelStart);
 
@@ -103,14 +103,14 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		InsnList hungerReplacement = new InsnList();
 		hungerReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
-		hungerReplacement.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(ASMConstants.FoodValues), "hunger", "I"));
+		hungerReplacement.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(ASMConstants.FOOD_VALUES), "hunger", "I"));
 
 		InsnList saturationNeedle = new InsnList();
 		saturationNeedle.add(new LdcInsnNode(0.1f));
 
 		InsnList saturationReplacement = new InsnList();
 		saturationReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
-		saturationReplacement.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(ASMConstants.FoodValues), "saturationModifier", "F"));
+		saturationReplacement.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(ASMConstants.FOOD_VALUES), "saturationModifier", "F"));
 
 		ASMHelper.findAndReplace(method.instructions, hungerNeedle, hungerReplacement, targetNode);
 		ASMHelper.findAndReplace(method.instructions, saturationNeedle, saturationReplacement, targetNode);
@@ -118,7 +118,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		/*
 		 * onPostBlockFoodEaten
 		 */
-		AbstractInsnNode targetNodeAfter = ASMHelper.find(targetNode, new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.FoodStats), InsnComparator.WILDCARD, ASMHelper.toMethodDescriptor("V", "I", "F"), false));
+		AbstractInsnNode targetNodeAfter = ASMHelper.find(targetNode, new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.FOOD_STATS), InsnComparator.WILDCARD, ASMHelper.toMethodDescriptor("V", "I", "F"), false));
 		InsnList toInjectAfter = new InsnList();
 
 		// Hooks.onPostBlockFoodEaten(this, modifiedFoodValues, prevFoodLevel, prevSaturationLevel, p_150036_5_);
@@ -127,7 +127,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		toInjectAfter.add(new VarInsnNode(ILOAD, prevFoodLevel.index));
 		toInjectAfter.add(new VarInsnNode(FLOAD, prevSaturationLevel.index));
 		toInjectAfter.add(new VarInsnNode(ALOAD, 4));
-		toInjectAfter.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "onPostBlockFoodEaten", ASMHelper.toMethodDescriptor("V", ASMConstants.Block, ASMConstants.FoodValues, "I", "F", ASMConstants.Player), false));
+		toInjectAfter.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "onPostBlockFoodEaten", ASMHelper.toMethodDescriptor("V", ASMConstants.BLOCK, ASMConstants.FOOD_VALUES, "I", "F", ASMConstants.PLAYER), false));
 
 		method.instructions.insert(targetNodeAfter, toInjectAfter);
 	}

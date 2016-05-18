@@ -14,8 +14,8 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	public String[] getClassesToTransform()
 	{
 		return new String[]{
-		ASMConstants.EntityLiving,
-		ASMConstants.ItemRenderer
+		ASMConstants.ENTITY_LIVING,
+		ASMConstants.ITEM_RENDERER
 		};
 	}
 
@@ -24,11 +24,11 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		if (transformedName.equals(ASMConstants.EntityLiving))
+		if (transformedName.equals(ASMConstants.ENTITY_LIVING))
 		{
 			addItemInUseMaxDurationField(classNode);
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_184598_c", "setActiveHand", ASMHelper.toMethodDescriptor("V", ASMConstants.Hand));
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_184598_c", "setActiveHand", ASMHelper.toMethodDescriptor("V", ASMConstants.HAND));
 			if (methodNode != null)
 			{
 				patchSetActiveHand(classNode, methodNode);
@@ -44,9 +44,9 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 			else
 				throw new RuntimeException(classNode.name + ": getItemInUseMaxCount method not found");
 		}
-		else if (transformedName.equals(ASMConstants.ItemRenderer))
+		else if (transformedName.equals(ASMConstants.ITEM_RENDERER))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_187454_a", "transformEatFirstPerson", ASMHelper.toMethodDescriptor("V", "F", ASMConstants.HandSide, ASMConstants.Stack));
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_187454_a", "transformEatFirstPerson", ASMHelper.toMethodDescriptor("V", "F", ASMConstants.HAND_SIDE, ASMConstants.STACK));
 			if (methodNode != null)
 			{
 				patchRenderItemInFirstPerson(methodNode);
@@ -62,13 +62,13 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	{
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 3));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.Stack), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.STACK), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
-		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.ItemRenderer), ObfHelper.isObfuscated() ? "field_78455_a" : "mc", ASMHelper.toDescriptor(ASMConstants.Minecraft)));
-		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.Minecraft), ObfHelper.isObfuscated() ? "field_71439_g" : "thePlayer", ASMHelper.toDescriptor(ASMConstants.PlayerSP)));
-		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.Player), "itemInUseMaxDuration", "I"));
+		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.ITEM_RENDERER), ObfHelper.isObfuscated() ? "field_78455_a" : "mc", ASMHelper.toDescriptor(ASMConstants.MINECRAFT)));
+		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.MINECRAFT), ObfHelper.isObfuscated() ? "field_71439_g" : "thePlayer", ASMHelper.toDescriptor(ASMConstants.PLAYER_SP)));
+		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.PLAYER), "itemInUseMaxDuration", "I"));
 
 		boolean replaced = ASMHelper.findAndReplace(method.instructions, needle, replacement) != null;
 		if (!replaced)
@@ -79,14 +79,14 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	{
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 0));
-		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.EntityLiving), ObfHelper.isObfuscated() ? "field_184627_bm" : "activeItemStack", ASMHelper.toDescriptor(ASMConstants.Stack)));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.Stack), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
+		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.ENTITY_LIVING), ObfHelper.isObfuscated() ? "field_184627_bm" : "activeItemStack", ASMHelper.toDescriptor(ASMConstants.STACK)));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.STACK), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(classNode.name), "itemInUseMaxDuration", "I"));
-		replacement.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "getItemInUseMaxCount", ASMHelper.toMethodDescriptor("I", ASMConstants.EntityLiving, "I"), false));
+		replacement.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "getItemInUseMaxCount", ASMHelper.toMethodDescriptor("I", ASMConstants.ENTITY_LIVING, "I"), false));
 
 		int numReplacementsMade = ASMHelper.findAndReplaceAll(method.instructions, needle, replacement);
 		if (numReplacementsMade == 0)

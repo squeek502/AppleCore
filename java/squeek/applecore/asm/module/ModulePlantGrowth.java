@@ -13,14 +13,14 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	public String[] getClassesToTransform()
 	{
 		return new String[]{
-		ASMConstants.Crops,
-		ASMConstants.Reed,
-		ASMConstants.Cactus,
-		ASMConstants.Cocoa,
-		ASMConstants.Mushroom,
-		ASMConstants.NetherWart,
-		ASMConstants.Sapling,
-		ASMConstants.Stem
+		ASMConstants.CROPS,
+		ASMConstants.REED,
+		ASMConstants.CACTUS,
+		ASMConstants.COCOA,
+		ASMConstants.MUSHROOM,
+		ASMConstants.NETHER_WART,
+		ASMConstants.SAPLING,
+		ASMConstants.STEM
 		};
 	}
 
@@ -29,29 +29,29 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", ASMHelper.toMethodDescriptor("V", ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Random));
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", ASMHelper.toMethodDescriptor("V", ASMConstants.WORLD, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE, ASMConstants.RANDOM));
 
 		if (methodNode == null)
-			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", ASMHelper.toMethodDescriptor("V", ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Random));
+			methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180650_b", "updateTick", ASMHelper.toMethodDescriptor("V", ASMConstants.WORLD, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE, ASMConstants.RANDOM));
 
 		if (methodNode == null)
 			throw new RuntimeException(classNode.name + ": updateTick method not found");
 
-		if (transformedName.equals(ASMConstants.Crops))
+		if (transformedName.equals(ASMConstants.CROPS))
 			hookBlockCrops(methodNode);
-		else if (transformedName.equals(ASMConstants.Reed))
+		else if (transformedName.equals(ASMConstants.REED))
 			hookBlockReed(methodNode);
-		else if (transformedName.equals(ASMConstants.Cactus))
+		else if (transformedName.equals(ASMConstants.CACTUS))
 			hookBlockCactus(methodNode);
-		else if (transformedName.equals(ASMConstants.Cocoa))
+		else if (transformedName.equals(ASMConstants.COCOA))
 			hookBlockCocoa(methodNode);
-		else if (transformedName.equals(ASMConstants.Mushroom))
+		else if (transformedName.equals(ASMConstants.MUSHROOM))
 			hookBlockMushroom(methodNode);
-		else if (transformedName.equals(ASMConstants.NetherWart))
+		else if (transformedName.equals(ASMConstants.NETHER_WART))
 			hookBlockNetherWart(methodNode);
-		else if (transformedName.equals(ASMConstants.Sapling))
+		else if (transformedName.equals(ASMConstants.SAPLING))
 			hookBlockSapling(methodNode);
-		else if (transformedName.equals(ASMConstants.Stem))
+		else if (transformedName.equals(ASMConstants.STEM))
 			hookBlockStem(methodNode);
 		else
 			throw new RuntimeException("Unexpected class passed to transformer : " + transformedName);
@@ -222,7 +222,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		LabelNode previousStateStart = new LabelNode();
 		LabelNode previousStateEnd = ASMHelper.findEndLabel(method);
-		LocalVariableNode previousState = new LocalVariableNode("previousState", ASMHelper.toDescriptor(ASMConstants.IBlockState), null, previousStateStart, previousStateEnd, method.maxLocals);
+		LocalVariableNode previousState = new LocalVariableNode("previousState", ASMHelper.toDescriptor(ASMConstants.IBLOCKSTATE), null, previousStateStart, previousStateEnd, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(previousState);
 
@@ -239,7 +239,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		// create allowGrowthResult variable
 		LabelNode allowGrowthResultStart = new LabelNode();
-		LocalVariableNode allowGrowthResult = new LocalVariableNode("allowGrowthResult", ASMHelper.toDescriptor(ASMConstants.EventResult), null, allowGrowthResultStart, endLabel, method.maxLocals);
+		LocalVariableNode allowGrowthResult = new LocalVariableNode("allowGrowthResult", ASMHelper.toDescriptor(ASMConstants.EVENT_RESULT), null, allowGrowthResultStart, endLabel, method.maxLocals);
 		method.maxLocals += 1;
 		method.localVariables.add(allowGrowthResult);
 
@@ -262,7 +262,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		insnList.add(new VarInsnNode(ALOAD, 2));
 		insnList.add(new VarInsnNode(ALOAD, 3));
 		insnList.add(new VarInsnNode(ALOAD, 4));
-		insnList.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAllowPlantGrowthEvent", ASMHelper.toMethodDescriptor(ASMConstants.EventResult, ASMConstants.Block, ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Random), false));
+		insnList.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "fireAllowPlantGrowthEvent", ASMHelper.toMethodDescriptor(ASMConstants.EVENT_RESULT, ASMConstants.BLOCK, ASMConstants.WORLD, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE, ASMConstants.RANDOM), false));
 	}
 
 	private void injectAllowedOrDefaultCheckBefore(MethodNode method, AbstractInsnNode injectPoint, int resultIndex, LabelNode ifAllowedLabel, LabelNode ifFailedLabel)
@@ -270,10 +270,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 
 		toInject.add(new VarInsnNode(ALOAD, resultIndex));
-		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EventResult), "ALLOW", ASMHelper.toDescriptor(ASMConstants.EventResult)));
+		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EVENT_RESULT), "ALLOW", ASMHelper.toDescriptor(ASMConstants.EVENT_RESULT)));
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowedLabel));
 		toInject.add(new VarInsnNode(ALOAD, resultIndex));
-		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EventResult), "DEFAULT", ASMHelper.toDescriptor(ASMConstants.EventResult)));
+		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EVENT_RESULT), "DEFAULT", ASMHelper.toDescriptor(ASMConstants.EVENT_RESULT)));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, ifFailedLabel));
 
 		method.instructions.insertBefore(injectPoint, toInject);
@@ -284,7 +284,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 
 		addFireGrowthEventInsnsToList(toInject);
-		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EventResult), "DENY", ASMHelper.toDescriptor(ASMConstants.EventResult)));
+		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EVENT_RESULT), "DENY", ASMHelper.toDescriptor(ASMConstants.EVENT_RESULT)));
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifDeniedLabel));
 
 		method.instructions.insertBefore(injectPoint, toInject);
@@ -298,7 +298,7 @@ public class ModulePlantGrowth implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, 2));
 		toInject.add(new VarInsnNode(ALOAD, previousStateIndex));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireOnGrowthEvent", ASMHelper.toMethodDescriptor("V", ASMConstants.Block, ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState), false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "fireOnGrowthEvent", ASMHelper.toMethodDescriptor("V", ASMConstants.BLOCK, ASMConstants.WORLD, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE), false));
 
 		method.instructions.insertBefore(injectPoint, toInject);
 	}

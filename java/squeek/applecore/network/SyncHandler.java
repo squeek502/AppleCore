@@ -16,13 +16,13 @@ import squeek.applecore.api.AppleCoreAPI;
 
 public class SyncHandler
 {
-	public static final SimpleNetworkWrapper channel = NetworkRegistry.INSTANCE.newSimpleChannel(ModInfo.MODID);
+	public static final SimpleNetworkWrapper CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(ModInfo.MODID);
 
 	public static void init()
 	{
-		channel.registerMessage(MessageDifficultySync.class, MessageDifficultySync.class, 0, Side.CLIENT);
-		channel.registerMessage(MessageExhaustionSync.class, MessageExhaustionSync.class, 1, Side.CLIENT);
-		channel.registerMessage(MessageSaturationSync.class, MessageSaturationSync.class, 2, Side.CLIENT);
+		CHANNEL.registerMessage(MessageDifficultySync.class, MessageDifficultySync.class, 0, Side.CLIENT);
+		CHANNEL.registerMessage(MessageExhaustionSync.class, MessageExhaustionSync.class, 1, Side.CLIENT);
+		CHANNEL.registerMessage(MessageSaturationSync.class, MessageSaturationSync.class, 2, Side.CLIENT);
 
 		MinecraftForge.EVENT_BUS.register(new SyncHandler());
 	}
@@ -46,14 +46,14 @@ public class SyncHandler
 
 		if (this.lastSaturationLevel != player.getFoodStats().getSaturationLevel())
 		{
-			channel.sendTo(new MessageSaturationSync(player.getFoodStats().getSaturationLevel()), player);
+			CHANNEL.sendTo(new MessageSaturationSync(player.getFoodStats().getSaturationLevel()), player);
 			this.lastSaturationLevel = player.getFoodStats().getSaturationLevel();
 		}
 
 		float exhaustionLevel = AppleCoreAPI.accessor.getExhaustion(player);
 		if (Math.abs(this.lastExhaustionLevel - exhaustionLevel) >= 0.01f)
 		{
-			channel.sendTo(new MessageExhaustionSync(exhaustionLevel), player);
+			CHANNEL.sendTo(new MessageExhaustionSync(exhaustionLevel), player);
 			this.lastExhaustionLevel = exhaustionLevel;
 		}
 	}
@@ -68,7 +68,7 @@ public class SyncHandler
 		{
 			if (this.lastDifficultySetting != event.world.getDifficulty())
 			{
-				channel.sendToAll(new MessageDifficultySync(event.world.getDifficulty()));
+				CHANNEL.sendToAll(new MessageDifficultySync(event.world.getDifficulty()));
 				this.lastDifficultySetting = event.world.getDifficulty();
 			}
 		}
