@@ -309,11 +309,11 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// if (allowExhaustionResult == Result.ALLOW || (allowExhaustionResult == Result.DEFAULT && this.foodExhaustionLevel >= maxExhaustion))
 		toInject.add(new VarInsnNode(ALOAD, allowExhaustionResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "ALLOW", ASMHelper.toDescriptor(ASMConstants.EventResult)));
+		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EventResult), "ALLOW", ASMHelper.toDescriptor(ASMConstants.EventResult)));
 		LabelNode ifAllowed = new LabelNode();
 		toInject.add(new JumpInsnNode(IF_ACMPEQ, ifAllowed));
 		toInject.add(new VarInsnNode(ALOAD, allowExhaustionResult.index));
-		toInject.add(new FieldInsnNode(GETSTATIC, "net/minecraftforge/fml/common/eventhandler/Event$Result", "DEFAULT", ASMHelper.toDescriptor(ASMConstants.EventResult)));
+		toInject.add(new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.EventResult), "DEFAULT", ASMHelper.toDescriptor(ASMConstants.EventResult)));
 		toInject.add(new JumpInsnNode(IF_ACMPNE, foodExhaustionBlockEndLabel));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, ObfHelper.isObfuscated() ? "field_75126_c" : "foodExhaustionLevel", "F"));
@@ -416,7 +416,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.Player), ObfHelper.isObfuscated() ? "field_70170_p" : "worldObj", ASMHelper.toDescriptor(ASMConstants.World)));
 		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.World), ObfHelper.isObfuscated() ? "func_82736_K" : "getGameRules", ASMHelper.toMethodDescriptor(ASMConstants.GameRules), false));
 		toInject.add(new LdcInsnNode("naturalRegeneration"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.world.GameRules"), ObfHelper.isObfuscated() ? "func_82766_b" : "getBoolean", ASMHelper.toMethodDescriptor("Z", ASMConstants.String), false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.GameRules), ObfHelper.isObfuscated() ? "func_82766_b" : "getBoolean", ASMHelper.toMethodDescriptor("Z", ASMConstants.String), false));
 		toInject.add(new JumpInsnNode(IFEQ, elseStart));
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, ObfHelper.isObfuscated() ? "field_75127_a" : "foodLevel", "I"));
@@ -465,7 +465,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 1));
 		toInject.add(new VarInsnNode(ALOAD, regenEvent.index));
 		toInject.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(ASMConstants.HealthRegenEvent.Regen), "deltaHealth", "F"));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.EntityLivingBase"), ObfHelper.isObfuscated() ? "func_70691_i" : "heal", ASMHelper.toMethodDescriptor("V", "F"), false));
+		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.EntityLiving), ObfHelper.isObfuscated() ? "func_70691_i" : "heal", ASMHelper.toMethodDescriptor("V", "F"), false));
 
 		// this.addExhaustion(regenEvent.deltaExhaustion);
 		toInject.add(new VarInsnNode(ALOAD, 0));

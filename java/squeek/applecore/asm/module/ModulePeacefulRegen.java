@@ -38,7 +38,7 @@ public class ModulePeacefulRegen implements IClassTransformerModule
 	public void addPeacefulRegenHook(ClassNode classNode, MethodNode method)
 	{
 		AbstractInsnNode relevantParentConditional = ASMHelper.find(method.instructions, new LdcInsnNode("naturalRegeneration"));
-		AbstractInsnNode relevantConditional = ASMHelper.find(relevantParentConditional, new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.Player), ObfHelper.isObfuscated() ? "func_110143_aJ" : "getHealth", "()F", false));
+		AbstractInsnNode relevantConditional = ASMHelper.find(relevantParentConditional, new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.Player), ObfHelper.isObfuscated() ? "func_110143_aJ" : "getHealth", ASMHelper.toMethodDescriptor("F"), false));
 		JumpInsnNode ifNode = (JumpInsnNode) ASMHelper.find(relevantConditional, new JumpInsnNode(IFNE, new LabelNode()));
 		LabelNode ifBlockEndLabel = ifNode.label;
 		AbstractInsnNode targetNode = ASMHelper.find(ifNode, new InsnNode(FCONST_1)).getPrevious();
