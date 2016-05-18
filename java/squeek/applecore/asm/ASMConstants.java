@@ -46,7 +46,9 @@ public class ASMConstants
 	public static final String IGrowable = "net.minecraft.block.IGrowable";
 	public static final String ItemFood = "net.minecraft.item.ItemFood";
 	public static final String ItemRenderer = "net.minecraft.client.renderer.ItemRenderer";
+	public static final String Minecraft = "net.minecraft.client.Minecraft";
 	public static final String Player = "net.minecraft.entity.player.EntityPlayer";
+	public static final String PlayerSP = "net.minecraft.client.entity.EntityPlayerSP";
 	public static final String Stack = "net.minecraft.item.ItemStack";
 	public static final String StatBase = "net.minecraft.stats.StatBase";
 	public static final String StatList = "net.minecraft.stats.StatList";

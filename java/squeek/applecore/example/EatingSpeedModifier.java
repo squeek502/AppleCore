@@ -11,7 +11,7 @@ public class EatingSpeedModifier
 	// normally, doing this will cause the eating animation to not work properly,
 	// but AppleCore fixes that
 	@SubscribeEvent
-	public void onItemUse(LivingEntityUseItemEvent event)
+	public void onItemUse(LivingEntityUseItemEvent.Start event)
 	{
 		if (event.getEntity() instanceof EntityPlayer)
 		{

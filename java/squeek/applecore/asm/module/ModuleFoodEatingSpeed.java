@@ -4,7 +4,6 @@ import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
 import squeek.asmhelper.applecore.ASMHelper;
-import squeek.asmhelper.applecore.InsnComparator;
 import squeek.asmhelper.applecore.ObfHelper;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -62,16 +61,14 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	private void patchRenderItemInFirstPerson(MethodNode method)
 	{
 		InsnList needle = new InsnList();
-		needle.add(new VarInsnNode(ALOAD, 0));
-		needle.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(ASMConstants.ItemRenderer), InsnComparator.WILDCARD, ASMHelper.toDescriptor(ASMConstants.Stack)));
+		needle.add(new VarInsnNode(ALOAD, 3));
 		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.Stack), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
 
-		int playerParamIndex = 1;
-		String playerInternalName = ASMHelper.toInternalClassName(ASMConstants.EntityLiving);
-
 		InsnList replacement = new InsnList();
-		replacement.add(new VarInsnNode(ALOAD, playerParamIndex));
-		replacement.add(new FieldInsnNode(GETFIELD, playerInternalName, "itemInUseMaxDuration", "I"));
+		replacement.add(new VarInsnNode(ALOAD, 0));
+		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.ItemRenderer), ObfHelper.isObfuscated() ? "field_78455_a" : "mc", ASMHelper.toDescriptor(ASMConstants.Minecraft)));
+		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.Minecraft), ObfHelper.isObfuscated() ? "field_71439_g" : "thePlayer", ASMHelper.toDescriptor(ASMConstants.PlayerSP)));
+		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.Player), "itemInUseMaxDuration", "I"));
 
 		boolean replaced = ASMHelper.findAndReplace(method.instructions, needle, replacement) != null;
 		if (!replaced)
@@ -110,7 +107,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		InsnList toInject = new InsnList();
 
 		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new VarInsnNode(ILOAD, 2));
+		toInject.add(new VarInsnNode(ILOAD, 3));
 		toInject.add(new FieldInsnNode(PUTFIELD, ASMHelper.toInternalClassName(classNode.name), "itemInUseMaxDuration", "I"));
 
 		method.instructions.insert(targetNode, toInject);
