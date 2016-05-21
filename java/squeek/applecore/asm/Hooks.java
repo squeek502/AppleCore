@@ -26,6 +26,7 @@ import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.HungerRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.api.plants.FertilizationEvent;
+import squeek.applecore.asm.util.IAppleCoreFertilizable;
 
 public class Hooks
 {
@@ -174,6 +175,10 @@ public class Hooks
 
 	public static void fireAppleCoreFertilizeEvent(Block block, World world, BlockPos pos, IBlockState state, Random random)
 	{
+		// if the block does not implement our dummy interface, then the transformation did occur
+		if (!(block instanceof IAppleCoreFertilizable))
+			return;
+
 		if (random == null)
 			random = fertilizeRandom;
 
@@ -188,15 +193,10 @@ public class Hooks
 
 		if (fertilizeResult == Event.Result.DEFAULT)
 		{
+			IAppleCoreFertilizable fertilizableBlock = (IAppleCoreFertilizable) block;
 			try
 			{
-				Method renamedFertilize = block.getClass().getMethod("AppleCore_fertilize", World.class, Random.class, BlockPos.class, IBlockState.class);
-				renamedFertilize.invoke(block, world, random, pos, state);
-			}
-			catch (NoClassDefFoundError e)
-			{
-				// swallow this exception, as it can be triggered by @SideOnly annotation issues
-				// see https://github.com/squeek502/AppleCore/issues/48
+				fertilizableBlock.AppleCore_fertilize(world, random, pos, state);
 			}
 			catch (RuntimeException e)
 			{
