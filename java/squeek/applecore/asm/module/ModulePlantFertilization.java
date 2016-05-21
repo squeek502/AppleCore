@@ -87,6 +87,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 			if (method != null)
 			{
 				ASMHelper.copyAndRenameMethod(classNode, method, "AppleCore_fertilize");
+				classNode.interfaces.add(ASMHelper.toInternalClassName(ASMConstants.IAPPLECOREFERTILIZABLE));
 				replaceFertilizeMethod(method, methodInfo);
 				return ASMHelper.writeClassToBytes(classNode);
 			}
