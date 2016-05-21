@@ -16,28 +16,28 @@ public class FertilizationModifier
 		// disable cocoa fertilization completely
 		if (event.block instanceof BlockCocoa)
 		{
-			AppleCoreExample.Log.info(event.block + " fertilization denied");
+			AppleCoreExample.LOG.info(event.block + " fertilization denied");
 			event.setResult(Result.DENY);
 		}
 		// custom fertilization effect for stems
 		else if (event.block instanceof BlockStem)
 		{
 			// randomize the meta
-			AppleCoreExample.Log.info("randomizing meta of " + event.block + " using custom fertilization handling");
-			IBlockState state = event.state.withProperty(BlockCrops.AGE, Integer.valueOf(event.random.nextInt(7)));
+			AppleCoreExample.LOG.info("randomizing meta of " + event.block + " using custom fertilization handling");
+			IBlockState state = event.state.withProperty(BlockCrops.AGE, event.random.nextInt(7));
 			event.world.setBlockState(event.pos, state, 1);
 			// mark as handled
 			event.setResult(Result.ALLOW);
 		}
 		else
 		{
-			AppleCoreExample.Log.info(event.block + " is about to be fertilized (" + event.state.toString() + ")");
+			AppleCoreExample.LOG.info(event.block + " is about to be fertilized (" + event.state.toString() + ")");
 		}
 	}
 
 	@SubscribeEvent
 	public void onFertilized(FertilizationEvent.Fertilized event)
 	{
-		AppleCoreExample.Log.info(event.block + " was fertilized from " + event.previousState.toString() + " to " + event.currentState.toString());
+		AppleCoreExample.LOG.info(event.block + " was fertilized from " + event.previousState.toString() + " to " + event.currentState.toString());
 	}
 }

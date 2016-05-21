@@ -25,6 +25,6 @@ public class PlantGrowthModifier
 	@SubscribeEvent
 	public void onGrowthTick(PlantGrowthEvent.GrowthTick event)
 	{
-		AppleCoreExample.Log.info(event.block + " grew from a growth tick (from " + event.previousState.toString() + " to " + event.currentState.toString() + ")");
+		AppleCoreExample.LOG.info(event.block + " grew from a growth tick (from " + event.previousState.toString() + " to " + event.currentState.toString() + ")");
 	}
 }

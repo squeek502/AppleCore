@@ -43,7 +43,7 @@ public class TooltipOverlayHandler
 		MinecraftForge.EVENT_BUS.register(new TooltipOverlayHandler());
 	}
 
-	public static final Field theSlot = ReflectionHelper.findField(GuiContainer.class, ObfuscationReflectionHelper.remapFieldNames(GuiContainer.class.getName(), "theSlot", "field_147006_u", "u"));
+	public static final Field THE_SLOT = ReflectionHelper.findField(GuiContainer.class, ObfuscationReflectionHelper.remapFieldNames(GuiContainer.class.getName(), "theSlot", "field_147006_u", "u"));
 	private static Method getStackMouseOver = null;
 	private static Field itemPanel = null;
 	private static boolean neiLoaded = false;
@@ -242,7 +242,7 @@ public class TooltipOverlayHandler
 					// try regular container
 					if (hoveredStack == null)
 					{
-						Slot hoveredSlot = (Slot) TooltipOverlayHandler.theSlot.get(gui);
+						Slot hoveredSlot = (Slot) TooltipOverlayHandler.THE_SLOT.get(gui);
 
 						// get the stack
 						if (hoveredSlot != null)

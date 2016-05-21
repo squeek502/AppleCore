@@ -33,7 +33,7 @@ public class BlockCactusModifications extends BlockCactus
 					world.setBlockState(pos.up(), this.getDefaultState());
 					IBlockState iblockstate = state.withProperty(AGE, 0);
 					world.setBlockState(pos, iblockstate, 4);
-					this.onNeighborBlockChange(world, pos.up(), iblockstate, this);
+					this.neighborChanged(iblockstate, world, pos.up(), this);
 				}
 				else
 				{

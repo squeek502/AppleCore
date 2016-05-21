@@ -14,7 +14,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 {
 	public static enum FertilizeMethodInfo
 	{
-		IGROWABLE_BLOCK(ObfHelper.isObfuscated() ? "func_176474_b" : "grow", ASMHelper.toMethodDescriptor("V", ASMConstants.World, ASMConstants.Random, ASMConstants.BlockPos, ASMConstants.IBlockState), 1, 3, 4, 2);
+		IGROWABLE_BLOCK(ObfHelper.isObfuscated() ? "func_176474_b" : "grow", ASMHelper.toMethodDescriptor("V", ASMConstants.WORLD, ASMConstants.RANDOM, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE), 1, 3, 4, 2);
 
 		public static final int NULL_PARAM = -1;
 		public final String name;
@@ -79,7 +79,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 	public byte[] transform(String name, String transformedName, byte[] bytes)
 	{
 		ClassReader classReader = new ClassReader(bytes);
-		if (ASMHelper.doesClassImplement(classReader, ObfHelper.getInternalClassName(ASMConstants.IGrowable)))
+		if (ASMHelper.doesClassImplement(classReader, ObfHelper.getInternalClassName(ASMConstants.IGROWABLE)))
 		{
 			FertilizeMethodInfo methodInfo = FertilizeMethodInfo.IGROWABLE_BLOCK;
 			ClassNode classNode = ASMHelper.readClassFromBytes(bytes, ClassReader.EXPAND_FRAMES);
@@ -110,7 +110,7 @@ public class ModulePlantFertilization implements IClassTransformerModule
 		method.instructions.add(methodInfo.getLoadCoordinatesInsns());
 		method.instructions.add(methodInfo.getLoadBlockStateInsns());
 		method.instructions.add(methodInfo.getLoadRandomInsns());
-		method.instructions.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.Hooks), "fireAppleCoreFertilizeEvent", ASMHelper.toMethodDescriptor("V", ASMConstants.Block, ASMConstants.World, ASMConstants.BlockPos, ASMConstants.IBlockState, ASMConstants.Random), false));
+		method.instructions.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "fireAppleCoreFertilizeEvent", ASMHelper.toMethodDescriptor("V", ASMConstants.BLOCK, ASMConstants.WORLD, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE, ASMConstants.RANDOM), false));
 		method.instructions.add(new InsnNode(RETURN));
 	}
 }

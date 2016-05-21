@@ -21,7 +21,7 @@ import squeek.applecore.ModInfo;
 @Mod(modid = ModInfo.MODID + "Example", version = ModInfo.VERSION, dependencies = "required-after:AppleCore")
 public class AppleCoreExample
 {
-	public static final Logger Log = LogManager.getLogger(ModInfo.MODID + "Example");
+	public static final Logger LOG = LogManager.getLogger(ModInfo.MODID + "Example");
 
 	@Instance(ModInfo.MODID + "Example")
 	public static AppleCoreExample instance;
