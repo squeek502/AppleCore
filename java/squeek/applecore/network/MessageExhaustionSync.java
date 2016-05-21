@@ -1,6 +1,7 @@
 package squeek.applecore.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -32,9 +33,14 @@ public class MessageExhaustionSync implements IMessage, IMessageHandler<MessageE
 	}
 
 	@Override
-	public IMessage onMessage(MessageExhaustionSync message, MessageContext ctx)
+	public IMessage onMessage(final MessageExhaustionSync message, final MessageContext ctx)
 	{
-		AppleCoreAPI.mutator.setExhaustion(NetworkHelper.getSidedPlayer(ctx), message.exhaustionLevel);
+		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+			@Override
+			public void run() {
+				AppleCoreAPI.mutator.setExhaustion(NetworkHelper.getSidedPlayer(ctx), message.exhaustionLevel);
+			}
+		});
 		return null;
 	}
 }
