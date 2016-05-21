@@ -35,6 +35,7 @@ public class MessageDifficultySync implements IMessage, IMessageHandler<MessageD
 	@Override
 	public IMessage onMessage(final MessageDifficultySync message, final MessageContext ctx)
 	{
+		// defer to the next game loop; we can't guarantee that Minecraft.thePlayer is initialized yet
 		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
 			@Override
 			public void run() {

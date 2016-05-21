@@ -34,6 +34,7 @@ public class MessageSaturationSync implements IMessage, IMessageHandler<MessageS
 	@Override
 	public IMessage onMessage(final MessageSaturationSync message, final MessageContext ctx)
 	{
+		// defer to the next game loop; we can't guarantee that Minecraft.thePlayer is initialized yet
 		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
 			@Override
 			public void run() {
