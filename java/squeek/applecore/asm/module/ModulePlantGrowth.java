@@ -64,7 +64,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	private void hookBlockCrops(ClassNode classNode, MethodNode method)
 	{
 		JumpInsnNode ifJumpInsn = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(ifJumpInsn).getNext();
+		AbstractInsnNode ifStartPoint = ASMHelper.findNextInstruction(ASMHelper.findFirstInstructionWithOpcode(method, INVOKESPECIAL));
+
+		if (ifStartPoint == null)
+			throw new RuntimeException("Failed to transform BlockCrops, INVOKESPECIAL instruction not found");
 
 		LabelNode endLabel = ASMHelper.findEndLabel(method);
 		LabelNode ifFailedLabel = ifJumpInsn.label;
@@ -175,7 +178,10 @@ public class ModulePlantGrowth implements IClassTransformerModule
 	{
 		JumpInsnNode lightValueIf = (JumpInsnNode) ASMHelper.findFirstInstructionWithOpcode(method, IF_ICMPLT);
 		JumpInsnNode randomIf = (JumpInsnNode) ASMHelper.findNextInstructionWithOpcode(lightValueIf, IFNE);
-		AbstractInsnNode ifStartPoint = ASMHelper.findPreviousLabelOrLineNumber(lightValueIf).getNext();
+		AbstractInsnNode ifStartPoint = ASMHelper.findNextInstruction(ASMHelper.findFirstInstructionWithOpcode(method, INVOKESPECIAL));
+
+		if (ifStartPoint == null)
+			throw new RuntimeException("Failed to transform BlockSapling, INVOKESPECIAL instruction not found");
 
 		LabelNode ifFailedLabel = lightValueIf.label;
 		LabelNode ifAllowedLabel = new LabelNode();
