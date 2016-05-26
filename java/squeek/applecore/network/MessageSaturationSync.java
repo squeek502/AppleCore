@@ -1,6 +1,7 @@
 package squeek.applecore.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -31,9 +32,16 @@ public class MessageSaturationSync implements IMessage, IMessageHandler<MessageS
 	}
 
 	@Override
-	public IMessage onMessage(MessageSaturationSync message, MessageContext ctx)
+	public IMessage onMessage(final MessageSaturationSync message, final MessageContext ctx)
 	{
-		NetworkHelper.getSidedPlayer(ctx).getFoodStats().setFoodSaturationLevel(message.saturationLevel);
+		// defer to the next game loop; we can't guarantee that Minecraft.thePlayer is initialized yet
+		Minecraft.getMinecraft().addScheduledTask(new Runnable()
+		{
+			@Override
+			public void run() {
+				NetworkHelper.getSidedPlayer(ctx).getFoodStats().setFoodSaturationLevel(message.saturationLevel);
+			}
+		});
 		return null;
 	}
 }

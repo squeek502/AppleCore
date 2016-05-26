@@ -1,6 +1,7 @@
 package squeek.applecore.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -32,9 +33,14 @@ public class MessageDifficultySync implements IMessage, IMessageHandler<MessageD
 	}
 
 	@Override
-	public IMessage onMessage(MessageDifficultySync message, MessageContext ctx)
+	public IMessage onMessage(final MessageDifficultySync message, final MessageContext ctx)
 	{
-		NetworkHelper.getSidedPlayer(ctx).worldObj.getWorldInfo().setDifficulty(message.difficulty);
+		// defer to the next game loop; we can't guarantee that Minecraft.thePlayer is initialized yet
+		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+			@Override
+			public void run() {
+				NetworkHelper.getSidedPlayer(ctx).worldObj.getWorldInfo().setDifficulty(message.difficulty);			}
+		});
 		return null;
 	}
 }
