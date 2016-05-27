@@ -179,8 +179,8 @@ public class TooltipOverlayHandler
 						Object jeiRuntime = jeiGetRuntime.invoke(null);
 
 						// try to get the hovered stack from the current recipe if possible
-						Object recipesGui = RecipesGui.isInstance(curScreen) ? curScreen : jeiGetRecipesGui.invoke(jeiRuntime);
-						if (RecipesGui.isInstance(curScreen))
+						Object recipesGui = isJEIRecipesGui ? curScreen : jeiGetRecipesGui.invoke(jeiRuntime);
+						if (isJEIRecipesGui)
 						{
 							Object recipesFocus = jeiRecipesGetFocusUnderMouse.invoke(curScreen, mouseX, mouseY);
 							if (recipesFocus != null)
