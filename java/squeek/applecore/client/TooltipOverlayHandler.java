@@ -47,14 +47,12 @@ public class TooltipOverlayHandler
 	private static Method getStackMouseOver = null;
 	private static Field itemPanel = null;
 	private static boolean neiLoaded = false;
-	private static Class<?> JustEnoughItems = null;
-	private static Field jeiProxy = null;
-	private static Field jeiGuiEventHandler = null;
-	private static Field jeiItemListOverlay = null;
+	private static Method jeiGetRuntime = null;
+	private static Class<?> JeiRuntime = null;
+	private static Method jeiGetItemListOverlay = null;
+	private static Method jeiGetRecipesGui = null;
 	private static Class<?> RecipesGui = null;
 	private static Method jeiGetFocusUnderMouse = null;
-	private static Field jeiInputHandler = null;
-	private static Field jeiRecipesGui = null;
 	private static Method jeiRecipesGetFocusUnderMouse = null;
 	private static Field jeiFocus_itemStack = null;
 	private static Field jeiRecipeLayouts = null;
@@ -73,24 +71,15 @@ public class TooltipOverlayHandler
 			jeiLoaded = Loader.isModLoaded("JEI");
 			if (jeiLoaded)
 			{
-				JustEnoughItems = Class.forName("mezz.jei.JustEnoughItems");
-				jeiProxy = JustEnoughItems.getDeclaredField("proxy");
-				jeiProxy.setAccessible(true);
-				Class<?> ProxyCommonClient = Class.forName("mezz.jei.ProxyCommonClient");
-				jeiGuiEventHandler = ProxyCommonClient.getDeclaredField("guiEventHandler");
-				jeiGuiEventHandler.setAccessible(true);
-				Class<?> GuiEventHandler = Class.forName("mezz.jei.GuiEventHandler");
+				Class<?> jeiInternal = Class.forName("mezz.jei.Internal");
+				jeiGetRuntime = jeiInternal.getDeclaredMethod("getRuntime");
+				JeiRuntime = Class.forName("mezz.jei.JeiRuntime");
+				jeiGetItemListOverlay = JeiRuntime.getDeclaredMethod("getItemListOverlay");
+				jeiGetRecipesGui = JeiRuntime.getDeclaredMethod("getRecipesGui");
 
-				jeiItemListOverlay = GuiEventHandler.getDeclaredField("itemListOverlay");
-				jeiItemListOverlay.setAccessible(true);
 				Class<?> ItemListOverlay = Class.forName("mezz.jei.gui.ItemListOverlay");
 				jeiGetFocusUnderMouse = ItemListOverlay.getDeclaredMethod("getFocusUnderMouse", int.class, int.class);
 
-				jeiInputHandler = GuiEventHandler.getDeclaredField("inputHandler");
-				jeiInputHandler.setAccessible(true);
-				Class<?> InputHandler = Class.forName("mezz.jei.input.InputHandler");
-				jeiRecipesGui = InputHandler.getDeclaredField("recipesGui");
-				jeiRecipesGui.setAccessible(true);
 				RecipesGui = Class.forName("mezz.jei.gui.RecipesGui");
 				jeiRecipesGetFocusUnderMouse = RecipesGui.getDeclaredMethod("getFocusUnderMouse", int.class, int.class);
 
@@ -187,19 +176,21 @@ public class TooltipOverlayHandler
 					// try JEI recipe handler
 					if (jeiFocus_itemStack != null)
 					{
-						Object guiEventHandler = jeiGuiEventHandler.get(jeiProxy.get(null));
-						Object inputHandler = jeiInputHandler.get(guiEventHandler);
+						Object jeiRuntime = jeiGetRuntime.invoke(null);
 
 						// try to get the hovered stack from the current recipe if possible
-						Object recipesGui = jeiRecipesGui.get(inputHandler);
-						Object recipesFocus = jeiRecipesGetFocusUnderMouse.invoke(recipesGui, mouseX, mouseY);
-						if (recipesFocus != null)
-							hoveredStack = (ItemStack) jeiFocus_itemStack.get(recipesFocus);
+						Object recipesGui = RecipesGui.isInstance(curScreen) ? curScreen : jeiGetRecipesGui.invoke(jeiRuntime);
+						if (RecipesGui.isInstance(curScreen))
+						{
+							Object recipesFocus = jeiRecipesGetFocusUnderMouse.invoke(curScreen, mouseX, mouseY);
+							if (recipesFocus != null)
+								hoveredStack = (ItemStack) jeiFocus_itemStack.get(recipesFocus);
+						}
 
 						// next try to get the hovered stack from the right-hand item list
 						if (hoveredStack == null)
 						{
-							Object itemList = jeiItemListOverlay.get(guiEventHandler);
+							Object itemList = jeiGetItemListOverlay.invoke(jeiRuntime);
 							Object listFocus = jeiGetFocusUnderMouse.invoke(itemList, mouseX, mouseY);
 							if (listFocus != null)
 								hoveredStack = (ItemStack) jeiFocus_itemStack.get(listFocus);
