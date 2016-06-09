@@ -54,66 +54,14 @@ public class FoodStatsModifications extends FoodStats
 		Hooks.onPostFoodStatsAdded(this, food, stack, modifiedFoodValues, this.foodLevel - prevFoodLevel, this.foodSaturationLevel - prevSaturationLevel, this.player);
 	}
 
-	// heavily modified method
 	@Override
 	public void onUpdate(EntityPlayer player)
 	{
-		this.prevFoodLevel = this.foodLevel;
+		// added lines
+		if (Hooks.onAppleCoreFoodStatsUpdate(this, player))
+			return;
 
-		Result allowExhaustionResult = Hooks.fireAllowExhaustionEvent(player);
-		float maxExhaustion = Hooks.fireExhaustionTickEvent(player, foodExhaustionLevel);
-		if (allowExhaustionResult == Result.ALLOW || (allowExhaustionResult == Result.DEFAULT && this.foodExhaustionLevel >= maxExhaustion))
-		{
-			ExhaustionEvent.Exhausted exhaustedEvent = Hooks.fireExhaustionMaxEvent(player, maxExhaustion, foodExhaustionLevel);
-
-			this.foodExhaustionLevel += exhaustedEvent.deltaExhaustion;
-			if (!exhaustedEvent.isCanceled())
-			{
-				this.foodSaturationLevel = Math.max(this.foodSaturationLevel + exhaustedEvent.deltaSaturation, 0.0F);
-				this.foodLevel = Math.max(this.foodLevel + exhaustedEvent.deltaHunger, 0);
-			}
-		}
-
-		Result allowRegenResult = Hooks.fireAllowRegenEvent(player);
-		if (allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && player.worldObj.getGameRules().hasRule("naturalRegeneration") && this.foodLevel >= 18 && player.shouldHeal()))
-		{
-			++this.foodTimer;
-
-			if (this.foodTimer >= Hooks.fireRegenTickEvent(player))
-			{
-				HealthRegenEvent.Regen regenEvent = Hooks.fireRegenEvent(player);
-				if (!regenEvent.isCanceled())
-				{
-					player.heal(regenEvent.deltaHealth);
-					this.addExhaustion(regenEvent.deltaExhaustion);
-				}
-				this.foodTimer = 0;
-			}
-		}
-		else
-		{
-			this.foodTimer = 0;
-		}
-
-		Result allowStarvationResult = Hooks.fireAllowStarvation(player);
-		if (allowStarvationResult == Result.ALLOW || (allowStarvationResult == Result.DEFAULT && this.foodLevel <= 0))
-		{
-			++this.starveTimer;
-
-			if (this.starveTimer >= Hooks.fireStarvationTickEvent(player))
-			{
-				StarvationEvent.Starve starveEvent = Hooks.fireStarveEvent(player);
-				if (!starveEvent.isCanceled())
-				{
-					player.attackEntityFrom(DamageSource.starve, starveEvent.starveDamage);
-				}
-				this.starveTimer = 0;
-			}
-		}
-		else
-		{
-			this.starveTimer = 0;
-		}
+		// the body of the base function
 	}
 
 	// start unmodified

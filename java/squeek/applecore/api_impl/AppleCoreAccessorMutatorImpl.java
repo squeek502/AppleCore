@@ -18,6 +18,7 @@ import squeek.applecore.api.food.IEdible;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
+import squeek.applecore.asm.util.IAppleCoreFoodStats;
 
 import java.lang.reflect.Field;
 
@@ -104,7 +105,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	{
 		try
 		{
-			return foodExhaustion.getFloat(player.getFoodStats());
+			return getAppleCoreFoodStats(player).getExhaustion();
 		}
 		catch (RuntimeException e)
 		{
@@ -140,6 +141,14 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		return event.starveTickPeriod;
 	}
 
+	@Override
+	public int getSaturatedHealthRegenTickPeriod(EntityPlayer player)
+	{
+		HealthRegenEvent.GetSaturatedRegenTickPeriod event = new HealthRegenEvent.GetSaturatedRegenTickPeriod(player);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.regenTickPeriod;
+	}
+
 	/*
 	 * IAppleCoreMutator implementation
 	 */
@@ -148,7 +157,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	{
 		try
 		{
-			foodExhaustion.setFloat(player.getFoodStats(), exhaustion);
+			getAppleCoreFoodStats(player).setExhaustion(exhaustion);
 		}
 		catch (RuntimeException e)
 		{
@@ -163,18 +172,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	@Override
 	public void setHunger(EntityPlayer player, int hunger)
 	{
-		try
-		{
-			foodLevel.setInt(player.getFoodStats(), hunger);
-		}
-		catch (RuntimeException e)
-		{
-			throw e;
-		}
-		catch (Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+		player.getFoodStats().setFoodLevel(hunger);
 	}
 
 	@Override
@@ -182,7 +180,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	{
 		try
 		{
-			foodSaturationLevel.setFloat(player.getFoodStats(), saturation);
+			getAppleCoreFoodStats(player).setSaturation(saturation);
 		}
 		catch (RuntimeException e)
 		{
@@ -199,7 +197,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	{
 		try
 		{
-			foodTimer.setInt(player.getFoodStats(), tickCounter);
+			getAppleCoreFoodStats(player).setFoodTimer(tickCounter);
 		}
 		catch (RuntimeException e)
 		{
@@ -216,7 +214,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	{
 		try
 		{
-			starveTimer.setInt(player.getFoodStats(), tickCounter);
+			getAppleCoreFoodStats(player).setStarveTimer(tickCounter);
 		}
 		catch (RuntimeException e)
 		{
@@ -228,18 +226,8 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		}
 	}
 
-	// reflection
-	static final Field foodLevel = ReflectionHelper.findField(FoodStats.class, "foodLevel", "field_75127_a", "a");
-	static final Field foodSaturationLevel = ReflectionHelper.findField(FoodStats.class, "foodSaturationLevel", "field_75125_b", "b");
-	static final Field foodExhaustion = ReflectionHelper.findField(FoodStats.class, "foodExhaustionLevel", "field_75126_c", "c");
-	static final Field foodTimer = ReflectionHelper.findField(FoodStats.class, "foodTimer", "field_75123_d", "d");
-	static final Field starveTimer = ReflectionHelper.findField(FoodStats.class, "starveTimer");
-	static
+	public IAppleCoreFoodStats getAppleCoreFoodStats(EntityPlayer player) throws ClassCastException
 	{
-		foodLevel.setAccessible(true);
-		foodSaturationLevel.setAccessible(true);
-		foodExhaustion.setAccessible(true);
-		foodTimer.setAccessible(true);
-		starveTimer.setAccessible(true);
+		return (IAppleCoreFoodStats) player.getFoodStats();
 	}
 }

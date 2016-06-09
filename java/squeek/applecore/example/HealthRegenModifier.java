@@ -32,4 +32,23 @@ public class HealthRegenModifier
 		event.deltaHealth = 0f;
 	}
 
+	@SubscribeEvent
+	public void allowSaturatedHealthRegen(HealthRegenEvent.AllowSaturatedRegen event)
+	{
+		event.setResult(Result.DEFAULT);
+	}
+
+	@SubscribeEvent
+	public void onSaturatedRegenTick(HealthRegenEvent.GetSaturatedRegenTickPeriod event)
+	{
+		event.regenTickPeriod = 20;
+	}
+
+	@SubscribeEvent
+	public void onSaturatedRegen(HealthRegenEvent.SaturatedRegen event)
+	{
+		event.deltaHealth = 1;
+		event.deltaExhaustion = 1f;
+	}
+
 }
