@@ -18,6 +18,8 @@ minecraft {
 	mappings = mappings_version
 	runDir = "run"
 
+	coreMod = "squeek.applecore.AppleCore"
+
 	replace "\${version}", project.version
 	replace "\${apiversion}", api_version
 	replaceIn "ModInfo.java"
