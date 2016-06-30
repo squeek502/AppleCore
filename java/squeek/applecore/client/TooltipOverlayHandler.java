@@ -54,7 +54,7 @@ public class TooltipOverlayHandler
 	private static Class<?> RecipesGui = null;
 	private static Method jeiGetFocusUnderMouse = null;
 	private static Method jeiRecipesGetFocusUnderMouse = null;
-	private static Field jeiFocus_itemStack = null;
+	private static Field jeiFocus_value = null;
 	private static Field jeiRecipeLayouts = null;
 	private static Field jeiRecipesGui_guiLeft = null;
 	private static Field jeiRecipesGui_guiTop = null;
@@ -97,8 +97,8 @@ public class TooltipOverlayHandler
 				jeiRecipeLayout_getFocusUnderMouse = RecipeLayout.getDeclaredMethod("getFocusUnderMouse", int.class, int.class);
 
 				Class<?> Focus = Class.forName("mezz.jei.gui.Focus");
-				jeiFocus_itemStack = Focus.getDeclaredField("stack");
-				jeiFocus_itemStack.setAccessible(true);
+				jeiFocus_value = Focus.getDeclaredField("value");
+				jeiFocus_value.setAccessible(true);
 			}
 		}
 		catch (RuntimeException e)
@@ -174,7 +174,7 @@ public class TooltipOverlayHandler
 				try
 				{
 					// try JEI recipe handler
-					if (jeiFocus_itemStack != null)
+					if (jeiFocus_value != null)
 					{
 						Object jeiRuntime = jeiGetRuntime.invoke(null);
 
@@ -183,8 +183,8 @@ public class TooltipOverlayHandler
 						if (isJEIRecipesGui)
 						{
 							Object recipesFocus = jeiRecipesGetFocusUnderMouse.invoke(curScreen, mouseX, mouseY);
-							if (recipesFocus != null)
-								hoveredStack = (ItemStack) jeiFocus_itemStack.get(recipesFocus);
+							if (recipesFocus != null && jeiFocus_value.get(recipesFocus) instanceof ItemStack)
+								hoveredStack = (ItemStack) jeiFocus_value.get(recipesFocus);
 						}
 
 						// next try to get the hovered stack from the right-hand item list
@@ -192,8 +192,8 @@ public class TooltipOverlayHandler
 						{
 							Object itemList = jeiGetItemListOverlay.invoke(jeiRuntime);
 							Object listFocus = jeiGetFocusUnderMouse.invoke(itemList, mouseX, mouseY);
-							if (listFocus != null)
-								hoveredStack = (ItemStack) jeiFocus_itemStack.get(listFocus);
+							if (listFocus != null && jeiFocus_value.get(listFocus) instanceof ItemStack)
+								hoveredStack = (ItemStack) jeiFocus_value.get(listFocus);
 						}
 						else
 						{
