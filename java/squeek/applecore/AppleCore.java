@@ -9,15 +9,11 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import squeek.applecore.api_impl.AppleCoreAccessorMutatorImpl;
 import squeek.applecore.api_impl.AppleCoreDispatcherImpl;
 import squeek.applecore.asm.TransformerModuleHandler;
-import squeek.applecore.client.DebugInfoHandler;
-import squeek.applecore.client.HUDOverlayHandler;
-import squeek.applecore.client.TooltipOverlayHandler;
 import squeek.applecore.commands.Commands;
 import squeek.applecore.network.SyncHandler;
 import squeek.asmhelper.applecore.ObfHelper;
@@ -28,7 +24,7 @@ import java.util.Map;
 @IFMLLoadingPlugin.SortingIndex(1100)
 @IFMLLoadingPlugin.MCVersion("1.10.2")
 @IFMLLoadingPlugin.TransformerExclusions({"squeek.applecore.asm", "squeek.asmhelper"})
-@Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, acceptableRemoteVersions="*", guiFactory = ModInfo.GUI_FACTORY_CLASS, dependencies = "after:JEI@[3.8.1,); required-after:Forge@[12.18.1.2053,)")
+@Mod(modid = ModInfo.MODID, version = ModInfo.VERSION, acceptableRemoteVersions = "*", dependencies = "after:JEI@[3.8.1,); required-after:Forge@[12.18.1.2053,)")
 public class AppleCore implements IFMLLoadingPlugin
 {
 	public static Logger Log = LogManager.getLogger(ModInfo.MODID);
@@ -46,8 +42,6 @@ public class AppleCore implements IFMLLoadingPlugin
 		AppleCoreAccessorMutatorImpl.values();
 		AppleCoreDispatcherImpl.values();
 
-		ModConfig.init(event.getSuggestedConfigurationFile());
-
 		FMLInterModComms.sendRuntimeMessage(ModInfo.MODID, "VersionChecker", "addVersionCheck", "http://www.ryanliptak.com/minecraft/versionchecker/squeek502/AppleCore");
 	}
 
@@ -55,13 +49,6 @@ public class AppleCore implements IFMLLoadingPlugin
 	public void init(FMLInitializationEvent event)
 	{
 		SyncHandler.init();
-
-		if (event.getSide() == Side.CLIENT)
-		{
-			DebugInfoHandler.init();
-			HUDOverlayHandler.init();
-			TooltipOverlayHandler.init();
-		}
 	}
 
 	@EventHandler

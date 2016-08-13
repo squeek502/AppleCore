@@ -6,9 +6,7 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.FoodStats;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreAccessor;
 import squeek.applecore.api.IAppleCoreMutator;
@@ -19,8 +17,6 @@ import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.util.IAppleCoreFoodStats;
-
-import java.lang.reflect.Field;
 
 public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCoreMutator
 {

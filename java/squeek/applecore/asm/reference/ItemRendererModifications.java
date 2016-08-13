@@ -1,10 +1,8 @@
 package squeek.applecore.asm.reference;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHandSide;
-import net.minecraft.util.math.MathHelper;
 
 public class ItemRendererModifications
 {

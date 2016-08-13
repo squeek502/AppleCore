@@ -1,7 +1,7 @@
 package squeek.applecore.example;
 
-import squeek.applecore.api.hunger.ExhaustionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import squeek.applecore.api.hunger.ExhaustionEvent;
 
 public class ExhaustionModifier
 {

@@ -3,8 +3,9 @@ package squeek.applecore.asm.module;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
-import squeek.asmhelper.applecore.ObfHelper;
 import squeek.asmhelper.applecore.ASMHelper;
+import squeek.asmhelper.applecore.ObfHelper;
+
 import static org.objectweb.asm.Opcodes.*;
 
 public class ModulePeacefulRegen implements IClassTransformerModule

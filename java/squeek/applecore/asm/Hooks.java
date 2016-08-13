@@ -27,7 +27,6 @@ import squeek.applecore.api.plants.FertilizationEvent;
 import squeek.applecore.asm.util.IAppleCoreFertilizable;
 import squeek.applecore.asm.util.IAppleCoreFoodStats;
 
-import java.lang.reflect.Method;
 import java.util.Random;
 
 public class Hooks

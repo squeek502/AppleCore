@@ -3,13 +3,8 @@ package squeek.applecore.asm.reference;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.FoodStats;
-import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import squeek.applecore.api.food.FoodValues;
-import squeek.applecore.api.hunger.ExhaustionEvent;
-import squeek.applecore.api.hunger.HealthRegenEvent;
-import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.Hooks;
 
 /*
