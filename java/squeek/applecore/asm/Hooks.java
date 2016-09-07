@@ -54,7 +54,7 @@ public class Hooks
 			}
 		}
 
-		boolean hasNaturalRegen = player.worldObj.getGameRules().hasRule("naturalRegeneration");
+		boolean hasNaturalRegen = player.worldObj.getGameRules().getBoolean("naturalRegeneration");
 
 		Result allowSaturatedRegenResult = Hooks.fireAllowSaturatedRegenEvent(player);
 		boolean shouldDoSaturatedRegen = allowSaturatedRegenResult == Result.ALLOW || (allowSaturatedRegenResult == Result.DEFAULT && hasNaturalRegen && foodStats.getSaturationLevel() > 0.0F && player.shouldHeal() && foodStats.getFoodLevel() >= 20);
