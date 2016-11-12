@@ -9,9 +9,15 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 
 import java.util.Random;
 
+/**
+ * Deprecated in favor of {@link net.minecraftforge.event.world.BlockEvent.CropGrowEvent}
+ */
+@Deprecated
 public class PlantGrowthEvent extends Event
 {
 	/**
+	 * Deprecated in favor of {@link net.minecraftforge.event.world.BlockEvent.CropGrowEvent.Pre}
+	 * <p/>
 	 * Fired each plant update tick to determine whether or not growth is allowed for the {@link #block}.
 	 * 
 	 * This event is fired in various {@link Block#updateTick} overrides.<br>
@@ -23,6 +29,7 @@ public class PlantGrowthEvent extends Event
 	 * {@link Result#ALLOW} will allow the growth tick without condition.
 	 * {@link Result#DENY} will deny the growth tick without condition.
 	 */
+	@Deprecated
 	@HasResult
 	public static class AllowGrowthTick extends PlantGrowthEvent
 	{
@@ -43,6 +50,8 @@ public class PlantGrowthEvent extends Event
 	}
 
 	/**
+	 * Deprecated in favor of {@link net.minecraftforge.event.world.BlockEvent.CropGrowEvent.Post}
+	 * <p/>
 	 * Fired after a plant grows from a growth tick.<br>
 	 * <br>
 	 * Note: {@code currentState.getBlock()} can differ from {@code block}
@@ -55,6 +64,7 @@ public class PlantGrowthEvent extends Event
 	 * <br>
 	 * This event does not have a result. {@link HasResult}<br>
 	 */
+	@Deprecated
 	public static class GrowthTick extends PlantGrowthEvent
 	{
 		public final Block block;
