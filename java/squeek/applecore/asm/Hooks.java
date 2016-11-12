@@ -323,4 +323,18 @@ public class Hooks
 		FertilizationEvent.Fertilized event = new FertilizationEvent.Fertilized(block, world, pos, previousState);
 		MinecraftForge.EVENT_BUS.post(event);
 	}
+
+	public static boolean needFood(FoodStats foodStats)
+	{
+		return foodStats.getFoodLevel() < getMaxHunger(foodStats);
+	}
+
+	public static int getMaxHunger(FoodStats foodStats)
+	{
+		if (!(foodStats instanceof IAppleCoreFoodStats))
+			return 20;
+
+		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
+		return AppleCoreAPI.accessor.getMaxHunger(player);
+	}
 }
