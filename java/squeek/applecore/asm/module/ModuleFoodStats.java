@@ -83,6 +83,14 @@ public class ModuleFoodStats implements IClassTransformerModule
 			else
 				throw new RuntimeException("FoodStats: onUpdate method not found");
 
+			MethodNode needFoodMethodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_75121_c", "needFood", ASMHelper.toMethodDescriptor("Z"));
+			if (needFoodMethodNode != null)
+			{
+				hookNeedFood(classNode, needFoodMethodNode);
+			}
+			else
+				throw new RuntimeException("FoodStats: needFood method not found");
+
 			return ASMHelper.writeClassToBytes(classNode);
 		}
 		return basicClass;
@@ -280,6 +288,15 @@ public class ModuleFoodStats implements IClassTransformerModule
 		targetNode = ASMHelper.findLastInstructionWithOpcode(method, RETURN);
 
 		method.instructions.insertBefore(targetNode, ifCanceled);
+
+		// BIPUSH 20 replaced with GetMaxHunger lookup
+		InsnList needle = new InsnList();
+		needle.add(new VarInsnNode(BIPUSH, 20));
+		InsnList replacement = new InsnList();
+		replacement.add(new VarInsnNode(ALOAD, 0));
+		replacement.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "getMaxHunger", ASMHelper.toMethodDescriptor("I", ASMConstants.FOOD_STATS), false));
+
+		ASMHelper.findAndReplaceAll(method.instructions, needle, replacement);
 	}
 
 	private void hookUpdate(ClassNode classNode, MethodNode updateMethodNode)
@@ -296,6 +313,17 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(ifSkipReturn);
 
 		updateMethodNode.instructions.insertBefore(ASMHelper.findFirstInstruction(updateMethodNode), toInject);
+	}
+
+	private void hookNeedFood(ClassNode classNode, MethodNode needFoodMethodNode)
+	{
+		InsnList toInject = new InsnList();
+		toInject.add(new VarInsnNode(ALOAD, 0));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "needFood", ASMHelper.toMethodDescriptor("Z", ASMConstants.FOOD_STATS), false));
+		toInject.add(new InsnNode(IRETURN));
+
+		needFoodMethodNode.instructions.clear();
+		needFoodMethodNode.instructions.insert(toInject);
 	}
 
 	private boolean tryAddFieldGetter(ClassNode classNode, String methodName, String fieldName, String fieldDescriptor)

@@ -28,7 +28,8 @@ public class FoodStatsModifications extends FoodStats
 	{
 		if (!Hooks.fireFoodStatsAdditionEvent(player, new FoodValues(foodLevel, foodSaturationModifier)))
 		{
-			this.foodLevel = Math.min(foodLevel + this.foodLevel, 20);
+			// 20 replaced with getMaxHunger
+			this.foodLevel = Math.min(foodLevel + this.foodLevel, Hooks.getMaxHunger(this));
 			this.foodSaturationLevel = Math.min(this.foodSaturationLevel + foodLevel * foodSaturationModifier * 2.0F, this.foodLevel);
 		}
 	}
