@@ -27,6 +27,7 @@ import squeek.applecore.api.plants.FertilizationEvent;
 import squeek.applecore.asm.util.IAppleCoreFertilizable;
 import squeek.applecore.asm.util.IAppleCoreFoodStats;
 
+import javax.annotation.Nonnull;
 import java.util.Random;
 
 public class Hooks
@@ -118,12 +119,12 @@ public class Hooks
 		return true;
 	}
 
-	public static FoodValues onFoodStatsAdded(FoodStats foodStats, ItemFood itemFood, ItemStack itemStack, EntityPlayer player)
+	public static FoodValues onFoodStatsAdded(FoodStats foodStats, @Nonnull ItemFood itemFood, @Nonnull ItemStack itemStack, EntityPlayer player)
 	{
 		return AppleCoreAPI.accessor.getFoodValuesForPlayer(itemStack, player);
 	}
 
-	public static void onPostFoodStatsAdded(FoodStats foodStats, ItemFood itemFood, ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded, EntityPlayer player)
+	public static void onPostFoodStatsAdded(FoodStats foodStats, @Nonnull ItemFood itemFood, @Nonnull ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded, EntityPlayer player)
 	{
 		MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemStack, foodValues, hungerAdded, saturationAdded));
 	}
@@ -138,19 +139,20 @@ public class Hooks
 	}
 
 	// should this be moved elsewhere?
+	@Nonnull
 	private static ItemStack getFoodFromBlock(Block block)
 	{
 		if (block instanceof BlockCake)
 			return new ItemStack(Items.CAKE);
 
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	public static FoodValues onBlockFoodEaten(Block block, World world, EntityPlayer player)
 	{
 		ItemStack itemStack = getFoodFromBlock(block);
 
-		if (itemStack != null)
+		if (!itemStack.isEmpty())
 			return AppleCoreAPI.accessor.getFoodValuesForPlayer(itemStack, player);
 		else
 			return null;
@@ -162,7 +164,7 @@ public class Hooks
 		int hungerAdded = player.getFoodStats().getFoodLevel() - prevFoodLevel;
 		float saturationAdded = player.getFoodStats().getSaturationLevel() - prevSaturationLevel;
 
-		if (itemStack != null)
+		if (!itemStack.isEmpty())
 			MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemStack, foodValues, hungerAdded, saturationAdded));
 	}
 
@@ -263,7 +265,7 @@ public class Hooks
 		return event.isCancelable() ? event.isCanceled() : false;
 	}
 
-	private static final Random fertilizeRandom = new Random();
+	private static final Random FERTILIZE_RANDOM = new Random();
 
 	public static void fireAppleCoreFertilizeEvent(Block block, World world, BlockPos pos, IBlockState state, Random random)
 	{
@@ -272,7 +274,7 @@ public class Hooks
 			return;
 
 		if (random == null)
-			random = fertilizeRandom;
+			random = FERTILIZE_RANDOM;
 
 		IBlockState previousState = state;
 

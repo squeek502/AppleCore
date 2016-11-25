@@ -4,6 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import squeek.applecore.api.food.FoodValues;
 
+import javax.annotation.Nonnull;
+
 public interface IAppleCoreAccessor
 {
 	/**
@@ -18,28 +20,28 @@ public interface IAppleCoreAccessor
 	 * item's tooltip, as it is more inclusive than a simple
 	 * {@code instanceof ItemFood} check.
 	 */
-	public boolean isFood(ItemStack food);
+	public boolean isFood(@Nonnull ItemStack food);
 
 	/**
 	 * Get player-agnostic food values.
 	 * 
-	 * @return The food values, or {@code null} if none were found.
+	 * @return The food values, or {@link ItemStack#EMPTY} if none were found.
 	 */
-	public FoodValues getFoodValues(ItemStack food);
+	public FoodValues getFoodValues(@Nonnull ItemStack food);
 
 	/**
 	 * Get player-specific food values.
 	 * 
-	 * @return The food values, or {@code null} if none were found.
+	 * @return The food values, or {@link ItemStack#EMPTY} if none were found.
 	 */
-	public FoodValues getFoodValuesForPlayer(ItemStack food, EntityPlayer player);
+	public FoodValues getFoodValuesForPlayer(@Nonnull ItemStack food, EntityPlayer player);
 
 	/**
 	 * Get unmodified (vanilla) food values.
 	 * 
-	 * @return The food values, or {@code null} if none were found.
+	 * @return The food values, or {@link ItemStack#EMPTY} if none were found.
 	 */
-	public FoodValues getUnmodifiedFoodValues(ItemStack food);
+	public FoodValues getUnmodifiedFoodValues(@Nonnull ItemStack food);
 
 	/**
 	 * @return The current exhaustion level of the {@code player}.

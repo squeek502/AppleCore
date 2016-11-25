@@ -7,6 +7,8 @@ import net.minecraft.util.FoodStats;
 import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.asm.Hooks;
 
+import javax.annotation.Nonnull;
+
 /*
  * The end result of the changes made by ModuleFoodStats
  */
@@ -35,7 +37,7 @@ public class FoodStatsModifications extends FoodStats
 
 	// hooks injected into method
 	@Override
-	public void addStats(ItemFood food, ItemStack stack)
+	public void addStats(@Nonnull ItemFood food, @Nonnull ItemStack stack)
 	{
 		// added lines
 		FoodValues modifiedFoodValues = Hooks.onFoodStatsAdded(this, food, stack, this.player);

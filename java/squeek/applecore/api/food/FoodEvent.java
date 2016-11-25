@@ -9,6 +9,8 @@ import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import squeek.applecore.api.AppleCoreAPI;
 
+import javax.annotation.Nonnull;
+
 /**
  * Base class for all FoodEvent events.<br>
  * <br>
@@ -35,7 +37,7 @@ public abstract class FoodEvent extends Event
 		public final FoodValues unmodifiedFoodValues;
 		public final ItemStack food;
 
-		public GetFoodValues(ItemStack itemStack, FoodValues foodValues)
+		public GetFoodValues(@Nonnull ItemStack itemStack, FoodValues foodValues)
 		{
 			this.food = itemStack;
 			this.foodValues = foodValues;
@@ -65,7 +67,7 @@ public abstract class FoodEvent extends Event
 		public final ItemStack food;
 		public final EntityPlayer player;
 
-		public GetPlayerFoodValues(EntityPlayer player, ItemStack itemStack, FoodValues foodValues)
+		public GetPlayerFoodValues(EntityPlayer player, @Nonnull ItemStack itemStack, FoodValues foodValues)
 		{
 			this.player = player;
 			this.food = itemStack;
@@ -91,7 +93,7 @@ public abstract class FoodEvent extends Event
 		public final ItemStack food;
 		public final EntityPlayer player;
 
-		public FoodEaten(EntityPlayer player, ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded)
+		public FoodEaten(EntityPlayer player, @Nonnull ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded)
 		{
 			this.player = player;
 			this.food = itemStack;

@@ -4,6 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
+
 /**
  * Useful for adding AppleCore compatibility to edible item
  * implementations that do not extend ItemFood for whatever reason.<br>
@@ -27,7 +29,7 @@ public class ItemFoodProxy extends ItemFood
 	/**
 	 * Applies the food values of the edible item to the player
 	 */
-	public void onEaten(ItemStack itemStack, EntityPlayer player)
+	public void onEaten(@Nonnull ItemStack itemStack, EntityPlayer player)
 	{
 		player.getFoodStats().addStats(this, itemStack);
 	}
@@ -36,7 +38,7 @@ public class ItemFoodProxy extends ItemFood
 	 * @return The hunger value of the edible item
 	 */
 	@Override
-	public int getHealAmount(ItemStack stack)
+	public int getHealAmount(@Nonnull ItemStack stack)
 	{
 		return proxyEdible.getFoodValues(stack).hunger;
 	}
@@ -45,7 +47,7 @@ public class ItemFoodProxy extends ItemFood
 	 * @return The saturation modifier of the edible item
 	 */
 	@Override
-	public float getSaturationModifier(ItemStack stack)
+	public float getSaturationModifier(@Nonnull ItemStack stack)
 	{
 		return proxyEdible.getFoodValues(stack).saturationModifier;
 	}

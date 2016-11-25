@@ -3,6 +3,8 @@ package squeek.applecore.api.food;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
+
 /**
  * An interface for edible objects.<br>
  * <br>
@@ -18,5 +20,5 @@ import net.minecraft.item.ItemStack;
  */
 public interface IEdible
 {
-	public FoodValues getFoodValues(ItemStack itemStack);
+	public FoodValues getFoodValues(@Nonnull ItemStack itemStack);
 }

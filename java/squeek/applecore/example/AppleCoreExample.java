@@ -38,9 +38,6 @@ public class AppleCoreExample
 
 		testMetadataFood = new ItemMetadataFood(new int[]{1, 10}, new float[]{2f, 0.1f}).setUnlocalizedName("testMetadataFood");
 		GameRegistry.register(testMetadataFood, new ResourceLocation(ModInfo.MODID + "example", "testMetadataFood"));
-
-		testBlockCrops = new BlockCropsExample();
-		GameRegistry.register(testBlockCrops, new ResourceLocation(ModInfo.MODID + "example", "testBlockCrops"));
 	}
 
 	@EventHandler

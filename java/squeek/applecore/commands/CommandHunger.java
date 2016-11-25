@@ -9,18 +9,22 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import squeek.applecore.api.AppleCoreAPI;
 
+import javax.annotation.Nonnull;
+import java.util.Collections;
 import java.util.List;
 
 public class CommandHunger extends CommandBase
 {
 	@Override
+	@Nonnull
 	public String getName()
 	{
 		return "hunger";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender)
+	@Nonnull
+	public String getUsage(@Nonnull ICommandSender sender)
 	{
 		return "applecore.commands.hunger.usage";
 	}
@@ -32,7 +36,7 @@ public class CommandHunger extends CommandBase
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender commandSender, String[] args) throws CommandException
+	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender commandSender, @Nonnull String[] args) throws CommandException
 	{
 		if (args.length > 0)
 		{
@@ -52,11 +56,12 @@ public class CommandHunger extends CommandBase
 	}
 
 	@Override
+	@Nonnull
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
 	{
 		if (args.length == 1)
 			return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
 		else
-			return null;
+			return Collections.emptyList();
 	}
 }

@@ -12,6 +12,8 @@ import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.HungerRegenEvent;
 import squeek.applecore.asm.Hooks;
 
+import javax.annotation.Nonnull;
+
 public abstract class EntityPlayerModifications extends EntityPlayer
 {
 	// modified initialization of foodStats field to use the added constructor
@@ -22,7 +24,7 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 
 	// a single line added
 	@Override
-	public void setActiveHand(EnumHand hand)
+	public void setActiveHand(@Nonnull EnumHand hand)
 	{
 		ItemStack stack = this.getHeldItem(hand);
 

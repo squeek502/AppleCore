@@ -6,6 +6,8 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 
+import javax.annotation.Nonnull;
+
 /**
  * An example implementation of a metadata-based food item
  * that is AppleCore compatible
@@ -28,7 +30,7 @@ public class ItemMetadataFood extends ItemFood
 	 * @return The hunger value of the ItemStack
 	 */
 	@Override
-	public int getHealAmount(ItemStack itemStack)
+	public int getHealAmount(@Nonnull ItemStack itemStack)
 	{
 		return hungerValues[itemStack.getItemDamage()];
 	}
@@ -43,7 +45,7 @@ public class ItemMetadataFood extends ItemFood
 	}
 
 	@Override
-	public void getSubItems(Item item, CreativeTabs creativeTabs, NonNullList<ItemStack> subItems)
+	public void getSubItems(@Nonnull Item item, CreativeTabs creativeTabs, NonNullList<ItemStack> subItems)
 	{
 		for (int meta = 0; meta < Math.min(hungerValues.length, saturationModifiers.length); meta++)
 		{

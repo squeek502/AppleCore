@@ -18,6 +18,8 @@ import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.food.IEdible;
 import squeek.applecore.api.food.ItemFoodProxy;
 
+import javax.annotation.Nonnull;
+
 @Optional.Interface(iface = "squeek.applecore.api.food.IEdible", modid = "AppleCore")
 public class ItemNonStandardFood extends Item implements IEdible
 {
@@ -27,7 +29,7 @@ public class ItemNonStandardFood extends Item implements IEdible
 
 	@Optional.Method(modid = "AppleCore")
 	@Override
-	public FoodValues getFoodValues(ItemStack itemStack)
+	public FoodValues getFoodValues(@Nonnull ItemStack itemStack)
 	{
 		return new FoodValues(1, 1f);
 	}
@@ -45,7 +47,8 @@ public class ItemNonStandardFood extends Item implements IEdible
 	}
 
 	@Override
-	public ItemStack onItemUseFinish(ItemStack stack, World world, EntityLivingBase entityLiving) {
+	@Nonnull
+	public ItemStack onItemUseFinish(@Nonnull ItemStack stack, World world, EntityLivingBase entityLiving) {
 		stack.shrink(1);
 
 		if (entityLiving instanceof EntityPlayer)
@@ -70,6 +73,7 @@ public class ItemNonStandardFood extends Item implements IEdible
 	}
 
 	@Override
+	@Nonnull
 	public EnumAction getItemUseAction(ItemStack itemStack)
 	{
 		return EnumAction.EAT;
@@ -82,7 +86,8 @@ public class ItemNonStandardFood extends Item implements IEdible
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
+	@Nonnull
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand)
 	{
         ItemStack stack = player.getHeldItem(hand);
 		if (player.canEat(true))
