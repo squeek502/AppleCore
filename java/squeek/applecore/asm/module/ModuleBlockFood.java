@@ -22,7 +22,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180682_b", "eatCake", ASMHelper.toMethodDescriptor("V", ASMConstants.WORLD, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE, ASMConstants.PLAYER));
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180682_b", "eatCake", ASMHelper.toMethodDescriptor("Z", ASMConstants.WORLD, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE, ASMConstants.PLAYER));
 
 		if (methodNode != null)
 		{
@@ -35,7 +35,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 	private void addOnBlockFoodEatenHook(ClassNode classNode, MethodNode method)
 	{
-		AbstractInsnNode firstUniqueInsnInsideIf = ASMHelper.find(method.instructions, new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.STAT_LIST), InsnComparator.WILDCARD,ASMHelper.toDescriptor(ASMConstants.STAT_BASE)));
+		AbstractInsnNode firstUniqueInsnInsideIf = ASMHelper.find(method.instructions, new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.STAT_LIST), InsnComparator.WILDCARD, ASMHelper.toDescriptor(ASMConstants.STAT_BASE)));
 
 		if (firstUniqueInsnInsideIf == null)
 			throw new RuntimeException("Target instruction not found in " + classNode.name + "." + method.name);

@@ -54,7 +54,7 @@ public class Hooks
 			}
 		}
 
-		boolean hasNaturalRegen = player.worldObj.getGameRules().getBoolean("naturalRegeneration");
+		boolean hasNaturalRegen = player.world.getGameRules().getBoolean("naturalRegeneration");
 
 		Result allowSaturatedRegenResult = Hooks.fireAllowSaturatedRegenEvent(player);
 		boolean shouldDoSaturatedRegen = allowSaturatedRegenResult == Result.ALLOW || (allowSaturatedRegenResult == Result.DEFAULT && hasNaturalRegen && foodStats.getSaturationLevel() > 0.0F && player.shouldHeal() && foodStats.getFoodLevel() >= 20);
@@ -261,21 +261,6 @@ public class Hooks
 		FoodEvent.FoodStatsAddition event = new FoodEvent.FoodStatsAddition(player, foodValuesToBeAdded);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.isCancelable() ? event.isCanceled() : false;
-	}
-
-	public static Result fireAllowPlantGrowthEvent(Block block, World world, BlockPos pos, IBlockState state, Random random)
-	{
-		return AppleCoreAPI.dispatcher.validatePlantGrowth(block, world, pos, state, random);
-	}
-
-	public static void fireOnGrowthEvent(Block block, World world, BlockPos pos, IBlockState currentState, IBlockState previousState)
-	{
-		AppleCoreAPI.dispatcher.announcePlantGrowth(block, world, pos, currentState, previousState);
-	}
-
-	public static void fireOnGrowthEvent(Block block, World world, BlockPos pos, IBlockState previousState)
-	{
-		AppleCoreAPI.dispatcher.announcePlantGrowth(block, world, pos, previousState);
 	}
 
 	private static final Random fertilizeRandom = new Random();

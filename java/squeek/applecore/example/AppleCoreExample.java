@@ -18,12 +18,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import squeek.applecore.ModInfo;
 
-@Mod(modid = ModInfo.MODID + "Example", version = ModInfo.VERSION, dependencies = "required-after:AppleCore")
+@Mod(modid = ModInfo.MODID + "example", version = ModInfo.VERSION, dependencies = "required-after:applecore")
 public class AppleCoreExample
 {
-	public static final Logger LOG = LogManager.getLogger(ModInfo.MODID + "Example");
+	public static final Logger LOG = LogManager.getLogger(ModInfo.MODID + "example");
 
-	@Instance(ModInfo.MODID + "Example")
+	@Instance(ModInfo.MODID + "example")
 	public static AppleCoreExample instance;
 
 	public static Item testFood;
@@ -34,13 +34,13 @@ public class AppleCoreExample
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		testFood = new ItemNonStandardFood().setUnlocalizedName("testNonStandardFood");
-		GameRegistry.register(testFood, new ResourceLocation(ModInfo.MODID + "Example", "testNonStandardFood"));
+		GameRegistry.register(testFood, new ResourceLocation(ModInfo.MODID + "example", "testNonStandardFood"));
 
 		testMetadataFood = new ItemMetadataFood(new int[]{1, 10}, new float[]{2f, 0.1f}).setUnlocalizedName("testMetadataFood");
-		GameRegistry.register(testMetadataFood, new ResourceLocation(ModInfo.MODID + "Example", "testMetadataFood"));
+		GameRegistry.register(testMetadataFood, new ResourceLocation(ModInfo.MODID + "example", "testMetadataFood"));
 
 		testBlockCrops = new BlockCropsExample();
-		GameRegistry.register(testBlockCrops, new ResourceLocation(ModInfo.MODID + "Example", "testBlockCrops"));
+		GameRegistry.register(testBlockCrops, new ResourceLocation(ModInfo.MODID + "example", "testBlockCrops"));
 	}
 
 	@EventHandler
@@ -74,7 +74,6 @@ public class AppleCoreExample
 			MinecraftForge.EVENT_BUS.register(new HealthRegenModifier());
 			MinecraftForge.EVENT_BUS.register(new HungerRegenModifier());
 			MinecraftForge.EVENT_BUS.register(new StarvationModifier());
-			MinecraftForge.EVENT_BUS.register(new PlantGrowthModifier());
 			MinecraftForge.EVENT_BUS.register(new FertilizationModifier());
 		}
 		if (event.getSide() == Side.CLIENT)

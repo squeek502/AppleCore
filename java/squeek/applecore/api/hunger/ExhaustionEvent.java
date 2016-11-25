@@ -102,7 +102,7 @@ public abstract class ExhaustionEvent extends Event
 			if (!shouldDecreaseSaturationLevel)
 				deltaSaturation = 0f;
 
-			EnumDifficulty difficulty = player.worldObj.getDifficulty();
+			EnumDifficulty difficulty = player.world.getDifficulty();
 			boolean shouldDecreaseFoodLevel = !shouldDecreaseSaturationLevel && difficulty != EnumDifficulty.PEACEFUL;
 
 			if (!shouldDecreaseFoodLevel)

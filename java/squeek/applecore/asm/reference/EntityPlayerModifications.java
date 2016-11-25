@@ -26,7 +26,7 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 	{
 		ItemStack stack = this.getHeldItem(hand);
 
-		if (stack != null && !this.isHandActive())
+		if (!stack.isEmpty() && !this.isHandActive())
 		{
 			int duration = ForgeEventFactory.onItemUseStart(this, stack, stack.getMaxItemUseDuration());
 			if (duration <= 0) return;
@@ -36,7 +36,7 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 			// added:
 			this.itemInUseMaxDuration = duration;
 
-			if (!this.worldObj.isRemote)
+			if (!this.world.isRemote)
 			{
 				int i = 1;
 
@@ -67,7 +67,7 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 		}
 
 		// modified
-		if (this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL && this.worldObj.getGameRules().getBoolean("naturalRegeneration"))
+		if (this.world.getDifficulty() == EnumDifficulty.PEACEFUL && this.world.getGameRules().getBoolean("naturalRegeneration"))
 		{
 			if (this.getHealth() < this.getMaxHealth() && this.ticksExisted % 20 == 0)
 			{

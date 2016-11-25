@@ -4,8 +4,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-
-import java.util.List;
+import net.minecraft.util.NonNullList;
 
 /**
  * An example implementation of a metadata-based food item
@@ -44,7 +43,7 @@ public class ItemMetadataFood extends ItemFood
 	}
 
 	@Override
-	public void getSubItems(Item item, CreativeTabs creativeTabs, List<ItemStack> subItems)
+	public void getSubItems(Item item, CreativeTabs creativeTabs, NonNullList<ItemStack> subItems)
 	{
 		for (int meta = 0; meta < Math.min(hungerValues.length, saturationModifiers.length); meta++)
 		{

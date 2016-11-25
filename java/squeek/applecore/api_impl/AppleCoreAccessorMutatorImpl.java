@@ -18,6 +18,8 @@ import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.util.IAppleCoreFoodStats;
 
+import javax.annotation.Nonnull;
+
 public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCoreMutator
 {
 	INSTANCE;
@@ -32,14 +34,14 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	 * IAppleCoreAccessor implementation
 	 */
 	@Override
-	public boolean isFood(ItemStack food)
+	public boolean isFood(@Nonnull ItemStack food)
 	{
 		return isEdible(food) && getUnmodifiedFoodValues(food) != null;
 	}
 
-	private boolean isEdible(ItemStack food)
+	private boolean isEdible(@Nonnull ItemStack food)
 	{
-		if (food == null || food.getItem() == null)
+		if (food.isEmpty() || food.getItem() == null)
 			return false;
 
 		// assume Block-based foods are edible
@@ -51,9 +53,9 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public FoodValues getUnmodifiedFoodValues(ItemStack food)
+	public FoodValues getUnmodifiedFoodValues(@Nonnull ItemStack food)
 	{
-		if (food != null && food.getItem() != null)
+		if (!food.isEmpty() && food.getItem() != null)
 		{
 			if (food.getItem() instanceof IEdible)
 				return ((IEdible) food.getItem()).getFoodValues(food);
@@ -65,13 +67,13 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		return null;
 	}
 
-	private FoodValues getItemFoodValues(ItemFood itemFood, ItemStack itemStack)
+	private FoodValues getItemFoodValues(@Nonnull ItemFood itemFood, @Nonnull ItemStack itemStack)
 	{
 		return new FoodValues(itemFood.getHealAmount(itemStack), itemFood.getSaturationModifier(itemStack));
 	}
 
 	@Override
-	public FoodValues getFoodValues(ItemStack food)
+	public FoodValues getFoodValues(@Nonnull ItemStack food)
 	{
 		FoodValues foodValues = getUnmodifiedFoodValues(food);
 		if (foodValues != null)
@@ -84,7 +86,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public FoodValues getFoodValuesForPlayer(ItemStack food, EntityPlayer player)
+	public FoodValues getFoodValuesForPlayer(@Nonnull ItemStack food, EntityPlayer player)
 	{
 		FoodValues foodValues = getFoodValues(food);
 		if (foodValues != null)

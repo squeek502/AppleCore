@@ -45,8 +45,8 @@ public class ItemNonStandardFood extends Item implements IEdible
 	}
 
 	@Override
-	public ItemStack onItemUseFinish(ItemStack itemStack, World world, EntityLivingBase entityLiving) {
-		--itemStack.stackSize;
+	public ItemStack onItemUseFinish(ItemStack stack, World world, EntityLivingBase entityLiving) {
+		stack.shrink(1);
 
 		if (entityLiving instanceof EntityPlayer)
 		{
@@ -54,7 +54,7 @@ public class ItemNonStandardFood extends Item implements IEdible
 
 			if (Loader.isModLoaded("AppleCore"))
 			{
-				onEatenCompatibility(itemStack, player);
+				onEatenCompatibility(stack, player);
 			}
 			else
 			{
@@ -66,7 +66,7 @@ public class ItemNonStandardFood extends Item implements IEdible
 			world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.5F, world.rand.nextFloat() * 0.1F + 0.9F);
 		}
 
-		return itemStack;
+		return stack;
 	}
 
 	@Override
@@ -82,8 +82,9 @@ public class ItemNonStandardFood extends Item implements IEdible
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand)
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
 	{
+        ItemStack stack = player.getHeldItem(hand);
 		if (player.canEat(true))
 		{
 			player.setActiveHand(hand);
