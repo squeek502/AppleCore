@@ -262,7 +262,7 @@ public class Hooks
 	{
 		FoodEvent.FoodStatsAddition event = new FoodEvent.FoodStatsAddition(player, foodValuesToBeAdded);
 		MinecraftForge.EVENT_BUS.post(event);
-		return event.isCancelable() ? event.isCanceled() : false;
+		return event.isCancelable() && event.isCanceled();
 	}
 
 	private static final Random FERTILIZE_RANDOM = new Random();

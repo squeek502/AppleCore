@@ -24,7 +24,7 @@ import java.util.Map;
 @IFMLLoadingPlugin.SortingIndex(1100)
 @IFMLLoadingPlugin.MCVersion("1.11")
 @IFMLLoadingPlugin.TransformerExclusions({"squeek.applecore.asm", "squeek.asmhelper"})
-@Mod(modid = ModInfo.MODID, name = ModInfo.MODNAME, version = ModInfo.VERSION, acceptableRemoteVersions = "*", dependencies = "after:jei@[4.0,); required-after:forge@[13.19,)")
+@Mod(modid = ModInfo.MODID, name = ModInfo.MODNAME, version = ModInfo.VERSION, acceptableRemoteVersions = "*", dependencies = "required-after:forge@[13.19,)")
 public class AppleCore implements IFMLLoadingPlugin
 {
 	public static final Logger LOG = LogManager.getLogger(ModInfo.MODID);

@@ -203,7 +203,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		InsnList saturationNeedle = new InsnList();
 		saturationNeedle.add(new VarInsnNode(ALOAD, 1));
 		saturationNeedle.add(new VarInsnNode(ALOAD, 2));
-		saturationNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.item.ItemFood"), ObfHelper.isObfuscated() ? "func_150906_h" : "getSaturationModifier", ASMHelper.toMethodDescriptor("F", ASMHelper.toDescriptor(ASMConstants.STACK)), false));
+		saturationNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.ITEM_FOOD), ObfHelper.isObfuscated() ? "func_150906_h" : "getSaturationModifier", ASMHelper.toMethodDescriptor("F", ASMHelper.toDescriptor(ASMConstants.STACK)), false));
 
 		InsnList saturationReplacement = new InsnList();
 		saturationReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));

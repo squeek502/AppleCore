@@ -11,7 +11,7 @@ public class TransformerModuleHandler implements IClassTransformer
 	public static final String WILDCARD = "*";
 	public static final String[] ALL_CLASSES = new String[] { WILDCARD };
 
-	private static final List<IClassTransformerModule> transformerModules = new ArrayList<IClassTransformerModule>();
+	private static final List<IClassTransformerModule> TRANSFORMER_MODULES = new ArrayList<IClassTransformerModule>();
 	static
 	{
 		registerTransformerModule(new ModuleFoodStats());
@@ -23,7 +23,7 @@ public class TransformerModuleHandler implements IClassTransformer
 
 	public static void registerTransformerModule(IClassTransformerModule transformerModule)
 	{
-		transformerModules.add(transformerModule);
+		TRANSFORMER_MODULES.add(transformerModule);
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class TransformerModuleHandler implements IClassTransformer
 		if (basicClass == null)
 			return null;
 
-		for (IClassTransformerModule transformerModule : transformerModules)
+		for (IClassTransformerModule transformerModule : TRANSFORMER_MODULES)
 		{
 			for (String classToTransform : transformerModule.getClassesToTransform())
 			{
