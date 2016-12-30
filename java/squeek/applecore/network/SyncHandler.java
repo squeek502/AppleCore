@@ -15,6 +15,10 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class SyncHandler
 {
 	public static final SimpleNetworkWrapper channel = NetworkRegistry.INSTANCE.newSimpleChannel(ModInfo.MODID);
@@ -35,8 +39,8 @@ public class SyncHandler
 	 * Sync exhaustion (vanilla MC does not sync it at all)
 	 * Sync difficulty (vanilla MC does not sync it on servers)
 	 */
-	private float lastSaturationLevel = 0;
-	private float lastExhaustionLevel = 0;
+	private static final Map<UUID, Float> lastSaturationLevels = new HashMap<UUID, Float>();
+	private static final Map<UUID, Float> lastExhaustionLevels = new HashMap<UUID, Float>();
 	private EnumDifficulty lastDifficultySetting = null;
 
 	@SubscribeEvent
@@ -46,18 +50,20 @@ public class SyncHandler
 			return;
 
 		EntityPlayerMP player = (EntityPlayerMP) event.entity;
+		Float lastSaturationLevel = lastSaturationLevels.get(player.getUniqueID());
+		Float lastExhaustionLevel = lastExhaustionLevels.get(player.getUniqueID());
 
-		if (this.lastSaturationLevel != player.getFoodStats().getSaturationLevel())
+		if (lastSaturationLevel == null || lastSaturationLevel != player.getFoodStats().getSaturationLevel())
 		{
 			channel.sendTo(new MessageSaturationSync(player.getFoodStats().getSaturationLevel()), player);
-			this.lastSaturationLevel = player.getFoodStats().getSaturationLevel();
+			lastSaturationLevels.put(player.getUniqueID(), player.getFoodStats().getSaturationLevel());
 		}
 
 		float exhaustionLevel = AppleCoreAPI.accessor.getExhaustion(player);
-		if (Math.abs(this.lastExhaustionLevel - exhaustionLevel) >= 0.01f)
+		if (lastExhaustionLevel == null || Math.abs(lastExhaustionLevel - exhaustionLevel) >= 0.01f)
 		{
 			channel.sendTo(new MessageExhaustionSync(exhaustionLevel), player);
-			this.lastExhaustionLevel = exhaustionLevel;
+			lastExhaustionLevels.put(player.getUniqueID(), exhaustionLevel);
 		}
 	}
 
