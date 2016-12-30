@@ -5,6 +5,7 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import squeek.applecore.ModConfig;
 import squeek.applecore.ModInfo;
 import squeek.applecore.api.AppleCoreAPI;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -60,7 +61,7 @@ public class SyncHandler
 		}
 
 		float exhaustionLevel = AppleCoreAPI.accessor.getExhaustion(player);
-		if (lastExhaustionLevel == null || Math.abs(lastExhaustionLevel - exhaustionLevel) >= 0.01f)
+		if (lastExhaustionLevel == null || Math.abs(lastExhaustionLevel - exhaustionLevel) >= ModConfig.EXHAUSTION_SYNC_THRESHOLD)
 		{
 			channel.sendTo(new MessageExhaustionSync(exhaustionLevel), player);
 			lastExhaustionLevels.put(player.getUniqueID(), exhaustionLevel);
