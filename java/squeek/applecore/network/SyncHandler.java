@@ -1,5 +1,6 @@
 package squeek.applecore.network;
 
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldServer;
@@ -66,6 +67,13 @@ public class SyncHandler
 			channel.sendTo(new MessageExhaustionSync(exhaustionLevel), player);
 			lastExhaustionLevels.put(player.getUniqueID(), exhaustionLevel);
 		}
+	}
+
+	@SubscribeEvent
+	public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
+	{
+		lastSaturationLevels.remove(event.player.getUniqueID());
+		lastExhaustionLevels.remove(event.player.getUniqueID());
 	}
 
 	@SubscribeEvent
