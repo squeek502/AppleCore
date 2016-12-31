@@ -11,6 +11,20 @@ public class ModConfig
 	public static Configuration config;
 
 	/*
+	 * SERVER
+	 */
+	public static final String CATEGORY_SERVER = "server";
+	private static final String CATEGORY_SERVER_COMMENT =
+		"These config settings are server-side only";
+
+	public static double EXHAUSTION_SYNC_THRESHOLD = ModConfig.EXHAUSTION_SYNC_THRESHOLD_DEFAULT;
+	public static double EXHAUSTION_SYNC_THRESHOLD_DEFAULT = 0.01D;
+	private static final String EXHAUSTION_SYNC_THRESHOLD_NAME = "exhaustion.sync.threshold";
+	private static final String EXHAUSTION_SYNC_THRESHOLD_COMMENT =
+		"The maximum difference between the server's value for exhaustion and the client's before the value is syncronized from the server to the client.\n"
+			+ "Raising this value will cause fewer packets to be sent, but will make the client's exhaustion values appear more choppy";
+
+	/*
 	 * CLIENT
 	 */
 	public static final String CATEGORY_CLIENT = "client";
@@ -69,6 +83,13 @@ public class ModConfig
 
 	public static void sync()
 	{
+		/*
+		 * SERVER
+		 */
+		config.getCategory(CATEGORY_SERVER).setComment(CATEGORY_SERVER_COMMENT);
+
+		EXHAUSTION_SYNC_THRESHOLD = config.get(CATEGORY_SERVER, EXHAUSTION_SYNC_THRESHOLD_NAME, EXHAUSTION_SYNC_THRESHOLD_DEFAULT, EXHAUSTION_SYNC_THRESHOLD_COMMENT).getDouble(EXHAUSTION_SYNC_THRESHOLD_DEFAULT);
+
 		/*
 		 * CLIENT
 		 */
