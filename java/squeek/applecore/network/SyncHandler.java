@@ -1,5 +1,6 @@
 package squeek.applecore.network;
 
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -7,6 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import squeek.applecore.ModInfo;
@@ -26,6 +28,15 @@ public class SyncHandler
 	 * Sync difficulty (vanilla MC does not sync it on servers)
 	 */
 	private EnumDifficulty lastDifficultySetting = null;
+
+	@SubscribeEvent
+	public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
+	{
+		if (!(event.player instanceof EntityPlayerMP))
+			return;
+
+		CHANNEL.sendTo(new MessageDifficultySync(event.player.world.getDifficulty()), (EntityPlayerMP) event.player);
+	}
 
 	@SubscribeEvent
 	public void onWorldTick(WorldTickEvent event)
