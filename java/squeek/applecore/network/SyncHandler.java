@@ -72,8 +72,12 @@ public class SyncHandler
 	@SubscribeEvent
 	public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
 	{
+		if (!(event.player instanceof EntityPlayerMP))
+			return;
+
 		lastSaturationLevels.remove(event.player.getUniqueID());
 		lastExhaustionLevels.remove(event.player.getUniqueID());
+		channel.sendTo(new MessageDifficultySync(event.player.worldObj.difficultySetting), (EntityPlayerMP) event.player);
 	}
 
 	@SubscribeEvent
