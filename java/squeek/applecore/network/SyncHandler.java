@@ -9,10 +9,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
+import squeek.applecore.ModConfig;
 import squeek.applecore.ModInfo;
 import squeek.applecore.api.AppleCoreAPI;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class SyncHandler
 {
@@ -32,8 +38,8 @@ public class SyncHandler
 	 * Sync exhaustion (vanilla MC does not sync it at all)
 	 * Sync difficulty (vanilla MC does not sync it on servers)
 	 */
-	private float lastSaturationLevel = 0;
-	private float lastExhaustionLevel = 0;
+	private static final Map<UUID, Float> lastSaturationLevels = new HashMap<UUID, Float>();
+	private static final Map<UUID, Float> lastExhaustionLevels = new HashMap<UUID, Float>();
 	private EnumDifficulty lastDifficultySetting = null;
 
 	@SubscribeEvent
@@ -43,19 +49,32 @@ public class SyncHandler
 			return;
 
 		EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
+		Float lastSaturationLevel = lastSaturationLevels.get(player.getUniqueID());
+		Float lastExhaustionLevel = lastExhaustionLevels.get(player.getUniqueID());
 
-		if (this.lastSaturationLevel != player.getFoodStats().getSaturationLevel())
+		if (lastSaturationLevel == null || lastSaturationLevel != player.getFoodStats().getSaturationLevel())
 		{
 			CHANNEL.sendTo(new MessageSaturationSync(player.getFoodStats().getSaturationLevel()), player);
-			this.lastSaturationLevel = player.getFoodStats().getSaturationLevel();
+			lastSaturationLevels.put(player.getUniqueID(), player.getFoodStats().getSaturationLevel());
 		}
 
 		float exhaustionLevel = AppleCoreAPI.accessor.getExhaustion(player);
-		if (Math.abs(this.lastExhaustionLevel - exhaustionLevel) >= 0.01f)
+		if (lastExhaustionLevel == null || Math.abs(lastExhaustionLevel - exhaustionLevel) >= ModConfig.EXHAUSTION_SYNC_THRESHOLD)
 		{
 			CHANNEL.sendTo(new MessageExhaustionSync(exhaustionLevel), player);
-			this.lastExhaustionLevel = exhaustionLevel;
+			lastExhaustionLevels.put(player.getUniqueID(), exhaustionLevel);
 		}
+	}
+
+	@SubscribeEvent
+	public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
+	{
+		if (!(event.player instanceof EntityPlayerMP))
+			return;
+
+		lastSaturationLevels.remove(event.player.getUniqueID());
+		lastExhaustionLevels.remove(event.player.getUniqueID());
+		CHANNEL.sendTo(new MessageDifficultySync(event.player.worldObj.getDifficulty()), (EntityPlayerMP) event.player);
 	}
 
 	@SubscribeEvent
