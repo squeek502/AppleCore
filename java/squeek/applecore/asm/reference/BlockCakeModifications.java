@@ -12,9 +12,13 @@ import squeek.applecore.asm.Hooks;
 public class BlockCakeModifications extends BlockCake
 {
 	@SuppressWarnings("unused")
-	private void eatCake(World world, BlockPos pos, IBlockState state, EntityPlayer player)
+	private boolean eatCake(World world, BlockPos pos, IBlockState state, EntityPlayer player)
 	{
-		if (player.canEat(false))
+		if (!player.canEat(false))
+		{
+			return false;
+		}
+		else
 		{
 			// begin modifications
 			FoodValues modifiedFoodValues = Hooks.onBlockFoodEaten(this, world, player);
@@ -38,6 +42,8 @@ public class BlockCakeModifications extends BlockCake
 			{
 				world.setBlockToAir(pos);
 			}
+
+			return true;
 		}
 	}
 }

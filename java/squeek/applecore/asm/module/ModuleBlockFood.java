@@ -40,7 +40,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		if (firstUniqueInsnInsideIf == null)
 			throw new RuntimeException("Target instruction not found in " + classNode.name + "." + method.name);
 
-		AbstractInsnNode returnInsn = ASMHelper.findPreviousInstructionWithOpcode(method.instructions.getLast(), RETURN);
+		AbstractInsnNode returnInsn = ASMHelper.findPreviousInstructionWithOpcode(method.instructions.getLast(), IRETURN);
 		AbstractInsnNode prevLabel = ASMHelper.findPreviousLabelOrLineNumber(returnInsn);
 		while (prevLabel != null && prevLabel.getType() != AbstractInsnNode.LABEL)
 			prevLabel = ASMHelper.findPreviousLabelOrLineNumber(prevLabel);
