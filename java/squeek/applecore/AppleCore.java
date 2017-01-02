@@ -22,9 +22,9 @@ import java.io.InputStream;
 import java.util.Map;
 
 @IFMLLoadingPlugin.SortingIndex(1100)
-@IFMLLoadingPlugin.MCVersion("1.11")
+@IFMLLoadingPlugin.MCVersion("1.11.2")
 @IFMLLoadingPlugin.TransformerExclusions({"squeek.applecore.asm", "squeek.asmhelper"})
-@Mod(modid = ModInfo.MODID, name = ModInfo.MODNAME, version = ModInfo.VERSION, acceptableRemoteVersions = "*", dependencies = "required-after:forge@[13.19,)")
+@Mod(modid = ModInfo.MODID, name = ModInfo.MODNAME, version = ModInfo.VERSION, acceptableRemoteVersions = "*", dependencies = "required-after:forge@[13.20,)")
 public class AppleCore implements IFMLLoadingPlugin
 {
 	public static final Logger LOG = LogManager.getLogger(ModInfo.MODID);

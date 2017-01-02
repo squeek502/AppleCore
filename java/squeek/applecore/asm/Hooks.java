@@ -106,7 +106,7 @@ public class Hooks
 				StarvationEvent.Starve starveEvent = Hooks.fireStarveEvent(player);
 				if (!starveEvent.isCanceled())
 				{
-					player.attackEntityFrom(DamageSource.starve, starveEvent.starveDamage);
+					player.attackEntityFrom(DamageSource.STARVE, starveEvent.starveDamage);
 				}
 				appleCoreFoodStats.setStarveTimer(0);
 			}
