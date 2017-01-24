@@ -39,7 +39,7 @@ public class MessageDifficultySync implements IMessage, IMessageHandler<MessageD
 		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
 			@Override
 			public void run() {
-				NetworkHelper.getSidedPlayer(ctx).worldObj.getWorldInfo().setDifficulty(message.difficulty);
+				NetworkHelper.getSidedPlayer(ctx).world.getWorldInfo().setDifficulty(message.difficulty);
 			}
 		});
 		return null;
