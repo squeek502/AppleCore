@@ -24,7 +24,7 @@ import java.util.Map;
 @IFMLLoadingPlugin.SortingIndex(1100)
 @IFMLLoadingPlugin.MCVersion("1.11.2")
 @IFMLLoadingPlugin.TransformerExclusions({"squeek.applecore.asm", "squeek.asmhelper"})
-@Mod(modid = ModInfo.MODID, name = ModInfo.MODNAME, version = ModInfo.VERSION, acceptableRemoteVersions = "*", dependencies = "required-after:forge@[13.20,)")
+@Mod(modid = ModInfo.MODID, name = ModInfo.MODNAME, version = ModInfo.VERSION, acceptedMinecraftVersions="[1.11.2]", acceptableRemoteVersions = "*", dependencies = "required-after:forge@[13.20,)")
 public class AppleCore implements IFMLLoadingPlugin
 {
 	public static final Logger LOG = LogManager.getLogger(ModInfo.MODID);
