@@ -35,7 +35,7 @@ public class SyncHandler
 		if (!(event.player instanceof EntityPlayerMP))
 			return;
 
-		CHANNEL.sendTo(new MessageDifficultySync(event.player.worldObj.getDifficulty()), (EntityPlayerMP) event.player);
+		CHANNEL.sendTo(new MessageDifficultySync(event.player.world.getDifficulty()), (EntityPlayerMP) event.player);
 	}
 
 	@SubscribeEvent

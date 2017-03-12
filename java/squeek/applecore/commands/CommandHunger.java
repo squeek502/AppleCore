@@ -14,13 +14,13 @@ import java.util.List;
 public class CommandHunger extends CommandBase
 {
 	@Override
-	public String getCommandName()
+	public String getName()
 	{
 		return "hunger";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender icommandsender)
+	public String getUsage(ICommandSender icommandsender)
 	{
 		return "applecore.commands.hunger.usage";
 	}
@@ -47,15 +47,15 @@ public class CommandHunger extends CommandBase
 		}
 		else
 		{
-			throw new WrongUsageException(getCommandUsage(commandSender));
+			throw new WrongUsageException(getUsage(commandSender));
 		}
 	}
 
 	@Override
-	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
 	{
 		if (args.length == 1)
-			return getListOfStringsMatchingLastWord(args, server.getAllUsernames());
+			return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
 		else
 			return null;
 	}

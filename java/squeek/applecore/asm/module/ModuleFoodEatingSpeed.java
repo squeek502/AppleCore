@@ -67,7 +67,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.ITEM_RENDERER), ObfHelper.isObfuscated() ? "field_78455_a" : "mc", ASMHelper.toDescriptor(ASMConstants.MINECRAFT)));
-		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.MINECRAFT), ObfHelper.isObfuscated() ? "field_71439_g" : "thePlayer", ASMHelper.toDescriptor(ASMConstants.PLAYER_SP)));
+		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.MINECRAFT), ObfHelper.isObfuscated() ? "field_71439_g" : "player", ASMHelper.toDescriptor(ASMConstants.PLAYER_SP)));
 		replacement.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.PLAYER), "itemInUseMaxDuration", "I"));
 
 		boolean replaced = ASMHelper.findAndReplace(method.instructions, needle, replacement) != null;

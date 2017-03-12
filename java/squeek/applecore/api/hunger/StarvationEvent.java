@@ -86,7 +86,7 @@ public abstract class StarvationEvent extends Event
 		{
 			super(player);
 
-			EnumDifficulty difficulty = player.worldObj.getDifficulty();
+			EnumDifficulty difficulty = player.world.getDifficulty();
 			boolean shouldDoDamage = player.getHealth() > 10.0F || difficulty == EnumDifficulty.HARD || player.getHealth() > 1.0F && difficulty == EnumDifficulty.NORMAL;
 
 			if (!shouldDoDamage)
