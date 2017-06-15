@@ -8,14 +8,14 @@ import net.minecraftforge.common.MinecraftForge;
 import squeek.applecore.api.AppleCoreAPI;
 
 /**
- * Base class for all FoodEvent events.<br>
+ * Base class for all HungerEvent events.<br>
  * <br>
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
  */
 public abstract class HungerEvent extends Event
 {
 	/**
-	 * Fired every time food values are retrieved to allow player-independent control over their values.
+	 * Fired every time max hunger level is retrieved to allow control over its value.
 	 *
 	 * This event is fired in {@link FoodStats#needFood()} and in {@link AppleCoreAPI}.<br>
 	 * <br>
