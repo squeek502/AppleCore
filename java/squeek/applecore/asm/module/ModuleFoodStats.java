@@ -291,7 +291,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 		// BIPUSH 20 replaced with GetMaxHunger lookup
 		InsnList needle = new InsnList();
-		needle.add(new VarInsnNode(BIPUSH, 20));
+		needle.add(new IntInsnNode(BIPUSH, 20));
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
 		replacement.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "getMaxHunger", ASMHelper.toMethodDescriptor("I", ASMConstants.FOOD_STATS), false));
