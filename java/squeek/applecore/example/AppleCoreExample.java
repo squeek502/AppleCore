@@ -1,6 +1,7 @@
 package squeek.applecore.example;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -76,6 +77,7 @@ public class AppleCoreExample
 			MinecraftForge.EVENT_BUS.register(new StarvationModifier());
 			MinecraftForge.EVENT_BUS.register(new PlantGrowthModifier());
 			MinecraftForge.EVENT_BUS.register(new FertilizationModifier());
+			MinecraftForge.EVENT_BUS.register(new MaxHungerExample());
 		}
 		if (event.getSide() == Side.CLIENT)
 			MinecraftForge.EVENT_BUS.register(new FoodValuesTooltipHandler());

@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import squeek.applecore.api.AppleCoreAPI;
+import squeek.applecore.asm.Hooks;
 
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class CommandHunger extends CommandBase
 		if (args.length > 0)
 		{
 			EntityPlayerMP playerToActOn = args.length >= 2 ? getPlayer(server, commandSender, args[1]) : getCommandSenderAsPlayer(commandSender);
-			int newHunger = args.length >= 2 ? parseInt(args[1], 0, 20) : parseInt(args[0], 0, 20);
+			int newHunger = args.length >= 2 ? parseInt(args[1], 0, Hooks.getMaxHunger(playerToActOn.getFoodStats())) : parseInt(args[0], 0, Hooks.getMaxHunger(playerToActOn.getFoodStats()));
 
 			AppleCoreAPI.mutator.setHunger(playerToActOn, newHunger);
 			if (playerToActOn.getFoodStats().getSaturationLevel() > newHunger)
