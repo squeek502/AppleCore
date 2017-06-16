@@ -27,10 +27,10 @@ archivesBaseName = modId + "-mc" + project.minecraft.version
 
 if (version == "unspecified")
 	version = ""
-if (System.getenv("BUILD_NUMBER") != null)
-	version += (version ? "+" : "") + "${System.getenv("BUILD_NUMBER")}"
-if (System.getenv("GIT_COMMIT") != null)
-	version += (version ? "." : "") + "${System.getenv("GIT_COMMIT").take(5)}"
+if (System.getenv("TRAVIS_BUILD_NUMBER") != null)
+	version += (version ? "+" : "") + "${System.getenv("TRAVIS_BUILD_NUMBER").toInteger() + 230}"
+if (System.getenv("TRAVIS_COMMIT") != null)
+	version += (version ? "." : "") + "${System.getenv("TRAVIS_COMMIT").take(5)}"
 
 sourceSets.main{
 	java {
@@ -116,8 +116,12 @@ afterEvaluate { project ->
 ext.mavenUrl = project.hasProperty('mavenUrl') ? mavenUrl : System.getenv("MAVEN_URL")
 ext.mavenUser = project.hasProperty('mavenUser') ? mavenUser : System.getenv("MAVEN_USER")
 ext.mavenPass = project.hasProperty('mavenPass') ? mavenPass : System.getenv("MAVEN_PASS")
+def isPullRequest = System.getenv("TRAVIS_PULL_REQUEST") != null && System.getenv("TRAVIS_PULL_REQUEST") != false
+def isCI = System.getenv("CI") == true
+def isMainBranch = System.getenv("TRAVIS_BRANCH") == project.minecraft.version
+def okayToPublish = !isCI || (!isPullRequest && isMainBranch)
 
-if (mavenUrl && !project.hasProperty('nopublish')) {
+if (mavenUrl && !project.hasProperty('nopublish') && okayToPublish) {
 	apply plugin: 'maven'
 
 	configurations {
