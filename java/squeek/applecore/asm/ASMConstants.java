@@ -57,6 +57,7 @@ public class ASMConstants
 
 	//FML & Forge
 	public static final String EVENT_RESULT = "net.minecraftforge.fml.common.eventhandler.Event$Result";
+	public static final String GUI_INGAME_FORGE = "net.minecraftforge.client.GuiIngameForge";
 
 	//Blocks
 	public static final String CACTUS =	"net.minecraft.block.BlockCactus";
