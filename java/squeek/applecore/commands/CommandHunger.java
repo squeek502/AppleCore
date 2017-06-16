@@ -37,7 +37,8 @@ public class CommandHunger extends CommandBase
 		if (args.length > 0)
 		{
 			EntityPlayerMP playerToActOn = args.length >= 2 ? getPlayer(server, commandSender, args[1]) : getCommandSenderAsPlayer(commandSender);
-			int newHunger = args.length >= 2 ? parseInt(args[1], 0, 20) : parseInt(args[0], 0, 20);
+			int maxHunger = AppleCoreAPI.accessor.getMaxHunger(playerToActOn);
+			int newHunger = args.length >= 2 ? parseInt(args[1], 0, maxHunger) : parseInt(args[0], 0, maxHunger);
 
 			AppleCoreAPI.mutator.setHunger(playerToActOn, newHunger);
 			if (playerToActOn.getFoodStats().getSaturationLevel() > newHunger)
