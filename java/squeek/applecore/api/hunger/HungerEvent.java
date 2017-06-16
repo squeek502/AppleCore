@@ -16,7 +16,11 @@ public abstract class HungerEvent extends Event
 {
 	/**
 	 * Fired every time max hunger level is retrieved to allow control over its value.
-	 *
+	 * <p>
+	 * Note: This also affects max saturation, as saturation is bounded by the player's
+	 * current hunger level (that is, a max of 40 hunger would also mean a max of 40
+	 * saturation).
+	 * </p>
 	 * This event is fired in {@link FoodStats#needFood()} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #maxHunger} contains the max hunger of the player.<br>
