@@ -44,6 +44,27 @@ public abstract class ExhaustionEvent extends Event
 	}
 
 	/**
+	 * Fired each time exhaustion is added to a {@link #player} to allow control over
+	 * its value.
+	 *
+	 * This event is fired in {@link FoodStats#addExhaustion}.<br>
+	 * <br>
+	 * This event is not {@link Cancelable}.<br>
+	 * <br>
+	 * This event does not have a result. {@link HasResult}<br>
+	 */
+	public static class ExhaustionAddition extends ExhaustionEvent
+	{
+		public float deltaExhaustion;
+
+		public ExhaustionAddition(EntityPlayer player, float deltaExhaustion)
+		{
+			super(player);
+			this.deltaExhaustion = deltaExhaustion;
+		}
+	}
+
+	/**
 	 * Fired every time max exhaustion level is retrieved to allow control over its value.
 	 * 
 	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAPI}.<br>
@@ -65,7 +86,7 @@ public abstract class ExhaustionEvent extends Event
 	}
 
 	/**
-	 * Fired once exchaustionLevel exceeds maxExhaustionLevel (see {@link GetMaxExhaustion}),
+	 * Fired once exhaustionLevel exceeds maxExhaustionLevel (see {@link GetMaxExhaustion}),
 	 * in order to control how exhaustion affects hunger/saturation.
 	 * 
 	 * This event is fired in {@link FoodStats#onUpdate}.<br>
