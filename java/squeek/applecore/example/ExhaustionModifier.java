@@ -20,4 +20,11 @@ public class ExhaustionModifier
 			event.deltaHunger = -1;
 	}
 
+	@SubscribeEvent
+	public void onExhaustionAddition(ExhaustionEvent.ExhaustionAddition event)
+	{
+		// scale all exhaustion additions by 1.5x
+		event.deltaExhaustion = event.deltaExhaustion * 1.5f;
+	}
+
 }

@@ -365,4 +365,15 @@ public class Hooks
 		// starving
 		return Math.max(scaledHunger, 1);
 	}
+
+	public static float onExhaustionAdded(FoodStats foodStats, float deltaExhaustion)
+	{
+		if (!(foodStats instanceof IAppleCoreFoodStats))
+			return deltaExhaustion;
+
+		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
+		ExhaustionEvent.ExhaustionAddition event = new ExhaustionEvent.ExhaustionAddition(player, deltaExhaustion);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.deltaExhaustion;
+	}
 }

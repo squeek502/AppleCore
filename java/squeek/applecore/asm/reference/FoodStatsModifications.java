@@ -60,6 +60,14 @@ public class FoodStatsModifications extends FoodStats
 		// the body of the base function
 	}
 
+	@Override
+	public void addExhaustion(float exhaustion)
+	{
+		exhaustion = Hooks.onExhaustionAdded(this, exhaustion);
+
+		// the body of the base function
+	}
+
 	// start unmodified
 	int foodLevel = 20;
 	float foodSaturationLevel = 5f;
