@@ -38,7 +38,8 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 			// added:
 			this.itemInUseMaxDuration = duration;
 
-			if (!this.world.isRemote) {
+			if (!this.world.isRemote)
+			{
 				int i = 1;
 
 				if (hand == EnumHand.OFF_HAND)
