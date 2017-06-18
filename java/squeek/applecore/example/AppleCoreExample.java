@@ -72,6 +72,7 @@ public class AppleCoreExample
 			MinecraftForge.EVENT_BUS.register(new HungerRegenModifier());
 			MinecraftForge.EVENT_BUS.register(new StarvationModifier());
 			MinecraftForge.EVENT_BUS.register(new FertilizationModifier());
+			MinecraftForge.EVENT_BUS.register(new MaxHungerModifier());
 		}
 		if (event.getSide() == Side.CLIENT)
 			MinecraftForge.EVENT_BUS.register(new FoodValuesTooltipHandler());

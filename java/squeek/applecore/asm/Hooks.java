@@ -12,10 +12,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.FoodStats;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.food.FoodEvent;
 import squeek.applecore.api.food.FoodValues;
@@ -63,7 +66,7 @@ public class Hooks
 		boolean shouldDoRegen = allowRegenResult == Result.ALLOW || (allowRegenResult == Result.DEFAULT && hasNaturalRegen && foodStats.getFoodLevel() >= 18 && player.shouldHeal());
 		if (shouldDoSaturatedRegen)
 		{
-			appleCoreFoodStats.setFoodTimer(appleCoreFoodStats.getFoodTimer()+1);
+			appleCoreFoodStats.setFoodTimer(appleCoreFoodStats.getFoodTimer() + 1);
 
 			if (appleCoreFoodStats.getFoodTimer() >= Hooks.fireSaturatedRegenTickEvent(player))
 			{
@@ -78,7 +81,7 @@ public class Hooks
 		}
 		else if (shouldDoRegen)
 		{
-			appleCoreFoodStats.setFoodTimer(appleCoreFoodStats.getFoodTimer()+1);
+			appleCoreFoodStats.setFoodTimer(appleCoreFoodStats.getFoodTimer() + 1);
 
 			if (appleCoreFoodStats.getFoodTimer() >= Hooks.fireRegenTickEvent(player))
 			{
@@ -99,7 +102,7 @@ public class Hooks
 		Result allowStarvationResult = Hooks.fireAllowStarvation(player);
 		if (allowStarvationResult == Result.ALLOW || (allowStarvationResult == Result.DEFAULT && foodStats.getFoodLevel() <= 0))
 		{
-			appleCoreFoodStats.setStarveTimer(appleCoreFoodStats.getStarveTimer()+1);
+			appleCoreFoodStats.setStarveTimer(appleCoreFoodStats.getStarveTimer() + 1);
 
 			if (appleCoreFoodStats.getStarveTimer() >= Hooks.fireStarvationTickEvent(player))
 			{
@@ -309,5 +312,55 @@ public class Hooks
 	{
 		FertilizationEvent.Fertilized event = new FertilizationEvent.Fertilized(block, world, pos, previousState);
 		MinecraftForge.EVENT_BUS.post(event);
+	}
+
+	public static boolean needFood(FoodStats foodStats)
+	{
+		return foodStats.getFoodLevel() < getMaxHunger(foodStats);
+	}
+
+	public static int getMaxHunger(FoodStats foodStats)
+	{
+		if (!(foodStats instanceof IAppleCoreFoodStats))
+			return 20;
+
+		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
+		return AppleCoreAPI.accessor.getMaxHunger(player);
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static int getHungerForDisplay(FoodStats foodStats)
+	{
+		if (!(foodStats instanceof IAppleCoreFoodStats))
+			return foodStats.getFoodLevel();
+
+		// return a scaled value so that the HUD can still use the same logic
+		// as if the max was 20
+		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
+		float scale = 20f / AppleCoreAPI.accessor.getMaxHunger(player);
+		int realHunger = foodStats.getFoodLevel();
+
+		// only return 0 if the real hunger value is 0
+		if (realHunger == 0)
+			return 0;
+
+		// floor here so that full hunger is only drawn when its actually maxed
+		int scaledHunger = MathHelper.floor(realHunger * scale);
+
+		// hunger is always some non-zero value here, so return at least one
+		// to make sure we don't draw 0 hunger when we're not actually
+		// starving
+		return Math.max(scaledHunger, 1);
+	}
+
+	public static float onExhaustionAdded(FoodStats foodStats, float deltaExhaustion)
+	{
+		if (!(foodStats instanceof IAppleCoreFoodStats))
+			return deltaExhaustion;
+
+		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
+		ExhaustionEvent.ExhaustionAddition event = new ExhaustionEvent.ExhaustionAddition(player, deltaExhaustion);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.deltaExhaustion;
 	}
 }

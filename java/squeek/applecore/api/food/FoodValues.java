@@ -9,9 +9,9 @@ import javax.annotation.Nonnull;
 
 /**
  * FoodValues is a utility class used to retrieve and hold food values.
- * 
+ *
  * To get food values for any given food, use any of the static {@link #get} methods.
- * 
+ *
  * <pre>
  * {@code
  * FoodValues appleFoodValues = FoodValues.get(new ItemStack(Items.apple));
@@ -35,11 +35,29 @@ public class FoodValues
 	}
 
 	/**
-	 * @return The amount of saturation that the food values would provide.
+	 * @return The amount of saturation that the food values would provide, ignoring any limits.
 	 */
+	public float getUnboundedSaturationIncrement()
+	{
+		return hunger * saturationModifier * 2f;
+	}
+
+	/**
+	 * see {@link #getSaturationIncrement(EntityPlayer)}
+	 */
+	@Deprecated
 	public float getSaturationIncrement()
 	{
-		return Math.min(20, hunger * saturationModifier * 2f);
+		return Math.min(20, getUnboundedSaturationIncrement());
+	}
+
+	/**
+	 * @return The bounded amount of saturation that the food values would provide to this player,
+	 * taking their max hunger level into account.
+	 */
+	public float getSaturationIncrement(EntityPlayer player)
+	{
+		return Math.min(AppleCoreAPI.accessor.getMaxHunger(player), getUnboundedSaturationIncrement());
 	}
 
 	/**

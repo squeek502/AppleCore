@@ -15,6 +15,7 @@ import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.food.IEdible;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
+import squeek.applecore.api.hunger.HungerEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.util.IAppleCoreFoodStats;
 
@@ -145,6 +146,14 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		HealthRegenEvent.GetSaturatedRegenTickPeriod event = new HealthRegenEvent.GetSaturatedRegenTickPeriod(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.regenTickPeriod;
+	}
+
+	@Override
+	public int getMaxHunger(EntityPlayer player)
+	{
+		HungerEvent.GetMaxHunger event = new HungerEvent.GetMaxHunger(player);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.maxHunger;
 	}
 
 	/*

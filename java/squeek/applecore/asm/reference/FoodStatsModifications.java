@@ -30,7 +30,8 @@ public class FoodStatsModifications extends FoodStats
 	{
 		if (!Hooks.fireFoodStatsAdditionEvent(player, new FoodValues(foodLevel, foodSaturationModifier)))
 		{
-			this.foodLevel = Math.min(foodLevel + this.foodLevel, 20);
+			// 20 replaced with getMaxHunger
+			this.foodLevel = Math.min(foodLevel + this.foodLevel, Hooks.getMaxHunger(this));
 			this.foodSaturationLevel = Math.min(this.foodSaturationLevel + foodLevel * foodSaturationModifier * 2.0F, this.foodLevel);
 		}
 	}
@@ -57,6 +58,14 @@ public class FoodStatsModifications extends FoodStats
 		// added lines
 		if (Hooks.onAppleCoreFoodStatsUpdate(this, player))
 			return;
+
+		// the body of the base function
+	}
+
+	@Override
+	public void addExhaustion(float exhaustion)
+	{
+		exhaustion = Hooks.onExhaustionAdded(this, exhaustion);
 
 		// the body of the base function
 	}

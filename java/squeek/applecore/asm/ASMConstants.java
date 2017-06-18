@@ -50,6 +50,9 @@ public class ASMConstants
 	public static final String STAT_LIST = "net.minecraft.stats.StatList";
 	public static final String WORLD = "net.minecraft.world.World";
 
+	//FML & Forge
+	public static final String GUI_INGAME_FORGE = "net.minecraftforge.client.GuiIngameForge";
+
 	//Blocks
 	public static final String CAKE = "net.minecraft.block.BlockCake";
 }

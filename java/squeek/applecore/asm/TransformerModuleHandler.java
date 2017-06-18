@@ -19,6 +19,7 @@ public class TransformerModuleHandler implements IClassTransformer
 		registerTransformerModule(new ModuleBlockFood());
 		registerTransformerModule(new ModulePeacefulRegen());
 		registerTransformerModule(new ModulePlantFertilization());
+		registerTransformerModule(new ModuleHungerHUD());
 	}
 
 	public static void registerTransformerModule(IClassTransformerModule transformerModule)
