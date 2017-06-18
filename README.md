@@ -1,4 +1,4 @@
-<img src="http://www.ryanliptak.com/images/applecore.png" width="32" /> [AppleCore](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2222837-applecore) [![Build Status](https://drone.io/github.com/squeek502/AppleCore/status.png)](https://drone.io/github.com/squeek502/AppleCore/files)
+<img src="http://www.ryanliptak.com/images/applecore.png" width="32" /> [AppleCore](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2222837-applecore) [![Build Status](https://travis-ci.org/squeek502/AppleCore.svg)](https://travis-ci.org/squeek502/AppleCore)
 ===========
 
 An API for modifying the food and hunger mechanics of Minecraft
