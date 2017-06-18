@@ -77,5 +77,4 @@ public class FoodStatsModifications extends FoodStats
 	int foodTimer;
 	float foodExhaustionLevel;
 	// end unmodified
-
 }

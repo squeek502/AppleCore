@@ -1,7 +1,6 @@
 package squeek.applecore.example;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -30,26 +29,29 @@ public class ItemMetadataFood extends ItemFood
 	 * @return The hunger value of the ItemStack
 	 */
 	@Override
-	public int getHealAmount(@Nonnull ItemStack itemStack)
+	public int getHealAmount(@Nonnull ItemStack stack)
 	{
-		return hungerValues[itemStack.getItemDamage()];
+		return hungerValues[stack.getItemDamage()];
 	}
 
 	/**
 	 * @return The saturation modifier of the ItemStack
 	 */
 	@Override
-	public float getSaturationModifier(ItemStack itemStack)
+	public float getSaturationModifier(@Nonnull ItemStack stack)
 	{
-		return saturationModifiers[itemStack.getItemDamage()];
+		return saturationModifiers[stack.getItemDamage()];
 	}
 
 	@Override
-	public void getSubItems(@Nonnull Item item, CreativeTabs creativeTabs, NonNullList<ItemStack> subItems)
+	public void getSubItems(@Nonnull CreativeTabs tab, @Nonnull NonNullList<ItemStack> subItems)
 	{
-		for (int meta = 0; meta < Math.min(hungerValues.length, saturationModifiers.length); meta++)
+		if (this.isInCreativeTab(tab))
 		{
-			subItems.add(new ItemStack(item, 1, meta));
+			for (int meta = 0; meta < Math.min(hungerValues.length, saturationModifiers.length); meta++)
+			{
+				subItems.add(new ItemStack(this, 1, meta));
+			}
 		}
 	}
 }

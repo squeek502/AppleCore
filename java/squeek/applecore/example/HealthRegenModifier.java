@@ -6,7 +6,6 @@ import squeek.applecore.api.hunger.HealthRegenEvent;
 
 public class HealthRegenModifier
 {
-
 	@SubscribeEvent
 	public void allowHealthRegen(HealthRegenEvent.AllowRegen event)
 	{
@@ -50,5 +49,4 @@ public class HealthRegenModifier
 		event.deltaHealth = 1;
 		event.deltaExhaustion = 1f;
 	}
-
 }

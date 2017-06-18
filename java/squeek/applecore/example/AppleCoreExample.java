@@ -1,8 +1,9 @@
 package squeek.applecore.example;
 
-import net.minecraft.block.Block;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -28,16 +29,20 @@ public class AppleCoreExample
 
 	public static Item testFood;
 	public static Item testMetadataFood;
-	public static Block testBlockCrops;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		testFood = new ItemNonStandardFood().setUnlocalizedName("testNonStandardFood");
-		GameRegistry.register(testFood, new ResourceLocation(ModInfo.MODID + "example", "testNonStandardFood"));
+		registerItem(testFood, new ResourceLocation(ModInfo.MODID + "example", "testNonStandardFood"));
 
 		testMetadataFood = new ItemMetadataFood(new int[]{1, 10}, new float[]{2f, 0.1f}).setUnlocalizedName("testMetadataFood");
-		GameRegistry.register(testMetadataFood, new ResourceLocation(ModInfo.MODID + "example", "testMetadataFood"));
+		registerItem(testMetadataFood, new ResourceLocation(ModInfo.MODID + "example", "testMetadataFood"));
+	}
+
+	private void registerItem(Item item, ResourceLocation location) {
+		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation("potato")); //Added to get rid of missing model errors on startup
+		GameRegistry.register(item, location);
 	}
 
 	@EventHandler

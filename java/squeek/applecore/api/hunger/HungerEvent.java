@@ -2,9 +2,9 @@ package squeek.applecore.api.hunger;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.FoodStats;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.common.MinecraftForge;
 import squeek.applecore.api.AppleCoreAPI;
 
 /**

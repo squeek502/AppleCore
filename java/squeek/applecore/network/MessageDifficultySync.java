@@ -36,12 +36,7 @@ public class MessageDifficultySync implements IMessage, IMessageHandler<MessageD
 	public IMessage onMessage(final MessageDifficultySync message, final MessageContext ctx)
 	{
 		// defer to the next game loop; we can't guarantee that Minecraft.thePlayer is initialized yet
-		Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-			@Override
-			public void run() {
-				NetworkHelper.getSidedPlayer(ctx).world.getWorldInfo().setDifficulty(message.difficulty);
-			}
-		});
+		Minecraft.getMinecraft().addScheduledTask(() -> NetworkHelper.getSidedPlayer(ctx).world.getWorldInfo().setDifficulty(message.difficulty));
 		return null;
 	}
 }

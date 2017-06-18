@@ -25,7 +25,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 {
 	INSTANCE;
 
-	private AppleCoreAccessorMutatorImpl()
+	AppleCoreAccessorMutatorImpl()
 	{
 		AppleCoreAPI.accessor = this;
 		AppleCoreAPI.mutator = this;

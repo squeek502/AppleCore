@@ -38,8 +38,7 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 			// added:
 			this.itemInUseMaxDuration = duration;
 
-			if (!this.world.isRemote)
-			{
+			if (!this.world.isRemote) {
 				int i = 1;
 
 				if (hand == EnumHand.OFF_HAND)
@@ -85,8 +84,7 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 			if (this.foodStats.needFood() && this.ticksExisted % 10 == 0)
 			{
 				HungerRegenEvent.PeacefulRegen peacefulHungerRegenEvent = Hooks.firePeacefulHungerRegenEvent(this);
-				if (!peacefulHungerRegenEvent.isCanceled())
-				{
+				if (!peacefulHungerRegenEvent.isCanceled()) {
 					this.foodStats.setFoodLevel(this.foodStats.getFoodLevel() + peacefulHungerRegenEvent.deltaHunger);
 				}
 			}
@@ -99,11 +97,11 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 	 * everything below is unmodified
 	 * it is only required to avoid compilation errors
 	 */
-		public ItemStack itemInUse;
-		public int itemInUseCount;
+	public ItemStack itemInUse;
+	public int itemInUseCount;
 
-		public EntityPlayerModifications(World world, GameProfile gameProfile)
-		{
-			super(world, gameProfile);
-		}
+	public EntityPlayerModifications(World world, GameProfile gameProfile)
+	{
+		super(world, gameProfile);
 	}
+}

@@ -5,7 +5,6 @@ import squeek.applecore.api.hunger.ExhaustionEvent;
 
 public class ExhaustionModifier
 {
-
 	@SubscribeEvent
 	public void onExhaustionTick(ExhaustionEvent.GetMaxExhaustion event)
 	{
@@ -26,5 +25,4 @@ public class ExhaustionModifier
 		// scale all exhaustion additions by 1.5x
 		event.deltaExhaustion = event.deltaExhaustion * 1.5f;
 	}
-
 }

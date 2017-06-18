@@ -22,9 +22,9 @@ import java.io.InputStream;
 import java.util.Map;
 
 @IFMLLoadingPlugin.SortingIndex(1100)
-@IFMLLoadingPlugin.MCVersion("1.11.2")
+@IFMLLoadingPlugin.MCVersion("1.12")
 @IFMLLoadingPlugin.TransformerExclusions({"squeek.applecore.asm", "squeek.asmhelper"})
-@Mod(modid = ModInfo.MODID, name = ModInfo.MODNAME, version = ModInfo.VERSION, acceptedMinecraftVersions="[1.11.2]", acceptableRemoteVersions = "*", dependencies = "required-after:forge@[13.20,)")
+@Mod(modid = ModInfo.MODID, name = ModInfo.MODNAME, version = ModInfo.VERSION, acceptedMinecraftVersions="[1.12]", acceptableRemoteVersions = "*", dependencies = "required-after:forge@[14.21,)")
 public class AppleCore implements IFMLLoadingPlugin
 {
 	public static final Logger LOG = LogManager.getLogger(ModInfo.MODID);
@@ -42,7 +42,7 @@ public class AppleCore implements IFMLLoadingPlugin
 		AppleCoreAccessorMutatorImpl.values();
 		AppleCoreDispatcherImpl.values();
 
-		FMLInterModComms.sendRuntimeMessage(ModInfo.MODID, "VersionChecker", "addVersionCheck", "http://www.ryanliptak.com/minecraft/versionchecker/squeek502/AppleCore");
+		FMLInterModComms.sendRuntimeMessage(ModInfo.MODID, "versionchecker", "addVersionCheck", "http://www.ryanliptak.com/minecraft/versionchecker/squeek502/AppleCore");
 	}
 
 	@EventHandler

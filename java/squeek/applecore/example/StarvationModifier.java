@@ -7,7 +7,6 @@ import squeek.applecore.api.hunger.StarvationEvent;
 
 public class StarvationModifier
 {
-
 	@SubscribeEvent
 	public void allowStarvation(StarvationEvent.AllowStarvation event)
 	{
@@ -25,5 +24,4 @@ public class StarvationModifier
 	{
 		event.starveDamage = 1;
 	}
-
 }

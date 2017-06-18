@@ -12,7 +12,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 public class ModulePlantFertilization implements IClassTransformerModule
 {
-	public static enum FertilizeMethodInfo
+	public enum FertilizeMethodInfo
 	{
 		IGROWABLE_BLOCK(ObfHelper.isObfuscated() ? "func_176474_b" : "grow", ASMHelper.toMethodDescriptor("V", ASMConstants.WORLD, ASMConstants.RANDOM, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE), 1, 3, 4, 2);
 

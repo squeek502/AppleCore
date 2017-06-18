@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import squeek.applecore.asm.Hooks;
 
+import javax.annotation.Nonnull;
 import java.util.Random;
 
 public class IGrowableModifications extends Block implements IGrowable
@@ -20,14 +21,14 @@ public class IGrowableModifications extends Block implements IGrowable
 	// is not fully grown
 	// untouched
 	@Override
-	public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient)
+	public boolean canGrow(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, boolean isClient)
 	{
 		return false;
 	}
 
 	// can fertilize
 	@Override
-	public boolean canUseBonemeal(World world, Random rand, BlockPos pos, IBlockState state)
+	public boolean canUseBonemeal(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull IBlockState state)
 	{
 		return true;
 	}
@@ -40,7 +41,7 @@ public class IGrowableModifications extends Block implements IGrowable
 
 	// fertilize
 	@Override
-	public void grow(World world, Random rand, BlockPos pos, IBlockState state)
+	public void grow(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull IBlockState state)
 	{
 		// method instructions replaced with only the following
 		Hooks.fireAppleCoreFertilizeEvent(this, world, pos, state, rand);

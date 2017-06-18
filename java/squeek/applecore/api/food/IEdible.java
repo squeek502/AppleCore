@@ -20,5 +20,5 @@ import javax.annotation.Nonnull;
  */
 public interface IEdible
 {
-	public FoodValues getFoodValues(@Nonnull ItemStack itemStack);
+	FoodValues getFoodValues(@Nonnull ItemStack itemStack);
 }

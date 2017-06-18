@@ -43,15 +43,6 @@ public class FoodValues
 	}
 
 	/**
-	 * see {@link #getSaturationIncrement(EntityPlayer)}
-	 */
-	@Deprecated
-	public float getSaturationIncrement()
-	{
-		return Math.min(20, getUnboundedSaturationIncrement());
-	}
-
-	/**
 	 * @return The bounded amount of saturation that the food values would provide to this player,
 	 * taking their max hunger level into account.
 	 */
@@ -110,5 +101,4 @@ public class FoodValues
 			return false;
 		return true;
 	}
-
 }

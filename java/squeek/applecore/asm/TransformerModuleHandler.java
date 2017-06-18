@@ -11,7 +11,7 @@ public class TransformerModuleHandler implements IClassTransformer
 	public static final String WILDCARD = "*";
 	public static final String[] ALL_CLASSES = new String[] { WILDCARD };
 
-	private static final List<IClassTransformerModule> TRANSFORMER_MODULES = new ArrayList<IClassTransformerModule>();
+	private static final List<IClassTransformerModule> TRANSFORMER_MODULES = new ArrayList<>();
 	static
 	{
 		registerTransformerModule(new ModuleFoodStats());
@@ -45,5 +45,4 @@ public class TransformerModuleHandler implements IClassTransformer
 		}
 		return basicClass;
 	}
-
 }
