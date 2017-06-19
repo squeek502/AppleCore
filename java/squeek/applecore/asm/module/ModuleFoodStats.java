@@ -1,5 +1,6 @@
 package squeek.applecore.asm.module;
 
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
@@ -99,7 +100,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 			else
 				throw new RuntimeException("FoodStats: addExhaustion method not found");
 
-			return ASMHelper.writeClassToBytes(classNode);
+			return ASMHelper.writeClassToBytes(classNode, ClassWriter.COMPUTE_FRAMES);
 		}
 		return basicClass;
 	}
