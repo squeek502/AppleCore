@@ -17,6 +17,11 @@ public class FoodValuesModifier
 	@SubscribeEvent
 	public void getPlayerSpecificFoodValues(FoodEvent.GetPlayerFoodValues event)
 	{
+		// Player can be null when, for example, Minecraft caches tooltips at startup,
+		// and a tooltip handler forwards that null player to AppleCore
+		if (event.player == null)
+			return;
+
 		if (event.food.getItem() == Items.APPLE)
 			event.foodValues = new FoodValues(19, 1f);
 		else
