@@ -1,6 +1,6 @@
 [
 {
-  "modid": "AppleCoreExample",
+  "modid": "applecoreexample",
   "name": "AppleCore Example",
   "description": "An example mod that uses the AppleCore API to make various test modifications",
   "version": "${version}",
@@ -12,6 +12,6 @@
   "logoFile": "",
   "screenshots": [],
   "dependencies": [],
-  "parent": "AppleCore"
+  "parent": "applecore"
 }
 ]

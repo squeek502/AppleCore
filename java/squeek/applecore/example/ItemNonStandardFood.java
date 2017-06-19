@@ -20,14 +20,14 @@ import squeek.applecore.api.food.ItemFoodProxy;
 
 import javax.annotation.Nonnull;
 
-@Optional.Interface(iface = "squeek.applecore.api.food.IEdible", modid = "AppleCore")
+@Optional.Interface(iface = "squeek.applecore.api.food.IEdible", modid = "applecore")
 public class ItemNonStandardFood extends Item implements IEdible
 {
 	public ItemNonStandardFood()
 	{
 	}
 
-	@Optional.Method(modid = "AppleCore")
+	@Optional.Method(modid = "applecore")
 	@Override
 	public FoodValues getFoodValues(@Nonnull ItemStack itemStack)
 	{
@@ -36,7 +36,7 @@ public class ItemNonStandardFood extends Item implements IEdible
 
 	// This needs to be abstracted into an Optional method,
 	// otherwise the ItemFoodProxy reference will cause problems
-	@Optional.Method(modid = "AppleCore")
+	@Optional.Method(modid = "applecore")
 	public void onEatenCompatibility(ItemStack itemStack, EntityPlayer player)
 	{
 		// one possible compatible method
@@ -55,7 +55,7 @@ public class ItemNonStandardFood extends Item implements IEdible
 		{
 			EntityPlayer player = (EntityPlayer)entityLiving;
 
-			if (Loader.isModLoaded("AppleCore"))
+			if (Loader.isModLoaded("applecore"))
 			{
 				onEatenCompatibility(stack, player);
 			}

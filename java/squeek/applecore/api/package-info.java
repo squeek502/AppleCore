@@ -1,4 +1,4 @@
-@API(apiVersion = "${apiversion}", owner = "AppleCore", provides = "AppleCoreAPI")
+@API(apiVersion = "${apiversion}", owner = "applecore", provides = "AppleCoreAPI")
 package squeek.applecore.api;
 
 import net.minecraftforge.fml.common.API;

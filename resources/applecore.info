@@ -1,6 +1,6 @@
 [
 {
-  "modid": "AppleCore",
+  "modid": "applecore",
   "name": "AppleCore",
   "description": "An API for modifying the food and hunger mechanics of Minecraft",
   "version": "${version}",
