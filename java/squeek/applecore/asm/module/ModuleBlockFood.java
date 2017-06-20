@@ -1,5 +1,6 @@
 package squeek.applecore.asm.module;
 
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
@@ -27,7 +28,7 @@ public class ModuleBlockFood implements IClassTransformerModule
 		if (methodNode != null)
 		{
 			addOnBlockFoodEatenHook(classNode, methodNode);
-			return ASMHelper.writeClassToBytes(classNode);
+			return ASMHelper.writeClassToBytes(classNode, ClassWriter.COMPUTE_FRAMES);
 		}
 		else
 			throw new RuntimeException("BlockCake: eatCake (func_180682_b) method not found");
