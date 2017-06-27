@@ -137,8 +137,24 @@ public class ModuleFoodStats implements IClassTransformerModule
 
 	public void injectFoodStatsConstructor(ClassNode classNode)
 	{
-		// get the default constructor and copy it
+		// get the default constructor, apply max hunger patches, and copy it
 		MethodNode defaultConstructor = ASMHelper.findMethodNodeOfClass(classNode, "<init>", ASMHelper.toMethodDescriptor("V"));
+
+		if (defaultConstructor == null)
+			throw new RuntimeException("FoodStats.<init>() not found");
+
+		InsnList foodLevelNeedle = new InsnList();
+		foodLevelNeedle.add(new IntInsnNode(BIPUSH, 20));
+
+		InsnList foodLevelReplacement = new InsnList();
+		foodLevelReplacement.add(new VarInsnNode(ALOAD, 0));
+		foodLevelReplacement.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "getMaxHunger", ASMHelper.toMethodDescriptor("I", ASMConstants.FOOD_STATS), false));
+
+		int numReplacements = ASMHelper.findAndReplaceAll(defaultConstructor.instructions, foodLevelNeedle, foodLevelReplacement);
+
+		if (numReplacements < 2)
+			throw new RuntimeException("FoodStats.<init>() replaced " + numReplacements + " (BIPUSH 20) instructions, expected >= 2");
+
 		MethodNode constructor = new MethodNode(ACC_PUBLIC, "<init>", ASMHelper.toMethodDescriptor("V", ASMConstants.PLAYER), null, null);
 		constructor.instructions = ASMHelper.cloneInsnList(defaultConstructor.instructions);
 
