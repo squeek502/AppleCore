@@ -42,7 +42,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 
 	private boolean isEdible(@Nonnull ItemStack food)
 	{
-		if (food.isEmpty())
+		if (food == ItemStack.EMPTY)
 			return false;
 
 		// assume Block-based foods are edible
@@ -56,7 +56,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	@Override
 	public FoodValues getUnmodifiedFoodValues(@Nonnull ItemStack food)
 	{
-		if (!food.isEmpty())
+		if (food != ItemStack.EMPTY)
 		{
 			if (food.getItem() instanceof IEdible)
 				return ((IEdible) food.getItem()).getFoodValues(food);
