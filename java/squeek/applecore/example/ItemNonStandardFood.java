@@ -1,5 +1,6 @@
 package squeek.applecore.example;
 
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
@@ -25,6 +26,7 @@ public class ItemNonStandardFood extends Item implements IEdible
 {
 	public ItemNonStandardFood()
 	{
+		this.setCreativeTab(CreativeTabs.FOOD);
 	}
 
 	@Optional.Method(modid = "applecore")
