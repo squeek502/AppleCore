@@ -1,8 +1,5 @@
 package squeek.applecore.asm;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCake;
@@ -25,8 +22,6 @@ import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.HungerRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
-import squeek.applecore.api.plants.FertilizationEvent;
-import squeek.applecore.asm.util.IAppleCoreFertilizable;
 
 public class Hooks
 {
@@ -169,52 +164,6 @@ public class Hooks
 	public static void fireOnGrowthEvent(Block block, World world, BlockPos pos, IBlockState previousState)
 	{
 		AppleCoreAPI.dispatcher.announcePlantGrowth(block, world, pos, previousState);
-	}
-
-	private static final Random fertilizeRandom = new Random();
-
-	public static void fireAppleCoreFertilizeEvent(Block block, World world, BlockPos pos, IBlockState state, Random random)
-	{
-		// if the block does not implement our dummy interface, then the transformation did occur
-		if (!(block instanceof IAppleCoreFertilizable))
-			return;
-
-		if (random == null)
-			random = fertilizeRandom;
-
-		IBlockState previousState = state;
-
-		FertilizationEvent.Fertilize event = new FertilizationEvent.Fertilize(block, world, pos, state, random);
-		MinecraftForge.EVENT_BUS.post(event);
-		Event.Result fertilizeResult = event.getResult();
-
-		if (fertilizeResult == Event.Result.DENY)
-			return;
-
-		if (fertilizeResult == Event.Result.DEFAULT)
-		{
-			IAppleCoreFertilizable fertilizableBlock = (IAppleCoreFertilizable) block;
-			try
-			{
-				fertilizableBlock.AppleCore_fertilize(world, random, pos, state);
-			}
-			catch (RuntimeException e)
-			{
-				throw e;
-			}
-			catch (Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-
-		Hooks.fireFertilizedEvent(block, world, pos, previousState);
-	}
-
-	public static void fireFertilizedEvent(Block block, World world, BlockPos pos, IBlockState previousState)
-	{
-		FertilizationEvent.Fertilized event = new FertilizationEvent.Fertilized(block, world, pos, previousState);
-		MinecraftForge.EVENT_BUS.post(event);
 	}
 
 	public static int toolTipX, toolTipY, toolTipW, toolTipH;
