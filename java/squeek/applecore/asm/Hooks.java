@@ -26,8 +26,6 @@ import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.HungerRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
-import squeek.applecore.api.plants.FertilizationEvent;
-import squeek.applecore.asm.util.IAppleCoreFertilizable;
 import squeek.applecore.asm.util.IAppleCoreFoodStats;
 
 import javax.annotation.Nonnull;
@@ -266,52 +264,6 @@ public class Hooks
 		FoodEvent.FoodStatsAddition event = new FoodEvent.FoodStatsAddition(player, foodValuesToBeAdded);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.isCancelable() && event.isCanceled();
-	}
-
-	private static final Random FERTILIZE_RANDOM = new Random();
-
-	public static void fireAppleCoreFertilizeEvent(Block block, World world, BlockPos pos, IBlockState state, Random random)
-	{
-		// if the block does not implement our dummy interface, then the transformation did occur
-		if (!(block instanceof IAppleCoreFertilizable))
-			return;
-
-		if (random == null)
-			random = FERTILIZE_RANDOM;
-
-		IBlockState previousState = state;
-
-		FertilizationEvent.Fertilize event = new FertilizationEvent.Fertilize(block, world, pos, state, random);
-		MinecraftForge.EVENT_BUS.post(event);
-		Event.Result fertilizeResult = event.getResult();
-
-		if (fertilizeResult == Event.Result.DENY)
-			return;
-
-		if (fertilizeResult == Event.Result.DEFAULT)
-		{
-			IAppleCoreFertilizable fertilizableBlock = (IAppleCoreFertilizable) block;
-			try
-			{
-				fertilizableBlock.AppleCore_fertilize(world, random, pos, state);
-			}
-			catch (RuntimeException e)
-			{
-				throw e;
-			}
-			catch (Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-
-		Hooks.fireFertilizedEvent(block, world, pos, previousState);
-	}
-
-	public static void fireFertilizedEvent(Block block, World world, BlockPos pos, IBlockState previousState)
-	{
-		FertilizationEvent.Fertilized event = new FertilizationEvent.Fertilized(block, world, pos, previousState);
-		MinecraftForge.EVENT_BUS.post(event);
 	}
 
 	public static boolean needFood(FoodStats foodStats)
