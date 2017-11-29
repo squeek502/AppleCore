@@ -1,8 +1,5 @@
 package squeek.applecore.asm;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCake;
@@ -20,10 +17,7 @@ import squeek.applecore.api.food.FoodValues;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
-import squeek.applecore.api.plants.FertilizationEvent;
-import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.Event.Result;
-import squeek.applecore.asm.util.IAppleCoreFertilizable;
 
 public class Hooks
 {
@@ -163,69 +157,6 @@ public class Hooks
 	public static void fireOnGrowthWithoutMetadataChangeEvent(Block block, World world, int x, int y, int z)
 	{
 		AppleCoreAPI.dispatcher.announcePlantGrowthWithoutMetadataChange(block, world, x, y, z);
-	}
-
-	private static final Random fertilizeRandom = new Random();
-	private static final Map<String, Class<?>[]> fertilizeMethods = new HashMap<String, Class<?>[]>();
-	static 
-	{
-		fertilizeMethods.put(ASMConstants.HarvestCraft.BlockPamFruit, new Class<?>[] { World.class, int.class, int.class, int.class });
-		fertilizeMethods.put(ASMConstants.HarvestCraft.BlockPamSapling, new Class<?>[] { World.class, int.class, int.class, int.class, Random.class });
-	}
-
-	public static void fireAppleCoreFertilizeEvent(Block block, World world, int x, int y, int z, Random random)
-	{
-		// if the block does not implement our dummy interface, then the transformation did occur
-		if (!(block instanceof IAppleCoreFertilizable))
-			return;
-
-		if (random == null)
-			random = fertilizeRandom;
-
-		int previousMetadata = world.getBlockMetadata(x, y, z);
-
-		FertilizationEvent.Fertilize event = new FertilizationEvent.Fertilize(block, world, x, y, z, random, previousMetadata);
-		MinecraftForge.EVENT_BUS.post(event);
-		Event.Result fertilizeResult = event.getResult();
-
-		if (fertilizeResult == Event.Result.DENY)
-			return;
-
-		if (fertilizeResult == Event.Result.DEFAULT)
-		{
-			IAppleCoreFertilizable fertilizableBlock = (IAppleCoreFertilizable) block;
-			try
-			{
-				if (fertilizeMethods.containsKey(block.getClass().getName()))
-				{
-					Class<?>[] argTypes = fertilizeMethods.get(block.getClass().getName());
-					if (argTypes.length == 4)
-						fertilizableBlock.AppleCore_fertilize(world, x, y, z);
-					else
-						fertilizableBlock.AppleCore_fertilize(world, x, y, z, random);
-				}
-				else
-				{
-					fertilizableBlock.AppleCore_fertilize(world, random, x, y, z);
-				}
-			}
-			catch (RuntimeException e)
-			{
-				throw e;
-			}
-			catch (Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-
-		Hooks.fireFertilizedEvent(block, world, x, y, z, previousMetadata);
-	}
-
-	public static void fireFertilizedEvent(Block block, World world, int x, int y, int z, int previousMetadata)
-	{
-		FertilizationEvent.Fertilized event = new FertilizationEvent.Fertilized(block, world, x, y, z, previousMetadata);
-		MinecraftForge.EVENT_BUS.post(event);
 	}
 
 	public static int toolTipX, toolTipY, toolTipW, toolTipH;
