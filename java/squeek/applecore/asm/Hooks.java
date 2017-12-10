@@ -2,9 +2,7 @@ package squeek.applecore.asm;
 
 import java.util.Random;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockCake;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
@@ -14,6 +12,7 @@ import net.minecraftforge.common.MinecraftForge;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.food.FoodEvent;
 import squeek.applecore.api.food.FoodValues;
+import squeek.applecore.api.food.ItemFoodProxy;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
@@ -44,33 +43,11 @@ public class Hooks
 			return player.getItemInUse().getMaxItemUseDuration();
 	}
 
-	// should this be moved elsewhere?
-	private static ItemStack getFoodFromBlock(Block block)
+	public static void onBlockFoodEaten(Block block, World world, EntityPlayer player)
 	{
-		if (block instanceof BlockCake)
-			return new ItemStack(Items.cake);
-
-		return null;
-	}
-
-	public static FoodValues onBlockFoodEaten(Block block, World world, EntityPlayer player)
-	{
-		ItemStack itemStack = getFoodFromBlock(block);
-
-		if (itemStack != null)
-			return AppleCoreAPI.accessor.getFoodValuesForPlayer(itemStack, player);
-		else
-			return null;
-	}
-
-	public static void onPostBlockFoodEaten(Block block, FoodValues foodValues, int prevFoodLevel, float prevSaturationLevel, EntityPlayer player)
-	{
-		ItemStack itemStack = getFoodFromBlock(block);
-		int hungerAdded = player.getFoodStats().getFoodLevel() - prevFoodLevel;
-		float saturationAdded = player.getFoodStats().getSaturationLevel() - prevSaturationLevel;
-
-		if (itemStack != null)
-			MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemStack, foodValues, hungerAdded, saturationAdded));
+		squeek.applecore.api.food.IEdible edibleBlock = (squeek.applecore.api.food.IEdible)block;
+		ItemStack itemStack = new ItemStack(AppleCoreAPI.registry.getItemFromEdibleBlock(block));
+		new ItemFoodProxy(edibleBlock).onEaten(itemStack, player);
 	}
 
 	public static Result fireAllowExhaustionEvent(EntityPlayer player)
