@@ -18,19 +18,19 @@ import squeek.applecore.api.food.ItemFoodProxy;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@Optional.Interface(iface = "squeek.applecore.api.food.IEdibleBlock", modid = "AppleCore")
+@Optional.Interface(iface = "squeek.applecore.api.food.IEdibleBlock", modid = "applecore")
 public class BlockEdibleExample extends BlockCake implements IEdibleBlock
 {
 	private boolean isEdibleAtMaxHunger = false;
 
-	@Optional.Method(modid = "AppleCore")
+	@Optional.Method(modid = "applecore")
 	@Override
 	public void setEdibleAtMaxHunger(boolean value)
 	{
 		isEdibleAtMaxHunger = value;
 	}
 
-	@Optional.Method(modid = "AppleCore")
+	@Optional.Method(modid = "applecore")
 	@Override
 	public FoodValues getFoodValues(@Nonnull ItemStack itemStack)
 	{
@@ -39,7 +39,7 @@ public class BlockEdibleExample extends BlockCake implements IEdibleBlock
 
 	// This needs to be abstracted into an Optional method,
 	// otherwise the ItemFoodProxy reference will cause problems
-	@Optional.Method(modid = "AppleCore")
+	@Optional.Method(modid = "applecore")
 	public void onEatenCompatibility(ItemStack itemStack, EntityPlayer player)
 	{
 		// one possible compatible method
@@ -71,7 +71,7 @@ public class BlockEdibleExample extends BlockCake implements IEdibleBlock
 		}
 		else
 		{
-			if (Loader.isModLoaded("AppleCore"))
+			if (Loader.isModLoaded("applecore"))
 			{
 				onEatenCompatibility(new ItemStack(this), player);
 			}
