@@ -1,9 +1,8 @@
 package squeek.applecore.api_impl;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
@@ -45,12 +44,12 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		if (food == null || food.getItem() == null)
 			return false;
 
-		// assume Block-based foods are edible
-		if (food.getItem() == Items.cake || food.getItem() instanceof ItemBlock)
+		EnumAction useAction = food.getItem().getItemUseAction(food);
+		if (useAction == EnumAction.EAT || useAction == EnumAction.DRINK)
 			return true;
 
-		EnumAction useAction = food.getItem().getItemUseAction(food);
-		return useAction == EnumAction.EAT || useAction == EnumAction.DRINK;
+		// assume Block-based foods are edible
+		return AppleCoreAPI.registry.getEdibleBlockFromItem(food.getItem()) != null;
 	}
 
 	@Override
@@ -62,8 +61,10 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 				return ((IEdible) food.getItem()).getFoodValues(food);
 			else if (food.getItem() instanceof ItemFood)
 				return getItemFoodValues((ItemFood) food.getItem(), food);
-			else if (food.getItem() == Items.cake)
-				return new FoodValues(2, 0.1f);
+
+			Block block = AppleCoreAPI.registry.getEdibleBlockFromItem(food.getItem());
+			if (block != null && block instanceof IEdible)
+				return ((IEdible) block).getFoodValues(food);
 		}
 		return null;
 	}
