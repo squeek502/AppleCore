@@ -29,6 +29,7 @@ public class AppleCoreExample
 	public static Item testFood;
 	public static Item testMetadataFood;
 	public static Block testBlockCrops;
+	public static Block testBlockEdible;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
@@ -41,6 +42,9 @@ public class AppleCoreExample
 
 		testBlockCrops = new BlockCropsExample();
 		GameRegistry.register(testBlockCrops, new ResourceLocation(ModInfo.MODID + "Example", "testBlockCrops"));
+
+		testBlockEdible = new BlockEdibleExample();
+		GameRegistry.registerBlock(testBlockEdible, "testBlockEdible");
 	}
 
 	@EventHandler

@@ -3,27 +3,23 @@ package squeek.applecore.asm.reference;
 import net.minecraft.block.BlockCake;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import squeek.applecore.api.food.FoodValues;
+import squeek.applecore.api.food.IEdibleBlock;
 import squeek.applecore.asm.Hooks;
 
-public class BlockCakeModifications extends BlockCake
+public class BlockCakeModifications extends BlockCake /* implemented by AppleCore */ implements IEdibleBlock
 {
 	@SuppressWarnings("unused")
 	private void eatCake(World world, BlockPos pos, IBlockState state, EntityPlayer player)
 	{
-		if (player.canEat(false))
+		if (player.canEat(AppleCore_isEdibleAtMaxHunger)) // modified (changed false to AppleCore_isEdibleAtMaxHunger
 		{
 			// begin modifications
-			FoodValues modifiedFoodValues = Hooks.onBlockFoodEaten(this, world, player);
-			int prevFoodLevel = player.getFoodStats().getFoodLevel();
-			float prevSaturationLevel = player.getFoodStats().getSaturationLevel();
-
-			player.getFoodStats().addStats(modifiedFoodValues.hunger, modifiedFoodValues.saturationModifier);
-
-			Hooks.onPostBlockFoodEaten(this, modifiedFoodValues, prevFoodLevel, prevSaturationLevel, player);
+			Hooks.onBlockFoodEaten(this, world, player);
 			// end modifications
 
 			player.addStat(StatList.CAKE_SLICES_EATEN);
@@ -39,5 +35,20 @@ public class BlockCakeModifications extends BlockCake
 				world.setBlockToAir(pos);
 			}
 		}
+	}
+
+	// All of the following added by AppleCore
+	private boolean AppleCore_isEdibleAtMaxHunger;
+
+	@Override
+	public void setEdibleAtMaxHunger(boolean value)
+	{
+		AppleCore_isEdibleAtMaxHunger = value;
+	}
+
+	@Override
+	public FoodValues getFoodValues(ItemStack itemStack)
+	{
+		return new FoodValues(2, 0.1f);
 	}
 }

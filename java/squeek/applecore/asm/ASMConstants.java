@@ -8,6 +8,8 @@ public class ASMConstants
 	public static final String HOOKS_INTERNAL_CLASS = ASMHelper.toInternalClassName(HOOKS);
 	public static final String FOOD_VALUES = "squeek.applecore.api.food.FoodValues";
 	public static final String IAPPLECOREFOODSTATS = "squeek.applecore.asm.util.IAppleCoreFoodStats";
+	public static final String IEDIBLEBLOCK = "squeek.applecore.api.food.IEdibleBlock";
+	public static final String IEDIBLE = "squeek.applecore.api.food.IEdible";
 
 	public static final class ExhaustionEvent
 	{

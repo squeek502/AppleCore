@@ -11,4 +11,5 @@ public abstract class AppleCoreAPI
 	public static IAppleCoreAccessor accessor;
 	public static IAppleCoreMutator mutator;
 	public static IAppleCoreDispatcher dispatcher;
+	public static IAppleCoreRegistry registry;
 }
