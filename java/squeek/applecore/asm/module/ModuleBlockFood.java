@@ -1,5 +1,7 @@
 package squeek.applecore.asm.module;
 
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.tree.*;
 import squeek.applecore.asm.ASMConstants;
 import squeek.applecore.asm.IClassTransformerModule;
@@ -11,6 +13,8 @@ import static org.objectweb.asm.Opcodes.*;
 
 public class ModuleBlockFood implements IClassTransformerModule
 {
+	private static String isEdibleAtMaxHungerField = "AppleCore_isEdibleAtMaxHunger";
+
 	@Override
 	public String[] getClassesToTransform()
 	{
@@ -22,113 +26,85 @@ public class ModuleBlockFood implements IClassTransformerModule
 	{
 		ClassNode classNode = ASMHelper.readClassFromBytes(basicClass);
 
-		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180682_b", "eatCake", ASMHelper.toMethodDescriptor("V", ASMConstants.WORLD, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE, ASMConstants.PLAYER));
+		implementIEdibleBlock(classNode);
 
+		MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_180682_b", "eatCake", ASMHelper.toMethodDescriptor("V", ASMConstants.WORLD, ASMConstants.BLOCK_POS, ASMConstants.IBLOCKSTATE, ASMConstants.PLAYER));
 		if (methodNode != null)
 		{
 			addOnBlockFoodEatenHook(classNode, methodNode);
+			addAlwaysEdibleCheck(classNode, methodNode);
 			return ASMHelper.writeClassToBytes(classNode);
 		}
 		else
 			throw new RuntimeException("BlockCake: eatCake (func_180682_b) method not found");
 	}
 
+	private void implementIEdibleBlock(ClassNode classNode)
+	{
+		classNode.interfaces.add(ASMHelper.toInternalClassName(ASMConstants.IEDIBLE));
+		classNode.interfaces.add(ASMHelper.toInternalClassName(ASMConstants.IEDIBLEBLOCK));
+
+		MethodVisitor mv = classNode.visitMethod(ACC_PUBLIC, "getFoodValues", "(Lnet/minecraft/item/ItemStack;)Lsqueek/applecore/api/food/FoodValues;", null, null);
+		mv.visitCode();
+		Label l0 = new Label();
+		mv.visitLabel(l0);
+		mv.visitTypeInsn(NEW, "squeek/applecore/api/food/FoodValues");
+		mv.visitInsn(DUP);
+		mv.visitInsn(ICONST_2);
+		mv.visitLdcInsn(new Float("0.1"));
+		mv.visitMethodInsn(INVOKESPECIAL, "squeek/applecore/api/food/FoodValues", "<init>", "(IF)V", false);
+		mv.visitInsn(ARETURN);
+		Label l1 = new Label();
+		mv.visitLabel(l1);
+		mv.visitLocalVariable("this", ASMHelper.toDescriptor(classNode.name), null, l0, l1, 0);
+		mv.visitLocalVariable("itemStack", "Lnet/minecraft/item/ItemStack;", null, l0, l1, 1);
+		mv.visitMaxs(4, 2);
+		mv.visitEnd();
+
+		classNode.fields.add(new FieldNode(ACC_PUBLIC, isEdibleAtMaxHungerField, "Z", null, null));
+
+		mv = classNode.visitMethod(ACC_PUBLIC, "setEdibleAtMaxHunger", ASMHelper.toMethodDescriptor("V", "Z"), null, null);
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitVarInsn(ILOAD, 1);
+		mv.visitFieldInsn(PUTFIELD, ASMHelper.toInternalClassName(classNode.name), isEdibleAtMaxHungerField, "Z");
+		mv.visitInsn(RETURN);
+		mv.visitMaxs(0, 0);
+	}
+
 	private void addOnBlockFoodEatenHook(ClassNode classNode, MethodNode method)
 	{
-		AbstractInsnNode firstUniqueInsnInsideIf = ASMHelper.find(method.instructions, new FieldInsnNode(GETSTATIC, ASMHelper.toInternalClassName(ASMConstants.STAT_LIST), InsnComparator.WILDCARD,ASMHelper.toDescriptor(ASMConstants.STAT_BASE)));
-
-		if (firstUniqueInsnInsideIf == null)
-			throw new RuntimeException("Target instruction not found in " + classNode.name + "." + method.name);
-
-		AbstractInsnNode returnInsn = ASMHelper.findPreviousInstructionWithOpcode(method.instructions.getLast(), RETURN);
-		AbstractInsnNode prevLabel = ASMHelper.findPreviousLabelOrLineNumber(returnInsn);
-		while (prevLabel != null && prevLabel.getType() != AbstractInsnNode.LABEL)
-			prevLabel = ASMHelper.findPreviousLabelOrLineNumber(prevLabel);
-
-		LabelNode ifEndLabel = (LabelNode) prevLabel;
-
+		// default player.getFoodStats().addStats call replaced with:
 		/*
-		 * Modify food values
-		 */
-		InsnList toInject = new InsnList();
-		AbstractInsnNode targetNode = firstUniqueInsnInsideIf.getPrevious();
+		Hooks.onBlockFoodEaten(this, world, player);
+		*/
+		InsnList needle = new InsnList();
+		needle.add(new VarInsnNode(ALOAD, 4));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.entity.player.EntityPlayer"), InsnComparator.WILDCARD, InsnComparator.WILDCARD, false));
+		needle.add(new InsnNode(ICONST_2));
+		needle.add(new LdcInsnNode(0.1f));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName("net.minecraft.util.FoodStats"), InsnComparator.WILDCARD, "(IF)V", false));
 
-		// create modifiedFoodValues variable
-		LabelNode modifiedFoodValuesStart = new LabelNode();
-		LocalVariableNode modifiedFoodValues = new LocalVariableNode("modifiedFoodValues", ASMHelper.toDescriptor(ASMConstants.FOOD_VALUES), null, modifiedFoodValuesStart, ifEndLabel, method.maxLocals);
-		method.maxLocals += 1;
-		method.localVariables.add(modifiedFoodValues);
+		InsnList replacement = new InsnList();
+		replacement.add(new VarInsnNode(ALOAD, 0));
+		replacement.add(new VarInsnNode(ALOAD, 1));
+		replacement.add(new VarInsnNode(ALOAD, 4));
+		replacement.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HOOKS_INTERNAL_CLASS, "onBlockFoodEaten", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)V", false));
 
-		// FoodValues modifiedFoodValues = Hooks.onBlockFoodEaten(this, p_150036_1_, p_150036_5_);
-		toInject.add(new VarInsnNode(ALOAD, 0));
-		toInject.add(new VarInsnNode(ALOAD, 1));
-		toInject.add(new VarInsnNode(ALOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HOOKS_INTERNAL_CLASS, "onBlockFoodEaten",  ASMHelper.toMethodDescriptor(ASMConstants.FOOD_VALUES, ASMConstants.BLOCK, ASMConstants.WORLD, ASMConstants.PLAYER), false));
-		toInject.add(new VarInsnNode(ASTORE, modifiedFoodValues.index));
-		toInject.add(modifiedFoodValuesStart);
+		if (ASMHelper.findAndReplace(method.instructions, needle, replacement) == null)
+			throw new RuntimeException("Could not replace FoodStats.addStats call in " + classNode.name + "." + method.name + "\n" + ASMHelper.getMethodAsString(method));
+	}
 
-		// create prevFoodLevel variable
-		LabelNode prevFoodLevelStart = new LabelNode();
-		LocalVariableNode prevFoodLevel = new LocalVariableNode("prevFoodLevel", "I", null, prevFoodLevelStart, ifEndLabel, method.maxLocals);
-		method.maxLocals += 1;
-		method.localVariables.add(prevFoodLevel);
+	private void addAlwaysEdibleCheck(ClassNode classNode, MethodNode method)
+	{
+		AbstractInsnNode pushFalse = ASMHelper.findFirstInstructionWithOpcode(method, ICONST_0);
 
-		// int prevFoodLevel = p_150036_5_.getFoodStats().getFoodLevel();
-		toInject.add(new VarInsnNode(ALOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.PLAYER), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", ASMHelper.toMethodDescriptor(ASMConstants.FOOD_STATS), false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.FOOD_STATS), ObfHelper.isObfuscated() ? "func_75116_a" : "getFoodLevel", ASMHelper.toMethodDescriptor("I"), false));
-		toInject.add(new VarInsnNode(ISTORE, prevFoodLevel.index));
-		toInject.add(prevFoodLevelStart);
+		if (pushFalse == null)
+			throw new RuntimeException("ICONST_0 instruction not found in " + classNode.name + "." + method.name);
 
-		// create prevSaturationLevel variable
-		LabelNode prevSaturationLevelStart = new LabelNode();
-		LocalVariableNode prevSaturationLevel = new LocalVariableNode("prevSaturationLevel", "F", null, prevSaturationLevelStart, ifEndLabel, method.maxLocals);
-		method.maxLocals += 1;
-		method.localVariables.add(prevSaturationLevel);
-
-		// float prevSaturationLevel = p_150036_5_.getFoodStats().getSaturationLevel();
-		toInject.add(new VarInsnNode(ALOAD, 4));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.PLAYER), ObfHelper.isObfuscated() ? "func_71024_bL" : "getFoodStats", ASMHelper.toMethodDescriptor(ASMConstants.FOOD_STATS), false));
-		toInject.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.FOOD_STATS), ObfHelper.isObfuscated() ? "func_75115_e" : "getSaturationLevel", ASMHelper.toMethodDescriptor("F"), false));
-		toInject.add(new VarInsnNode(FSTORE, prevSaturationLevel.index));
-		toInject.add(prevSaturationLevelStart);
-
-		method.instructions.insertBefore(targetNode, toInject);
-
-		/*
-		 * Replace 2/0.1F with the modified values
-		 */
-		InsnList hungerNeedle = new InsnList();
-		hungerNeedle.add(new InsnNode(ICONST_2));
-
-		InsnList hungerReplacement = new InsnList();
-		hungerReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
-		hungerReplacement.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(ASMConstants.FOOD_VALUES), "hunger", "I"));
-
-		InsnList saturationNeedle = new InsnList();
-		saturationNeedle.add(new LdcInsnNode(0.1f));
-
-		InsnList saturationReplacement = new InsnList();
-		saturationReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
-		saturationReplacement.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(ASMConstants.FOOD_VALUES), "saturationModifier", "F"));
-
-		ASMHelper.findAndReplace(method.instructions, hungerNeedle, hungerReplacement, targetNode);
-		ASMHelper.findAndReplace(method.instructions, saturationNeedle, saturationReplacement, targetNode);
-
-		/*
-		 * onPostBlockFoodEaten
-		 */
-		AbstractInsnNode targetNodeAfter = ASMHelper.find(targetNode, new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.FOOD_STATS), InsnComparator.WILDCARD, ASMHelper.toMethodDescriptor("V", "I", "F"), false));
-		InsnList toInjectAfter = new InsnList();
-
-		// Hooks.onPostBlockFoodEaten(this, modifiedFoodValues, prevFoodLevel, prevSaturationLevel, p_150036_5_);
-		toInjectAfter.add(new VarInsnNode(ALOAD, 0));
-		toInjectAfter.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
-		toInjectAfter.add(new VarInsnNode(ILOAD, prevFoodLevel.index));
-		toInjectAfter.add(new VarInsnNode(FLOAD, prevSaturationLevel.index));
-		toInjectAfter.add(new VarInsnNode(ALOAD, 4));
-		toInjectAfter.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "onPostBlockFoodEaten", ASMHelper.toMethodDescriptor("V", ASMConstants.BLOCK, ASMConstants.FOOD_VALUES, "I", "F", ASMConstants.PLAYER), false));
-
-		method.instructions.insert(targetNodeAfter, toInjectAfter);
+		InsnList pushField = new InsnList();
+		pushField.add(new VarInsnNode(ALOAD, 0));
+		pushField.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(classNode.name), isEdibleAtMaxHungerField, "Z"));
+		method.instructions.insert(pushFalse, pushField);
+		method.instructions.remove(pushFalse);
 	}
 }
