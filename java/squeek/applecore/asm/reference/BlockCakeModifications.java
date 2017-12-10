@@ -36,12 +36,6 @@ public class BlockCakeModifications extends BlockCake /* implemented by AppleCor
 	private boolean AppleCore_isEdibleAtMaxHunger;
 
 	@Override
-	public boolean isEdibleAtMaxHunger()
-	{
-		return AppleCore_isEdibleAtMaxHunger;
-	}
-
-	@Override
 	public void setEdibleAtMaxHunger(boolean value)
 	{
 		AppleCore_isEdibleAtMaxHunger = value;

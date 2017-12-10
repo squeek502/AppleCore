@@ -17,13 +17,6 @@ public class BlockEdibleExample extends BlockCake implements IEdibleBlock
 
 	@Optional.Method(modid = "AppleCore")
 	@Override
-	public boolean isEdibleAtMaxHunger()
-	{
-		return isEdibleAtMaxHunger;
-	}
-
-	@Optional.Method(modid = "AppleCore")
-	@Override
 	public void setEdibleAtMaxHunger(boolean value)
 	{
 		isEdibleAtMaxHunger = value;

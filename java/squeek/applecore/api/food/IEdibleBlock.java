@@ -11,12 +11,6 @@ import net.minecraft.item.ItemStack;
 public interface IEdibleBlock extends IEdible
 {
 	/**
-	 * The IEdibleBlock equivalent of {@link ItemFood#alwaysEdible}.
-	 * Should return true if the food can be eaten when at max hunger.
-	 */
-	public boolean isEdibleAtMaxHunger();
-
-	/**
 	 * The IEdibleBlock equivalent of {@link ItemFood#setAlwaysEdible}.
 	 * Should set whether or not the food can be eaten when at max hunger.
 	 */

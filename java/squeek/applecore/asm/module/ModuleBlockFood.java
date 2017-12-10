@@ -67,8 +67,12 @@ public class ModuleBlockFood implements IClassTransformerModule
 
 		classNode.fields.add(new FieldNode(ACC_PUBLIC, isEdibleAtMaxHungerField, "Z", null, null));
 
-		tryAddFieldGetter(classNode, "isEdibleAtMaxHunger", isEdibleAtMaxHungerField, "Z");
-		tryAddFieldSetter(classNode, "setEdibleAtMaxHunger", isEdibleAtMaxHungerField, "Z");
+		mv = classNode.visitMethod(ACC_PUBLIC, "setEdibleAtMaxHunger", ASMHelper.toMethodDescriptor("V", "Z"), null, null);
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitVarInsn(ILOAD, 1);
+		mv.visitFieldInsn(PUTFIELD, ASMHelper.toInternalClassName(classNode.name), isEdibleAtMaxHungerField, "Z");
+		mv.visitInsn(RETURN);
+		mv.visitMaxs(0, 0);
 	}
 
 	private void addOnBlockFoodEatenHook(ClassNode classNode, MethodNode method)
@@ -111,34 +115,5 @@ public class ModuleBlockFood implements IClassTransformerModule
 		pushField.add(new FieldInsnNode(GETFIELD, ASMHelper.toInternalClassName(classNode.name), isEdibleAtMaxHungerField, "Z"));
 		method.instructions.insert(pushFalse, pushField);
 		method.instructions.remove(pushFalse);
-	}
-
-	private boolean tryAddFieldGetter(ClassNode classNode, String methodName, String fieldName, String fieldDescriptor)
-	{
-		String methodDescriptor = ASMHelper.toMethodDescriptor(fieldDescriptor);
-		if (ASMHelper.findMethodNodeOfClass(classNode, methodName, methodDescriptor) != null)
-			return false;
-
-		MethodVisitor mv = classNode.visitMethod(ACC_PUBLIC, methodName, methodDescriptor, null, null);
-		mv.visitVarInsn(ALOAD, 0);
-		mv.visitFieldInsn(GETFIELD, ASMHelper.toInternalClassName(classNode.name), fieldName, fieldDescriptor);
-		mv.visitInsn(Type.getType(fieldDescriptor).getOpcode(IRETURN));
-		mv.visitMaxs(0, 0);
-		return true;
-	}
-
-	private boolean tryAddFieldSetter(ClassNode classNode, String methodName, String fieldName, String fieldDescriptor)
-	{
-		String methodDescriptor = ASMHelper.toMethodDescriptor("V", fieldDescriptor);
-		if (ASMHelper.findMethodNodeOfClass(classNode, methodName, methodDescriptor) != null)
-			return false;
-
-		MethodVisitor mv = classNode.visitMethod(ACC_PUBLIC, methodName, methodDescriptor, null, null);
-		mv.visitVarInsn(ALOAD, 0);
-		mv.visitVarInsn(Type.getType(fieldDescriptor).getOpcode(ILOAD), 1);
-		mv.visitFieldInsn(PUTFIELD, ASMHelper.toInternalClassName(classNode.name), fieldName, fieldDescriptor);
-		mv.visitInsn(RETURN);
-		mv.visitMaxs(0, 0);
-		return true;
 	}
 }
