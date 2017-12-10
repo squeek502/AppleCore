@@ -12,6 +12,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import squeek.applecore.api_impl.AppleCoreAccessorMutatorImpl;
+import squeek.applecore.api_impl.AppleCoreRegistryImpl;
 import squeek.applecore.asm.TransformerModuleHandler;
 import squeek.applecore.commands.Commands;
 import squeek.applecore.network.SyncHandler;
@@ -39,6 +40,7 @@ public class AppleCore implements IFMLLoadingPlugin
 
 		// force initialization of the singletons
 		AppleCoreAccessorMutatorImpl.values();
+		AppleCoreRegistryImpl.values();
 
 		FMLInterModComms.sendRuntimeMessage(ModInfo.MODID, "versionchecker", "addVersionCheck", "http://www.ryanliptak.com/minecraft/versionchecker/squeek502/AppleCore");
 	}
