@@ -1,0 +1,2 @@
+applecore.commands.hunger.usage=/hunger [gracz] <wartość>
+applecore.commands.hunger.set.hunger.to=Ustaw %s's głód na %d
