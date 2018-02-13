@@ -2,8 +2,8 @@ package squeek.applecore.api_impl;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreRegistry;
 
@@ -20,7 +20,17 @@ public enum AppleCoreRegistryImpl implements IAppleCoreRegistry
 	private AppleCoreRegistryImpl()
 	{
 		AppleCoreAPI.registry = this;
-		registerEdibleBlock(Blocks.CAKE, Items.CAKE);
+	}
+
+	@GameRegistry.ObjectHolder("minecraft:cake")
+	public static final Block CAKE_BLOCK = null;
+
+	@GameRegistry.ObjectHolder("minecraft:cake")
+	public static final Item CAKE_ITEM = null;
+
+	public void init()
+	{
+		registerEdibleBlock(CAKE_BLOCK, CAKE_ITEM);
 	}
 
 	@Override
