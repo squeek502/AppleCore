@@ -1,0 +1,2 @@
+applecore.commands.hunger.usage=/hunger [joueur] <valeur>
+applecore.commands.hunger.set.hunger.to=La faim de %s a été défini à %d
