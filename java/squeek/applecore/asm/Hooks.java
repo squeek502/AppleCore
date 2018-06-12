@@ -31,10 +31,25 @@ import java.util.Random;
 
 public class Hooks
 {
-	public static boolean onAppleCoreFoodStatsUpdate(FoodStats foodStats, EntityPlayer player)
+	private static void verifyFoodStats(FoodStats foodStats, EntityPlayer player)
 	{
 		if (!(foodStats instanceof IAppleCoreFoodStats))
-			return false;
+		{
+			String playerName = player != null ? player.getName() : "<unknown>";
+			String className = foodStats.getClass().getName();
+			throw new RuntimeException("FoodStats does not implement IAppleCoreFoodStats on player '"+playerName+"' (class = "+className+"). This likely means that AppleCore has failed catastrophically in some way.");
+		}
+		if (((IAppleCoreFoodStats)foodStats).getPlayer() == null)
+		{
+			String playerName = player != null ? player.getName() : "<unknown>";
+			String className = foodStats.getClass().getName();
+			throw new RuntimeException("FoodStats has a null player field (this field is added by AppleCore at runtime) on player '"+playerName+"' (class = "+className+"). This likely means that some mod has overloaded FoodStats, which is incompatible with AppleCore.");
+		}
+	}
+
+	public static boolean onAppleCoreFoodStatsUpdate(FoodStats foodStats, EntityPlayer player)
+	{
+		verifyFoodStats(foodStats, player);
 
 		IAppleCoreFoodStats appleCoreFoodStats = (IAppleCoreFoodStats) foodStats;
 
@@ -120,11 +135,13 @@ public class Hooks
 
 	public static FoodValues onFoodStatsAdded(FoodStats foodStats, ItemFood itemFood, ItemStack itemStack, EntityPlayer player)
 	{
+		verifyFoodStats(foodStats, player);
 		return AppleCoreAPI.accessor.getFoodValuesForPlayer(itemStack, player);
 	}
 
 	public static void onPostFoodStatsAdded(FoodStats foodStats, ItemFood itemFood, ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded, EntityPlayer player)
 	{
+		verifyFoodStats(foodStats, player);
 		MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemStack, foodValues, hungerAdded, saturationAdded));
 	}
 
@@ -258,13 +275,13 @@ public class Hooks
 
 	public static boolean needFood(FoodStats foodStats)
 	{
+		verifyFoodStats(foodStats, null);
 		return foodStats.getFoodLevel() < getMaxHunger(foodStats);
 	}
 
 	public static int getMaxHunger(FoodStats foodStats)
 	{
-		if (!(foodStats instanceof IAppleCoreFoodStats))
-			return 20;
+		verifyFoodStats(foodStats, null);
 
 		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
 		return AppleCoreAPI.accessor.getMaxHunger(player);
@@ -297,8 +314,7 @@ public class Hooks
 
 	public static float onExhaustionAdded(FoodStats foodStats, float deltaExhaustion)
 	{
-		if (!(foodStats instanceof IAppleCoreFoodStats))
-			return deltaExhaustion;
+		verifyFoodStats(foodStats, null);
 
 		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
 		ExhaustionEvent.ExhaustionAddition event = new ExhaustionEvent.ExhaustionAddition(player, deltaExhaustion);
