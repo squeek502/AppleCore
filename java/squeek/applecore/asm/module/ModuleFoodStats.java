@@ -157,14 +157,14 @@ public class ModuleFoodStats implements IClassTransformerModule
 		MethodNode constructor = new MethodNode(ACC_PUBLIC, "<init>", ASMHelper.toMethodDescriptor("V", ASMConstants.PLAYER), null, null);
 		constructor.instructions = ASMHelper.cloneInsnList(defaultConstructor.instructions);
 
-		AbstractInsnNode targetNode = ASMHelper.findLastInstructionWithOpcode(constructor, RETURN);
+		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionWithOpcode(constructor, INVOKESPECIAL);
 
 		InsnList toInject = new InsnList();
 		toInject.add(new VarInsnNode(ALOAD, 0)); // this
 		toInject.add(new VarInsnNode(ALOAD, 1)); // player param
 		toInject.add(new FieldInsnNode(PUTFIELD, classNode.name, foodStatsPlayerField, ASMHelper.toDescriptor(ASMConstants.PLAYER)));
 
-		constructor.instructions.insertBefore(targetNode, toInject);
+		constructor.instructions.insert(targetNode, toInject);
 
 		classNode.methods.add(constructor);
 	}
