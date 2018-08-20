@@ -9,6 +9,7 @@ public interface IAppleCoreFoodStats
 	int getStarveTimer();
 	void setStarveTimer(int value);
 	EntityPlayer getPlayer();
+	void setPlayer(EntityPlayer player);
 	void setPrevFoodLevel(int value);
 	float getExhaustion();
 	void setExhaustion(float value);

@@ -55,6 +55,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 			tryAddFieldGetter(classNode, "getStarveTimer", foodStatsStarveTimerField, "I");
 			tryAddFieldSetter(classNode, "setStarveTimer", foodStatsStarveTimerField, "I");
 			tryAddFieldGetter(classNode, "getPlayer", foodStatsPlayerField, ASMHelper.toDescriptor(ASMConstants.PLAYER));
+			tryAddFieldSetter(classNode, "setPlayer", foodStatsPlayerField, ASMHelper.toDescriptor(ASMConstants.PLAYER));
 			tryAddFieldSetter(classNode, "setPrevFoodLevel", ObfHelper.isObfuscated() ? "field_75124_e" : "prevFoodLevel", "I");
 			tryAddFieldGetter(classNode, "getExhaustion", ObfHelper.isObfuscated() ? "field_75126_c" : "foodExhaustionLevel", "F");
 			tryAddFieldSetter(classNode, "setExhaustion", ObfHelper.isObfuscated() ? "field_75126_c" : "foodExhaustionLevel", "F");
@@ -143,6 +144,9 @@ public class ModuleFoodStats implements IClassTransformerModule
 		if (defaultConstructor == null)
 			throw new RuntimeException("FoodStats.<init>() not found");
 
+		MethodNode constructor = new MethodNode(ACC_PUBLIC, "<init>", ASMHelper.toMethodDescriptor("V", ASMConstants.PLAYER), null, null);
+		constructor.instructions = ASMHelper.cloneInsnList(defaultConstructor.instructions);
+
 		InsnList foodLevelNeedle = new InsnList();
 		foodLevelNeedle.add(new IntInsnNode(BIPUSH, 20));
 
@@ -150,13 +154,10 @@ public class ModuleFoodStats implements IClassTransformerModule
 		foodLevelReplacement.add(new VarInsnNode(ALOAD, 0));
 		foodLevelReplacement.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "getMaxHunger", ASMHelper.toMethodDescriptor("I", ASMConstants.FOOD_STATS), false));
 
-		int numReplacements = ASMHelper.findAndReplaceAll(defaultConstructor.instructions, foodLevelNeedle, foodLevelReplacement);
+		int numReplacements = ASMHelper.findAndReplaceAll(constructor.instructions, foodLevelNeedle, foodLevelReplacement);
 
 		if (numReplacements < 2)
 			throw new RuntimeException("FoodStats.<init>() replaced " + numReplacements + " (BIPUSH 20) instructions, expected >= 2");
-
-		MethodNode constructor = new MethodNode(ACC_PUBLIC, "<init>", ASMHelper.toMethodDescriptor("V", ASMConstants.PLAYER), null, null);
-		constructor.instructions = ASMHelper.cloneInsnList(defaultConstructor.instructions);
 
 		AbstractInsnNode targetNode = ASMHelper.findFirstInstructionWithOpcode(constructor, INVOKESPECIAL);
 
