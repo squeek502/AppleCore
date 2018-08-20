@@ -42,7 +42,13 @@ public class Hooks
 		}
 		if (((IAppleCoreFoodStats)foodStats).getPlayer() == null)
 		{
-			String playerName = player != null ? player.getName() : "<unknown>";
+			// attempt to salvage the situation by setting the field here
+			if (player != null)
+			{
+				((IAppleCoreFoodStats)foodStats).setPlayer(player);
+				return;
+			}
+			String playerName = "<unknown>";
 			String className = foodStats.getClass().getName();
 			throw new RuntimeException("FoodStats has a null player field (this field is added by AppleCore at runtime) on player '"+playerName+"' (class = "+className+"). This likely means that some mod has overloaded FoodStats, which is incompatible with AppleCore.");
 		}
