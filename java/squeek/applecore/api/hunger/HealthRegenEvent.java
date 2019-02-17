@@ -83,7 +83,7 @@ public abstract class HealthRegenEvent extends Event
 	public static class Regen extends HealthRegenEvent
 	{
 		public float deltaHealth = 1f;
-		public float deltaExhaustion = 4f;
+		public float deltaExhaustion = 6f;
 
 		public Regen(EntityPlayer player)
 		{
@@ -186,8 +186,8 @@ public abstract class HealthRegenEvent extends Event
 		public SaturatedRegen(EntityPlayer player)
 		{
 			super(player);
-			this.deltaExhaustion = Math.min(player.getFoodStats().getSaturationLevel(), 4.0F);
-			this.deltaHealth = deltaExhaustion / 4.0F;
+			this.deltaExhaustion = Math.min(player.getFoodStats().getSaturationLevel(), 6.0F);
+			this.deltaHealth = deltaExhaustion / 6.0F;
 		}
 	}
 }
