@@ -69,7 +69,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 			else
 				throw new RuntimeException("FoodStats: addStats(IF)V method not found");
 
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_151686_a", "addStats", ASMHelper.toMethodDescriptor("V", ASMConstants.ITEM_FOOD, ASMConstants.STACK));
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_151686_a", "addStats", ASMHelper.toMethodDescriptor("V", ASMConstants.ITEM_FOOD, ASMConstants.ITEM_STACK));
 			if (methodNode != null)
 			{
 				addItemStackAwareFoodStatsHook(classNode, methodNode, ObfHelper.isObfuscated());
@@ -206,7 +206,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(ALOAD, 2));					// param 2: ItemStack
 		toInject.add(new VarInsnNode(ALOAD, 0));					// this.player (together with below line)
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, foodStatsPlayerField, ASMHelper.toDescriptor(ASMConstants.PLAYER)));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HOOKS_INTERNAL_CLASS, "onFoodStatsAdded", ASMHelper.toMethodDescriptor(ASMConstants.FOOD_VALUES, ASMConstants.FOOD_STATS, ASMConstants.ITEM_FOOD, ASMConstants.STACK, ASMConstants.PLAYER), false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HOOKS_INTERNAL_CLASS, "onFoodStatsAdded", ASMHelper.toMethodDescriptor(ASMConstants.FOOD_VALUES, ASMConstants.FOOD_STATS, ASMConstants.ITEM_FOOD, ASMConstants.ITEM_STACK, ASMConstants.PLAYER), false));
 		toInject.add(new VarInsnNode(ASTORE, modifiedFoodValues.index));		// modifiedFoodValues = hookClass.hookMethod(...)
 		toInject.add(modifiedFoodValuesStart);								// variable scope start
 
@@ -228,7 +228,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		InsnList hungerNeedle = new InsnList();
 		hungerNeedle.add(new VarInsnNode(ALOAD, 1));
 		hungerNeedle.add(new VarInsnNode(ALOAD, 2));
-		hungerNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.ITEM_FOOD), ObfHelper.isObfuscated() ? "func_150905_g" : "getHealAmount" , ASMHelper.toMethodDescriptor("I", ASMHelper.toDescriptor(ASMConstants.STACK)), false));
+		hungerNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.ITEM_FOOD), ObfHelper.isObfuscated() ? "func_150905_g" : "getHealAmount" , ASMHelper.toMethodDescriptor("I", ASMHelper.toDescriptor(ASMConstants.ITEM_STACK)), false));
 
 		InsnList hungerReplacement = new InsnList();
 		hungerReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
@@ -237,7 +237,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		InsnList saturationNeedle = new InsnList();
 		saturationNeedle.add(new VarInsnNode(ALOAD, 1));
 		saturationNeedle.add(new VarInsnNode(ALOAD, 2));
-		saturationNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.ITEM_FOOD), ObfHelper.isObfuscated() ? "func_150906_h" : "getSaturationModifier", ASMHelper.toMethodDescriptor("F", ASMHelper.toDescriptor(ASMConstants.STACK)), false));
+		saturationNeedle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.ITEM_FOOD), ObfHelper.isObfuscated() ? "func_150906_h" : "getSaturationModifier", ASMHelper.toMethodDescriptor("F", ASMHelper.toDescriptor(ASMConstants.ITEM_STACK)), false));
 
 		InsnList saturationReplacement = new InsnList();
 		saturationReplacement.add(new VarInsnNode(ALOAD, modifiedFoodValues.index));
@@ -279,7 +279,7 @@ public class ModuleFoodStats implements IClassTransformerModule
 		// player
 		toInject.add(new VarInsnNode(ALOAD, 0));
 		toInject.add(new FieldInsnNode(GETFIELD, internalFoodStatsName, foodStatsPlayerField, ASMHelper.toDescriptor(ASMConstants.PLAYER)));
-		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HOOKS_INTERNAL_CLASS, "onPostFoodStatsAdded",  ASMHelper.toMethodDescriptor("V", ASMConstants.FOOD_STATS, ASMConstants.ITEM_FOOD, ASMConstants.STACK, ASMConstants.FOOD_VALUES, "I", "F", ASMConstants.PLAYER), false));
+		toInject.add(new MethodInsnNode(INVOKESTATIC, ASMConstants.HOOKS_INTERNAL_CLASS, "onPostFoodStatsAdded", ASMHelper.toMethodDescriptor("V", ASMConstants.FOOD_STATS, ASMConstants.ITEM_FOOD, ASMConstants.ITEM_STACK, ASMConstants.FOOD_VALUES, "I", "F", ASMConstants.PLAYER), false));
 
 		method.instructions.insertBefore(targetNode, toInject);
 	}

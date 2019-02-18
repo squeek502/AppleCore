@@ -46,7 +46,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 		}
 		else if (transformedName.equals(ASMConstants.ITEM_RENDERER))
 		{
-			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_187454_a", "transformEatFirstPerson", ASMHelper.toMethodDescriptor("V", "F", ASMConstants.HAND_SIDE, ASMConstants.STACK));
+			MethodNode methodNode = ASMHelper.findMethodNodeOfClass(classNode, "func_187454_a", "transformEatFirstPerson", ASMHelper.toMethodDescriptor("V", "F", ASMConstants.HAND_SIDE, ASMConstants.ITEM_STACK));
 			if (methodNode != null)
 			{
 				patchRenderItemInFirstPerson(methodNode);
@@ -62,7 +62,7 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	{
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 3));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.STACK), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ASMHelper.toInternalClassName(ASMConstants.ITEM_STACK), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));
@@ -79,8 +79,8 @@ public class ModuleFoodEatingSpeed implements IClassTransformerModule
 	{
 		InsnList needle = new InsnList();
 		needle.add(new VarInsnNode(ALOAD, 0));
-		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.ENTITY_LIVING), ObfHelper.isObfuscated() ? "field_184627_bm" : "activeItemStack", ASMHelper.toDescriptor(ASMConstants.STACK)));
-		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.STACK), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
+		needle.add(new FieldInsnNode(GETFIELD, ObfHelper.getInternalClassName(ASMConstants.ENTITY_LIVING), ObfHelper.isObfuscated() ? "field_184627_bm" : "activeItemStack", ASMHelper.toDescriptor(ASMConstants.ITEM_STACK)));
+		needle.add(new MethodInsnNode(INVOKEVIRTUAL, ObfHelper.getInternalClassName(ASMConstants.ITEM_STACK), ObfHelper.isObfuscated() ? "func_77988_m" : "getMaxItemUseDuration", ASMHelper.toMethodDescriptor("I"), false));
 
 		InsnList replacement = new InsnList();
 		replacement.add(new VarInsnNode(ALOAD, 0));

@@ -3,11 +3,13 @@ package squeek.applecore.asm.reference;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
+import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.HungerRegenEvent;
 import squeek.applecore.asm.Hooks;
@@ -91,6 +93,23 @@ public abstract class EntityPlayerModifications extends EntityPlayer
 			}
 
 			// ...
+		}
+	}
+
+	// example modification of addExhaustion callers throughout the code
+	@Override
+	public void jump()
+	{
+		super.jump();
+		this.addStat(StatList.JUMP);
+
+		if (this.isSprinting())
+		{
+			this.addExhaustion(Hooks.fireExhaustingActionEvent(this, ExhaustionEvent.ExhaustingActions.SPRINTING_JUMP, 0.2F));
+		}
+		else
+		{
+			this.addExhaustion(Hooks.fireExhaustingActionEvent(this, ExhaustionEvent.ExhaustingActions.NORMAL_JUMP, 0.05F));
 		}
 	}
 

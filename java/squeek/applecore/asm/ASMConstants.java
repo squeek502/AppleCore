@@ -14,6 +14,7 @@ public class ASMConstants
 	public static final class ExhaustionEvent
 	{
 		public static final String EXHAUSTED = "squeek.applecore.api.hunger.ExhaustionEvent$Exhausted";
+		public static final String EXHAUSTING_ACTIONS = "squeek.applecore.api.hunger.ExhaustionEvent$ExhaustingActions";
 	}
 	public static final class HealthRegenEvent
 	{
@@ -34,7 +35,11 @@ public class ASMConstants
 
 	//Minecraft
 	public static final String BLOCK = "net.minecraft.block.Block";
+	public static final String BLOCK_CONTAINER = "net.minecraft.block.BlockContainer";
+	public static final String BLOCK_ICE = "net.minecraft.block.BlockIce";
 	public static final String BLOCK_POS = "net.minecraft.util.math.BlockPos";
+	public static final String DAMAGE_SOURCE = "net.minecraft.util.DamageSource";
+	public static final String ENTITY = "net.minecraft.entity.Entity";
 	public static final String ENTITY_LIVING = "net.minecraft.entity.EntityLivingBase";
 	public static final String FOOD_STATS = "net.minecraft.util.FoodStats";
 	public static final String HAND = "net.minecraft.util.EnumHand";
@@ -46,7 +51,9 @@ public class ASMConstants
 	public static final String MINECRAFT = "net.minecraft.client.Minecraft";
 	public static final String PLAYER = "net.minecraft.entity.player.EntityPlayer";
 	public static final String PLAYER_SP = "net.minecraft.client.entity.EntityPlayerSP";
-	public static final String STACK = "net.minecraft.item.ItemStack";
+	public static final String POTION = "net.minecraft.potion.Potion";
+	public static final String ITEM_STACK = "net.minecraft.item.ItemStack";
+	public static final String TILE_ENTITY = "net.minecraft.tileentity.TileEntity";
 	public static final String STAT_BASE = "net.minecraft.stats.StatBase";
 	public static final String STAT_LIST = "net.minecraft.stats.StatList";
 	public static final String WORLD = "net.minecraft.world.World";

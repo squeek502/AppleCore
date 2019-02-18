@@ -313,4 +313,11 @@ public class Hooks
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.deltaExhaustion;
 	}
+
+	public static float fireExhaustingActionEvent(EntityPlayer player, ExhaustionEvent.ExhaustingActions source, float deltaExhaustion)
+	{
+		ExhaustionEvent.ExhaustingAction event = new ExhaustionEvent.ExhaustingAction(player, source, deltaExhaustion);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.deltaExhaustion;
+	}
 }

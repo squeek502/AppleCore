@@ -25,4 +25,14 @@ public class ExhaustionModifier
 		// scale all exhaustion additions by 1.5x
 		event.deltaExhaustion = event.deltaExhaustion * 1.5f;
 	}
+
+	@SubscribeEvent
+	public void onExhaustingAction(ExhaustionEvent.ExhaustingAction event)
+	{
+		if (event.source == ExhaustionEvent.ExhaustingActions.NORMAL_JUMP || event.source == ExhaustionEvent.ExhaustingActions.SPRINTING_JUMP)
+		{
+			// random exhaustion each jump
+			event.deltaExhaustion *= Math.random();
+		}
+	}
 }

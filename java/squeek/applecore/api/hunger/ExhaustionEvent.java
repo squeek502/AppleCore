@@ -47,6 +47,9 @@ public abstract class ExhaustionEvent extends Event
 	 * Fired each time exhaustion is added to a {@link #player} to allow control over
 	 * its value.
 	 *
+	 * Note: This is a catch-all event for *any* time exhaustion is modified. For more fine-grained
+	 * control, see {@link ExhaustingAction}
+	 *
 	 * This event is fired in {@link FoodStats#addExhaustion}.<br>
 	 * <br>
 	 * This event is not {@link Cancelable}.<br>
@@ -60,6 +63,47 @@ public abstract class ExhaustionEvent extends Event
 		public ExhaustionAddition(EntityPlayer player, float deltaExhaustion)
 		{
 			super(player);
+			this.deltaExhaustion = deltaExhaustion;
+		}
+	}
+
+	/**
+	 * See {@link ExhaustingAction}
+	 */
+	public enum ExhaustingActions
+	{
+		HARVEST_BLOCK,
+		NORMAL_JUMP,
+		SPRINTING_JUMP,
+		ATTACK_ENTITY,
+		DAMAGE_TAKEN,
+		HUNGER_POTION,
+		MOVEMENT_DIVE,
+		MOVEMENT_SWIM,
+		MOVEMENT_SPRINT,
+		MOVEMENT_CROUCH,
+		MOVEMENT_WALK
+	}
+
+	/**
+	 * Fired each time a {@link #player} does something that changes exhaustion in vanilla Minecraft
+	 * (i.e. jumping, sprinting, etc; see {@link ExhaustingActions} for the full list of possible sources)
+	 *
+	 * This event is fired whenever {@link EntityPlayer#addExhaustion} is called from within Minecraft code.<br>
+	 * <br>
+	 * This event is not {@link Cancelable}.<br>
+	 * <br>
+	 * This event does not have a result. {@link HasResult}<br>
+	 */
+	public static class ExhaustingAction extends ExhaustionEvent
+	{
+		public final ExhaustingActions source;
+		public float deltaExhaustion;
+
+		public ExhaustingAction(EntityPlayer player, ExhaustingActions source, float deltaExhaustion)
+		{
+			super(player);
+			this.source = source;
 			this.deltaExhaustion = deltaExhaustion;
 		}
 	}
