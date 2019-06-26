@@ -95,20 +95,6 @@ processResources {
 	}
 }
 
-// TODO: does this work?
-task processSources(type:Copy) {
-	inputs.property "vars", project.version + project.minecraft_version + api_version
-	from(sourceSets.main.java.outputDir) {
-		include '**/ModInfo.java'
-		include '**/package-info.java'
-		expand 'version':project.version, 'mcversion':project.minecraft_version, 'apiversion':api_version
-	}
-	from(sourceSets.main.java.outputDir) {
-		exclude '**/ModInfo.java', '**/package-info.java'
-	}
-}
-compileJava.dependsOn(processSources)
-
 jar {
 	manifest {
 		attributes([
@@ -129,6 +115,7 @@ task removeExampleAndReferenceSources(type:Delete) {
 	delete += sourceSets.main.java.outputDir.getPath()+"/squeek/applecore/asm/reference"
 }
 
+// TODO: port this, depends on how example mod works now
 task removeExampleAndReferenceResources(type:Delete) {
 	delete += file(sourceSets.main.output.resourcesDir.getPath()+"/mcmod.info")
 }

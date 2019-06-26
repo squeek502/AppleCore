@@ -1,0 +1,4 @@
+{
+    "applecore.commands.hunger.usage":"/hunger [玩家ID] <數值>",
+    "applecore.commands.hunger.set.hunger.to":"設置%s的飢餓值為%d"
+}

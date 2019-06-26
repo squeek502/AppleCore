@@ -1,0 +1,13 @@
+modLoader="javafml"
+loaderVersion="[27,)"
+issueTrackerURL="https://github.com/squeek502/AppleCore"
+
+[[mods]]
+modId="applecore"
+version="${version}"
+displayName="AppleCore"
+#updateJSONURL=""
+displayURL="https://github.com/squeek502/AppleCore"
+#logoFile="applecore.png"
+authors="squeek"
+description="An API for modifying the food and hunger mechanics of Minecraft"
