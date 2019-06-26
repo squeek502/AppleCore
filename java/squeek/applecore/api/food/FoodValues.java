@@ -1,6 +1,6 @@
 package squeek.applecore.api.food;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreAccessor;
@@ -46,7 +46,7 @@ public class FoodValues
 	 * @return The bounded amount of saturation that the food values would provide to this player,
 	 * taking their max hunger level into account.
 	 */
-	public float getSaturationIncrement(EntityPlayer player)
+	public float getSaturationIncrement(PlayerEntity player)
 	{
 		return Math.min(AppleCoreAPI.accessor.getMaxHunger(player), getUnboundedSaturationIncrement());
 	}
@@ -70,7 +70,7 @@ public class FoodValues
 	/**
 	 * See {@link IAppleCoreAccessor#getFoodValuesForPlayer}
 	 */
-	public static FoodValues get(@Nonnull ItemStack itemStack, EntityPlayer player)
+	public static FoodValues get(@Nonnull ItemStack itemStack, PlayerEntity player)
 	{
 		return AppleCoreAPI.accessor.getFoodValuesForPlayer(itemStack, player);
 	}

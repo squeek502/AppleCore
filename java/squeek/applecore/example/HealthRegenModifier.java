@@ -1,7 +1,7 @@
 package squeek.applecore.example;
 
-import net.minecraftforge.fml.common.eventhandler.Event.Result;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.Event.Result;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 
 public class HealthRegenModifier

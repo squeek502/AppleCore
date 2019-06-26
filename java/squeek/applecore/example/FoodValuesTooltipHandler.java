@@ -1,8 +1,10 @@
 package squeek.applecore.example;
 
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.food.FoodValues;
 
@@ -21,10 +23,10 @@ public class FoodValuesTooltipHandler
 			FoodValues modifiedValues = AppleCoreAPI.accessor.getFoodValues(event.getItemStack());
 			FoodValues playerValues = AppleCoreAPI.accessor.getFoodValuesForPlayer(event.getItemStack(), event.getEntityPlayer());
 
-			event.getToolTip().add("Food Values [hunger : satMod (+sat)]");
-			event.getToolTip().add("- Player-specific: " + playerValues.hunger + " : " + playerValues.saturationModifier + " (+" + DF.format(playerValues.getSaturationIncrement(event.getEntityPlayer())) + ")");
-			event.getToolTip().add("- Player-agnostic: " + modifiedValues.hunger + " : " + modifiedValues.saturationModifier + " (+" + DF.format(modifiedValues.getSaturationIncrement(event.getEntityPlayer())) + ")");
-			event.getToolTip().add("- Unmodified: " + unmodifiedValues.hunger + " : " + unmodifiedValues.saturationModifier + " (+" + DF.format(unmodifiedValues.getSaturationIncrement(event.getEntityPlayer())) + ")");
+			event.getToolTip().add(new StringTextComponent("Food Values [hunger : satMod (+sat)]"));
+			event.getToolTip().add(new StringTextComponent("- Player-specific: " + playerValues.hunger + " : " + playerValues.saturationModifier + " (+" + DF.format(playerValues.getSaturationIncrement(event.getEntityPlayer())) + ")"));
+			event.getToolTip().add(new StringTextComponent("- Player-agnostic: " + modifiedValues.hunger + " : " + modifiedValues.saturationModifier + " (+" + DF.format(modifiedValues.getSaturationIncrement(event.getEntityPlayer())) + ")"));
+			event.getToolTip().add(new StringTextComponent("- Unmodified: " + unmodifiedValues.hunger + " : " + unmodifiedValues.saturationModifier + " (+" + DF.format(unmodifiedValues.getSaturationIncrement(event.getEntityPlayer())) + ")"));
 		}
 	}
 }

@@ -1,12 +1,12 @@
 package squeek.applecore.api.food;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemFood;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.Cancelable;
 import squeek.applecore.api.AppleCoreAPI;
 
 import javax.annotation.Nonnull;
@@ -21,7 +21,7 @@ public abstract class FoodEvent extends Event
 	/**
 	 * Fired every time food values are retrieved to allow player-independent control over their values.
 	 * 
-	 * This event is fired in {@link FoodStats#addStats(ItemFood, ItemStack)} and in {@link AppleCoreAPI}.<br>
+	 * This event is fired in {@link FoodStats#consume(Item, ItemStack)} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #foodValues} contains the values of the {@link #food}.<br>
 	 * {@link #unmodifiedFoodValues} contains the food values of the {@link #food} before the GetFoodValues event was fired.<br>
@@ -49,7 +49,7 @@ public abstract class FoodEvent extends Event
 	 * Fired every time food values are retrieved to allow player-dependent control over their values.
 	 * This event will always be preceded by {@link GetFoodValues} being fired.
 	 * 
-	 * This event is fired in {@link FoodStats#addStats(ItemFood, ItemStack)} and in {@link AppleCoreAPI}.<br>
+	 * This event is fired in {@link FoodStats#consume(Item, ItemStack)} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #player} contains the player.<br>
 	 * {@link #foodValues} contains the values of the {@link #food}.<br>
@@ -65,9 +65,9 @@ public abstract class FoodEvent extends Event
 		public FoodValues foodValues;
 		public final FoodValues unmodifiedFoodValues;
 		public final ItemStack food;
-		public final EntityPlayer player;
+		public final PlayerEntity player;
 
-		public GetPlayerFoodValues(EntityPlayer player, @Nonnull ItemStack itemStack, FoodValues foodValues)
+		public GetPlayerFoodValues(PlayerEntity player, @Nonnull ItemStack itemStack, FoodValues foodValues)
 		{
 			this.player = player;
 			this.food = itemStack;
@@ -79,7 +79,7 @@ public abstract class FoodEvent extends Event
 	/**
 	 * Fired after {@link FoodStats#addStats}, containing the effects and context for the food that was eaten.
 	 * 
-	 * This event is fired in {@link FoodStats#addStats(ItemFood, ItemStack)}.<br>
+	 * This event is fired in {@link FoodStats#consume(Item, ItemStack)}.<br>
 	 * <br>
 	 * This event is not {@link Cancelable}.<br>
 	 * <br>
@@ -91,9 +91,9 @@ public abstract class FoodEvent extends Event
 		public final int hungerAdded;
 		public final float saturationAdded;
 		public final ItemStack food;
-		public final EntityPlayer player;
+		public final PlayerEntity player;
 
-		public FoodEaten(EntityPlayer player, @Nonnull ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded)
+		public FoodEaten(PlayerEntity player, @Nonnull ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded)
 		{
 			this.player = player;
 			this.food = itemStack;
@@ -117,9 +117,9 @@ public abstract class FoodEvent extends Event
 	public static class FoodStatsAddition extends FoodEvent
 	{
 		public final FoodValues foodValuesToBeAdded;
-		public final EntityPlayer player;
+		public final PlayerEntity player;
 
-		public FoodStatsAddition(EntityPlayer player, FoodValues foodValuesToBeAdded)
+		public FoodStatsAddition(PlayerEntity player, FoodValues foodValuesToBeAdded)
 		{
 			this.player = player;
 			this.foodValuesToBeAdded = foodValuesToBeAdded;

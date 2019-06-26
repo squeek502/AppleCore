@@ -1,9 +1,9 @@
 package squeek.applecore.api_impl;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.ObjectHolder;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreRegistry;
 
@@ -22,10 +22,10 @@ public enum AppleCoreRegistryImpl implements IAppleCoreRegistry
 		AppleCoreAPI.registry = this;
 	}
 
-	@GameRegistry.ObjectHolder("minecraft:cake")
+	@ObjectHolder("minecraft:cake")
 	public static final Block CAKE_BLOCK = null;
 
-	@GameRegistry.ObjectHolder("minecraft:cake")
+	@ObjectHolder("minecraft:cake")
 	public static final Item CAKE_ITEM = null;
 
 	public void init()
@@ -44,7 +44,7 @@ public enum AppleCoreRegistryImpl implements IAppleCoreRegistry
 	public Item getItemFromEdibleBlock(Block block)
 	{
 		Item item = edibleBlockToItem.get(block);
-		if (item == null) item = Item.getItemFromBlock(block);
+		if (item == null) item = block.asItem();
 		return item;
 	}
 

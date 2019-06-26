@@ -1,10 +1,10 @@
 package squeek.applecore.api.hunger;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 import squeek.applecore.api.AppleCoreAPI;
 
 /**
@@ -33,9 +33,9 @@ public abstract class HungerEvent extends Event
 	public static class GetMaxHunger extends HungerEvent
 	{
 		public int maxHunger = 20;
-		public final EntityPlayer player;
+		public final PlayerEntity player;
 
-		public GetMaxHunger(EntityPlayer player)
+		public GetMaxHunger(PlayerEntity player)
 		{
 			this.player = player;
 		}

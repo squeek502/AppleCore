@@ -1,6 +1,6 @@
 package squeek.applecore.asm.util;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public interface IAppleCoreFoodStats
 {
@@ -8,8 +8,8 @@ public interface IAppleCoreFoodStats
 	void setFoodTimer(int value);
 	int getStarveTimer();
 	void setStarveTimer(int value);
-	EntityPlayer getPlayer();
-	void setPlayer(EntityPlayer player);
+	PlayerEntity getPlayer();
+	void setPlayer(PlayerEntity player);
 	void setPrevFoodLevel(int value);
 	float getExhaustion();
 	void setExhaustion(float value);

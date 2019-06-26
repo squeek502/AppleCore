@@ -1,10 +1,12 @@
 package squeek.applecore.api_impl;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.ItemFood;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.UseAction;
+import net.minecraft.item.Food;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.UseAction;
 import net.minecraftforge.common.MinecraftForge;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreAccessor;
@@ -44,8 +46,8 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		if (food == ItemStack.EMPTY)
 			return false;
 
-		EnumAction useAction = food.getItem().getItemUseAction(food);
-		if (useAction == EnumAction.EAT || useAction == EnumAction.DRINK)
+		UseAction useAction = food.getItem().getUseAction(food);
+		if (useAction == UseAction.EAT || useAction == UseAction.DRINK)
 			return true;
 
 		// assume Block-based foods are edible
@@ -59,8 +61,8 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		{
 			if (food.getItem() instanceof IEdible)
 				return ((IEdible) food.getItem()).getFoodValues(food);
-			else if (food.getItem() instanceof ItemFood)
-				return getItemFoodValues((ItemFood) food.getItem(), food);
+			else if (food.getItem().isFood())
+				return getItemFoodValues(food.getItem().getFood(), food);
 
 			Block block = AppleCoreAPI.registry.getEdibleBlockFromItem(food.getItem());
 			if (block != null && block instanceof IEdible)
@@ -69,9 +71,9 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		return null;
 	}
 
-	private FoodValues getItemFoodValues(@Nonnull ItemFood itemFood, @Nonnull ItemStack itemStack)
+	private FoodValues getItemFoodValues(@Nonnull Food food, @Nonnull ItemStack itemStack)
 	{
-		return new FoodValues(itemFood.getHealAmount(itemStack), itemFood.getSaturationModifier(itemStack));
+		return new FoodValues(food.getHealing(), food.getSaturation());
 	}
 
 	@Override
@@ -88,7 +90,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public FoodValues getFoodValuesForPlayer(@Nonnull ItemStack food, EntityPlayer player)
+	public FoodValues getFoodValuesForPlayer(@Nonnull ItemStack food, PlayerEntity player)
 	{
 		FoodValues foodValues = getFoodValues(food);
 		if (foodValues != null)
@@ -101,7 +103,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public float getExhaustion(EntityPlayer player)
+	public float getExhaustion(PlayerEntity player)
 	{
 		try
 		{
@@ -118,7 +120,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public float getMaxExhaustion(EntityPlayer player)
+	public float getMaxExhaustion(PlayerEntity player)
 	{
 		ExhaustionEvent.GetMaxExhaustion event = new ExhaustionEvent.GetMaxExhaustion(player);
 		MinecraftForge.EVENT_BUS.post(event);
@@ -126,7 +128,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public int getHealthRegenTickPeriod(EntityPlayer player)
+	public int getHealthRegenTickPeriod(PlayerEntity player)
 	{
 		HealthRegenEvent.GetRegenTickPeriod event = new HealthRegenEvent.GetRegenTickPeriod(player);
 		MinecraftForge.EVENT_BUS.post(event);
@@ -134,7 +136,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public int getStarveDamageTickPeriod(EntityPlayer player)
+	public int getStarveDamageTickPeriod(PlayerEntity player)
 	{
 		StarvationEvent.GetStarveTickPeriod event = new StarvationEvent.GetStarveTickPeriod(player);
 		MinecraftForge.EVENT_BUS.post(event);
@@ -142,7 +144,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public int getSaturatedHealthRegenTickPeriod(EntityPlayer player)
+	public int getSaturatedHealthRegenTickPeriod(PlayerEntity player)
 	{
 		HealthRegenEvent.GetSaturatedRegenTickPeriod event = new HealthRegenEvent.GetSaturatedRegenTickPeriod(player);
 		MinecraftForge.EVENT_BUS.post(event);
@@ -150,7 +152,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public int getMaxHunger(EntityPlayer player)
+	public int getMaxHunger(PlayerEntity player)
 	{
 		HungerEvent.GetMaxHunger event = new HungerEvent.GetMaxHunger(player);
 		MinecraftForge.EVENT_BUS.post(event);
@@ -161,7 +163,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	 * IAppleCoreMutator implementation
 	 */
 	@Override
-	public void setExhaustion(EntityPlayer player, float exhaustion)
+	public void setExhaustion(PlayerEntity player, float exhaustion)
 	{
 		try
 		{
@@ -178,13 +180,13 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public void setHunger(EntityPlayer player, int hunger)
+	public void setHunger(PlayerEntity player, int hunger)
 	{
 		player.getFoodStats().setFoodLevel(hunger);
 	}
 
 	@Override
-	public void setSaturation(EntityPlayer player, float saturation)
+	public void setSaturation(PlayerEntity player, float saturation)
 	{
 		try
 		{
@@ -201,7 +203,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public void setHealthRegenTickCounter(EntityPlayer player, int tickCounter)
+	public void setHealthRegenTickCounter(PlayerEntity player, int tickCounter)
 	{
 		try
 		{
@@ -218,7 +220,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public void setStarveDamageTickCounter(EntityPlayer player, int tickCounter)
+	public void setStarveDamageTickCounter(PlayerEntity player, int tickCounter)
 	{
 		try
 		{
@@ -234,7 +236,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		}
 	}
 
-	public IAppleCoreFoodStats getAppleCoreFoodStats(EntityPlayer player) throws ClassCastException
+	public IAppleCoreFoodStats getAppleCoreFoodStats(PlayerEntity player) throws ClassCastException
 	{
 		return (IAppleCoreFoodStats) player.getFoodStats();
 	}

@@ -1,25 +1,33 @@
 package squeek.applecore.network;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.WorldServer;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 import squeek.applecore.ModInfo;
 
 public class SyncHandler
 {
-	public static final SimpleNetworkWrapper CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(ModInfo.MODID);
+	private static final String PROTOCOL_VERSION = Integer.toString(1);
+	public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
+		.named(new ResourceLocation(ModInfo.MODID, "sync"))
+		.clientAcceptedVersions(s -> true)
+		.serverAcceptedVersions(s -> true)
+		.networkProtocolVersion(() -> PROTOCOL_VERSION)
+		.simpleChannel();
 
 	public static void init()
 	{
-		CHANNEL.registerMessage(MessageDifficultySync.class, MessageDifficultySync.class, 0, Side.CLIENT);
+		CHANNEL.registerMessage(1, MessageDifficultySync.class, MessageDifficultySync::encode, MessageDifficultySync::decode, MessageDifficultySync::handle);
 
 		MinecraftForge.EVENT_BUS.register(new SyncHandler());
 	}
@@ -27,15 +35,18 @@ public class SyncHandler
 	/*
 	 * Sync difficulty (vanilla MC does not sync it on servers)
 	 */
-	private EnumDifficulty lastDifficultySetting = null;
+	private Difficulty lastDifficultySetting = null;
 
 	@SubscribeEvent
 	public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
 	{
-		if (!(event.player instanceof EntityPlayerMP))
+		if (!(event.getPlayer() instanceof ServerPlayerEntity))
 			return;
 
-		CHANNEL.sendTo(new MessageDifficultySync(event.player.world.getDifficulty()), (EntityPlayerMP) event.player);
+		ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
+
+		MessageDifficultySync msg = new MessageDifficultySync(event.getPlayer().world.getDifficulty());
+		CHANNEL.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
 	}
 
 	@SubscribeEvent
@@ -44,11 +55,11 @@ public class SyncHandler
 		if (event.phase != TickEvent.Phase.END)
 			return;
 
-		if (event.world instanceof WorldServer)
+		if (event.world instanceof ServerWorld)
 		{
 			if (this.lastDifficultySetting != event.world.getDifficulty())
 			{
-				CHANNEL.sendToAll(new MessageDifficultySync(event.world.getDifficulty()));
+				CHANNEL.send(PacketDistributor.ALL.noArg(), new MessageDifficultySync(event.world.getDifficulty()));
 				this.lastDifficultySetting = event.world.getDifficulty();
 			}
 		}

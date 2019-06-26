@@ -1,7 +1,6 @@
 package squeek.applecore.api.food;
 
-import net.minecraft.item.ItemFood;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.Food;
 
 /**
  * An interface for edible blocks (e.g. cakes).<br>
@@ -11,7 +10,7 @@ import net.minecraft.item.ItemStack;
 public interface IEdibleBlock extends IEdible
 {
 	/**
-	 * The IEdibleBlock equivalent of {@link ItemFood#setAlwaysEdible}.
+	 * The IEdibleBlock equivalent of {@link Food#canEatWhenFull()}.
 	 * Should set whether or not the food can be eaten when at max hunger.
 	 */
 	public void setEdibleAtMaxHunger(boolean value);

@@ -1,11 +1,11 @@
 package squeek.applecore.api.hunger;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.FoodStats;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.Difficulty;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 import squeek.applecore.api.AppleCoreAPI;
 
 /**
@@ -15,9 +15,9 @@ import squeek.applecore.api.AppleCoreAPI;
  */
 public abstract class StarvationEvent extends Event
 {
-	public final EntityPlayer player;
+	public final PlayerEntity player;
 
-	public StarvationEvent(EntityPlayer player)
+	public StarvationEvent(PlayerEntity player)
 	{
 		this.player = player;
 	}
@@ -25,7 +25,7 @@ public abstract class StarvationEvent extends Event
 	/**
 	 * Fired each FoodStats update to determine whether or not starvation is allowed for the {@link #player}.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate}.<br>
+	 * This event is fired in {@link FoodStats#tick}.<br>
 	 * <br>
 	 * This event is not {@link Cancelable}.<br>
 	 * <br>
@@ -37,7 +37,7 @@ public abstract class StarvationEvent extends Event
 	@HasResult
 	public static class AllowStarvation extends StarvationEvent
 	{
-		public AllowStarvation(EntityPlayer player)
+		public AllowStarvation(PlayerEntity player)
 		{
 			super(player);
 		}
@@ -46,7 +46,7 @@ public abstract class StarvationEvent extends Event
 	/**
 	 * Fired every time the starve tick period is retrieved to allow control over its value.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAPI}.<br>
+	 * This event is fired in {@link FoodStats#tick} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #starveTickPeriod} contains the number of ticks between starvation damage being done.<br>
 	 * <br>
@@ -58,7 +58,7 @@ public abstract class StarvationEvent extends Event
 	{
 		public int starveTickPeriod = 80;
 
-		public GetStarveTickPeriod(EntityPlayer player)
+		public GetStarveTickPeriod(PlayerEntity player)
 		{
 			super(player);
 		}
@@ -68,7 +68,7 @@ public abstract class StarvationEvent extends Event
 	 * Fired once the time since last starvation damage reaches starveTickPeriod (see {@link GetStarveTickPeriod}),
 	 * in order to control how much starvation damage to do.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate}.<br>
+	 * This event is fired in {@link FoodStats#tick}.<br>
 	 * <br>
 	 * {@link #starveDamage} contains the amount of damage to deal from starvation.<br>
 	 * <br>
@@ -82,12 +82,12 @@ public abstract class StarvationEvent extends Event
 	{
 		public float starveDamage = 1f;
 
-		public Starve(EntityPlayer player)
+		public Starve(PlayerEntity player)
 		{
 			super(player);
 
-			EnumDifficulty difficulty = player.world.getDifficulty();
-			boolean shouldDoDamage = player.getHealth() > 10.0F || difficulty == EnumDifficulty.HARD || player.getHealth() > 1.0F && difficulty == EnumDifficulty.NORMAL;
+			Difficulty difficulty = player.world.getDifficulty();
+			boolean shouldDoDamage = player.getHealth() > 10.0F || difficulty == Difficulty.HARD || player.getHealth() > 1.0F && difficulty == Difficulty.NORMAL;
 
 			if (!shouldDoDamage)
 				starveDamage = 0f;

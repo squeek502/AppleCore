@@ -1,7 +1,8 @@
 package squeek.applecore.api.food;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemFood;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Food;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -16,39 +17,40 @@ import javax.annotation.Nonnull;
  * <br>
  * {@code new ItemFoodProxy(this).onEaten(itemStack, player);}
  */
-public class ItemFoodProxy extends ItemFood
-{
-	public IEdible proxyEdible;
-
-	public ItemFoodProxy(IEdible proxyEdible)
-	{
-		super(0, false);
-		this.proxyEdible = proxyEdible;
-	}
-
-	/**
-	 * Applies the food values of the edible item to the player
-	 */
-	public void onEaten(@Nonnull ItemStack itemStack, EntityPlayer player)
-	{
-		player.getFoodStats().addStats(this, itemStack);
-	}
-
-	/**
-	 * @return The hunger value of the edible item
-	 */
-	@Override
-	public int getHealAmount(@Nonnull ItemStack stack)
-	{
-		return proxyEdible.getFoodValues(stack).hunger;
-	}
-
-	/**
-	 * @return The saturation modifier of the edible item
-	 */
-	@Override
-	public float getSaturationModifier(@Nonnull ItemStack stack)
-	{
-		return proxyEdible.getFoodValues(stack).saturationModifier;
-	}
-}
+// TODO
+//public class ItemFoodProxy extends Item
+//{
+//	public IEdible proxyEdible;
+//
+//	public ItemFoodProxy(IEdible proxyEdible)
+//	{
+//		super(new Item.Properties());
+//		this.proxyEdible = proxyEdible;
+//	}
+//
+//	/**
+//	 * Applies the food values of the edible item to the player
+//	 */
+//	public void onEaten(@Nonnull ItemStack itemStack, PlayerEntity player)
+//	{
+//		player.getFoodStats().addStats(this, itemStack);
+//	}
+//
+//	/**
+//	 * @return The hunger value of the edible item
+//	 */
+//	@Override
+//	public int getHealAmount(@Nonnull ItemStack stack)
+//	{
+//		return proxyEdible.getFoodValues(stack).hunger;
+//	}
+//
+//	/**
+//	 * @return The saturation modifier of the edible item
+//	 */
+//	@Override
+//	public float getSaturationModifier(@Nonnull ItemStack stack)
+//	{
+//		return proxyEdible.getFoodValues(stack).saturationModifier;
+//	}
+//}

@@ -1,9 +1,9 @@
 package squeek.applecore.api.hunger;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 
 /**
  * Base class for all HealthRegenEvent events.<br>
@@ -12,9 +12,9 @@ import net.minecraftforge.fml.common.eventhandler.Event;
  */
 public class HungerRegenEvent extends Event
 {
-	public final EntityPlayer player;
+	public final PlayerEntity player;
 
-	public HungerRegenEvent(EntityPlayer player)
+	public HungerRegenEvent(PlayerEntity player)
 	{
 		this.player = player;
 	}
@@ -23,7 +23,7 @@ public class HungerRegenEvent extends Event
 	 * Fired twice every second for each player while in Peaceful difficulty,
 	 * in order to control how much hunger to passively regenerate.
 	 * 
-	 * This event is fired in {@link EntityPlayer#onLivingUpdate}.<br>
+	 * This event is fired in {@link PlayerEntity#onLivingUpdate}.<br>
 	 * <br>
 	 * This event is never fired if the game rule "naturalRegeneration" is false.<br>
 	 * <br>
@@ -39,7 +39,7 @@ public class HungerRegenEvent extends Event
 	{
 		public int deltaHunger = 1;
 
-		public PeacefulRegen(EntityPlayer player)
+		public PeacefulRegen(PlayerEntity player)
 		{
 			super(player);
 		}

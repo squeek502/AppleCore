@@ -1,42 +1,35 @@
 package squeek.applecore.network;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.Difficulty;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class MessageDifficultySync implements IMessage, IMessageHandler<MessageDifficultySync, IMessage>
+import java.util.function.Supplier;
+
+public class MessageDifficultySync
 {
-	EnumDifficulty difficulty;
+	Difficulty difficulty;
 
-	public MessageDifficultySync()
-	{
-	}
-
-	public MessageDifficultySync(EnumDifficulty difficulty)
+	public MessageDifficultySync(Difficulty difficulty)
 	{
 		this.difficulty = difficulty;
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf)
+	public static void encode(MessageDifficultySync pkt, PacketBuffer buf)
 	{
-		buf.writeByte(difficulty.getDifficultyId());
+		buf.writeInt(pkt.difficulty.getId());
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf)
+	public static MessageDifficultySync decode(PacketBuffer buf)
 	{
-		difficulty = EnumDifficulty.getDifficultyEnum(buf.readByte());
+		return new MessageDifficultySync(Difficulty.byId(buf.readInt()));
 	}
 
-	@Override
-	public IMessage onMessage(final MessageDifficultySync message, final MessageContext ctx)
+	public static void handle(final MessageDifficultySync message, Supplier<NetworkEvent.Context> ctx)
 	{
-		// defer to the next game loop; we can't guarantee that Minecraft.thePlayer is initialized yet
-		Minecraft.getMinecraft().addScheduledTask(() -> NetworkHelper.getSidedPlayer(ctx).world.getWorldInfo().setDifficulty(message.difficulty));
-		return null;
+		ctx.get().enqueueWork(() -> {
+			NetworkHelper.getSidedPlayer(ctx.get()).world.getWorldInfo().setDifficulty(message.difficulty);
+		});
+		ctx.get().setPacketHandled(true);
 	}
 }

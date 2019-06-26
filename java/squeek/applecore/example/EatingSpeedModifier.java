@@ -1,9 +1,8 @@
 package squeek.applecore.example;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemFood;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class EatingSpeedModifier
 {
@@ -13,9 +12,9 @@ public class EatingSpeedModifier
 	@SubscribeEvent
 	public void onItemUse(LivingEntityUseItemEvent.Start event)
 	{
-		if (event.getEntity() instanceof EntityPlayer)
+		if (event.getEntity() instanceof PlayerEntity)
 		{
-			if (event.getItem().getItem() instanceof ItemFood)
+			if (event.getItem().getItem().isFood())
 			{
 				event.setDuration(100);
 			}

@@ -1,6 +1,6 @@
 package squeek.applecore.example;
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import squeek.applecore.api.hunger.HungerRegenEvent;
 
 public class HungerRegenModifier

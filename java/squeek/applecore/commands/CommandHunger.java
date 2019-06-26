@@ -1,20 +1,8 @@
 package squeek.applecore.commands;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import squeek.applecore.api.AppleCoreAPI;
-
-import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.List;
-
-public class CommandHunger extends CommandBase
+public class CommandHunger
 {
+	/* TODO
 	@Override
 	@Nonnull
 	public String getName()
@@ -40,7 +28,7 @@ public class CommandHunger extends CommandBase
 	{
 		if (args.length > 0)
 		{
-			EntityPlayerMP playerToActOn = args.length >= 2 ? getPlayer(server, commandSender, args[1]) : getCommandSenderAsPlayer(commandSender);
+			ServerPlayerEntity playerToActOn = args.length >= 2 ? getPlayer(server, commandSender, args[1]) : getCommandSenderAsPlayer(commandSender);
 			int maxHunger = AppleCoreAPI.accessor.getMaxHunger(playerToActOn);
 			int newHunger = args.length >= 2 ? parseInt(args[1], 0, maxHunger) : parseInt(args[0], 0, maxHunger);
 
@@ -65,4 +53,5 @@ public class CommandHunger extends CommandBase
 		else
 			return Collections.emptyList();
 	}
+	*/
 }

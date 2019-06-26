@@ -1,11 +1,11 @@
 package squeek.applecore.api.hunger;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.FoodStats;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.Difficulty;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 import squeek.applecore.api.AppleCoreAPI;
 
 /**
@@ -15,9 +15,9 @@ import squeek.applecore.api.AppleCoreAPI;
  */
 public abstract class ExhaustionEvent extends Event
 {
-	public final EntityPlayer player;
+	public final PlayerEntity player;
 
-	public ExhaustionEvent(EntityPlayer player)
+	public ExhaustionEvent(PlayerEntity player)
 	{
 		this.player = player;
 	}
@@ -25,7 +25,7 @@ public abstract class ExhaustionEvent extends Event
 	/**
 	 * Fired each FoodStats update to determine whether or not exhaustion is allowed for the {@link #player}.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate}.<br>
+	 * This event is fired in {@link FoodStats#tick}.<br>
 	 * <br>
 	 * This event is not {@link Cancelable}.<br>
 	 * <br>
@@ -37,7 +37,7 @@ public abstract class ExhaustionEvent extends Event
 	@HasResult
 	public static class AllowExhaustion extends ExhaustionEvent
 	{
-		public AllowExhaustion(EntityPlayer player)
+		public AllowExhaustion(PlayerEntity player)
 		{
 			super(player);
 		}
@@ -60,7 +60,7 @@ public abstract class ExhaustionEvent extends Event
 	{
 		public float deltaExhaustion;
 
-		public ExhaustionAddition(EntityPlayer player, float deltaExhaustion)
+		public ExhaustionAddition(PlayerEntity player, float deltaExhaustion)
 		{
 			super(player);
 			this.deltaExhaustion = deltaExhaustion;
@@ -89,7 +89,7 @@ public abstract class ExhaustionEvent extends Event
 	 * Fired each time a {@link #player} does something that changes exhaustion in vanilla Minecraft
 	 * (i.e. jumping, sprinting, etc; see {@link ExhaustingActions} for the full list of possible sources)
 	 *
-	 * This event is fired whenever {@link EntityPlayer#addExhaustion} is called from within Minecraft code.<br>
+	 * This event is fired whenever {@link PlayerEntity#addExhaustion} is called from within Minecraft code.<br>
 	 * <br>
 	 * This event is not {@link Cancelable}.<br>
 	 * <br>
@@ -100,7 +100,7 @@ public abstract class ExhaustionEvent extends Event
 		public final ExhaustingActions source;
 		public float deltaExhaustion;
 
-		public ExhaustingAction(EntityPlayer player, ExhaustingActions source, float deltaExhaustion)
+		public ExhaustingAction(PlayerEntity player, ExhaustingActions source, float deltaExhaustion)
 		{
 			super(player);
 			this.source = source;
@@ -111,7 +111,7 @@ public abstract class ExhaustionEvent extends Event
 	/**
 	 * Fired every time max exhaustion level is retrieved to allow control over its value.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate} and in {@link AppleCoreAPI}.<br>
+	 * This event is fired in {@link FoodStats#tick} and in {@link AppleCoreAPI}.<br>
 	 * <br>
 	 * {@link #maxExhaustionLevel} contains the exhaustion level that will trigger a hunger/saturation decrement.<br>
 	 * <br>
@@ -123,7 +123,7 @@ public abstract class ExhaustionEvent extends Event
 	{
 		public float maxExhaustionLevel = 4f;
 
-		public GetMaxExhaustion(EntityPlayer player)
+		public GetMaxExhaustion(PlayerEntity player)
 		{
 			super(player);
 		}
@@ -133,7 +133,7 @@ public abstract class ExhaustionEvent extends Event
 	 * Fired once exhaustionLevel exceeds maxExhaustionLevel (see {@link GetMaxExhaustion}),
 	 * in order to control how exhaustion affects hunger/saturation.
 	 * 
-	 * This event is fired in {@link FoodStats#onUpdate}.<br>
+	 * This event is fired in {@link FoodStats#tick}.<br>
 	 * <br>
 	 * {@link #currentExhaustionLevel} contains the exhaustion level of the {@link #player}.<br>
 	 * {@link #deltaExhaustion} contains the delta to be applied to exhaustion level (default: {@link GetMaxExhaustion#maxExhaustionLevel}).<br>
@@ -156,7 +156,7 @@ public abstract class ExhaustionEvent extends Event
 		public int deltaHunger = -1;
 		public float deltaSaturation = -1f;
 
-		public Exhausted(EntityPlayer player, float exhaustionToRemove, float currentExhaustionLevel)
+		public Exhausted(PlayerEntity player, float exhaustionToRemove, float currentExhaustionLevel)
 		{
 			super(player);
 			this.deltaExhaustion = -exhaustionToRemove;
@@ -167,8 +167,8 @@ public abstract class ExhaustionEvent extends Event
 			if (!shouldDecreaseSaturationLevel)
 				deltaSaturation = 0f;
 
-			EnumDifficulty difficulty = player.world.getDifficulty();
-			boolean shouldDecreaseFoodLevel = !shouldDecreaseSaturationLevel && difficulty != EnumDifficulty.PEACEFUL;
+			Difficulty difficulty = player.world.getDifficulty();
+			boolean shouldDecreaseFoodLevel = !shouldDecreaseSaturationLevel && difficulty != Difficulty.PEACEFUL;
 
 			if (!shouldDecreaseFoodLevel)
 				deltaHunger = 0;
