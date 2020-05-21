@@ -6,6 +6,8 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindFieldException;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreAccessor;
 import squeek.applecore.api.IAppleCoreMutator;
@@ -17,6 +19,8 @@ import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.HungerEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.util.IAppleCoreFoodStats;
+
+import java.lang.reflect.Field;
 
 import javax.annotation.Nonnull;
 
@@ -55,7 +59,40 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	@Override
 	public boolean isFoodEdible(@Nonnull ItemStack food, @Nonnull EntityPlayer player)
 	{
-		return player.getFoodStats().getFoodLevel() < getMaxHunger(player) || false;
+		return player.getFoodStats().getFoodLevel() < getMaxHunger(player) || isAlwaysEdible(food);
+	}
+	
+	private boolean isAlwaysEdible(@Nonnull ItemStack food)
+	{
+		if(food == ItemStack.EMPTY || !(food.getItem() instanceof ItemFood))
+			return false;
+		Field edibility = null;
+		try
+		{
+			edibility = ObfuscationReflectionHelper.findField(ItemFood.class, "field_77852_bZ");
+		}
+		catch(UnableToFindFieldException e)
+		{
+			//perhaps the field is deobfuscated?
+			try
+			{
+				edibility = ObfuscationReflectionHelper.findField(ItemFood.class, "alwaysEdible"); 
+			}
+			catch(UnableToFindFieldException f)
+			{
+				return false;
+			}
+		}
+		try
+		{
+			//Should be a safe cast from the predicates checked.
+			ItemFood item = (ItemFood) food.getItem();
+			return edibility != null ? (boolean) edibility.getBoolean(item) : false;
+		}
+		catch(IllegalAccessException e)
+		{
+			return false;
+		}
 	}
 
 	@Override
