@@ -1,5 +1,7 @@
 package squeek.applecore.api_impl;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
@@ -19,10 +21,6 @@ import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.HungerEvent;
 import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.util.IAppleCoreFoodStats;
-
-import java.lang.reflect.Field;
-
-import javax.annotation.Nonnull;
 
 public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCoreMutator
 {
