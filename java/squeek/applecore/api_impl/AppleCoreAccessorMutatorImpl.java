@@ -55,7 +55,7 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	}
 
 	@Override
-	public boolean isFoodEdible(@Nonnull ItemStack food, @Nonnull EntityPlayer player)
+	public boolean canPlayerEatFood(@Nonnull ItemStack food, @Nonnull EntityPlayer player)
 	{
 		return player.getFoodStats().getFoodLevel() < getMaxHunger(player) || isAlwaysEdible(food);
 	}
