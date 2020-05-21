@@ -66,33 +66,25 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 	{
 		if(food == ItemStack.EMPTY || !(food.getItem() instanceof ItemFood))
 			return false;
-		Field edibility = null;
+		Boolean edibility = null;
+		ItemFood item = (ItemFood) food.getItem();
 		try
 		{
-			edibility = ObfuscationReflectionHelper.findField(ItemFood.class, "field_77852_bZ");
+			edibility = ObfuscationReflectionHelper.<Boolean, ItemFood>getPrivateValue(ItemFood.class, item, "field_77852_bZ");//.findField(ItemFood.class, "field_77852_bZ");
 		}
 		catch(UnableToFindFieldException e)
 		{
 			//perhaps the field is deobfuscated?
 			try
 			{
-				edibility = ObfuscationReflectionHelper.findField(ItemFood.class, "alwaysEdible"); 
+				edibility = (Boolean) ObfuscationReflectionHelper.<Boolean, ItemFood>getPrivateValue(ItemFood.class, item, "alwaysEdible");
 			}
 			catch(UnableToFindFieldException f)
 			{
 				return false;
 			}
 		}
-		try
-		{
-			//Should be a safe cast from the predicates checked.
-			ItemFood item = (ItemFood) food.getItem();
-			return edibility != null ? (boolean) edibility.getBoolean(item) : false;
-		}
-		catch(IllegalAccessException e)
-		{
-			return false;
-		}
+		return edibility.booleanValue();
 	}
 
 	@Override
