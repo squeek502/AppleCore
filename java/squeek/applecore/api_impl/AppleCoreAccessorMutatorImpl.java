@@ -51,6 +51,12 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 		// assume Block-based foods are edible
 		return AppleCoreAPI.registry.getEdibleBlockFromItem(food.getItem()) != null;
 	}
+	
+	@Override
+	public boolean isFoodEdible(@Nonnull ItemStack food, @Nonnull EntityPlayer player)
+	{
+		return player.getFoodStats().getFoodLevel() < getMaxHunger(player) || false;
+	}
 
 	@Override
 	public FoodValues getUnmodifiedFoodValues(@Nonnull ItemStack food)
