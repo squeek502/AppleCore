@@ -25,6 +25,12 @@ public class FoodValuesTooltipHandler
 			event.getToolTip().add("- Player-specific: " + playerValues.hunger + " : " + playerValues.saturationModifier + " (+" + DF.format(playerValues.getSaturationIncrement(event.getEntityPlayer())) + ")");
 			event.getToolTip().add("- Player-agnostic: " + modifiedValues.hunger + " : " + modifiedValues.saturationModifier + " (+" + DF.format(modifiedValues.getSaturationIncrement(event.getEntityPlayer())) + ")");
 			event.getToolTip().add("- Unmodified: " + unmodifiedValues.hunger + " : " + unmodifiedValues.saturationModifier + " (+" + DF.format(unmodifiedValues.getSaturationIncrement(event.getEntityPlayer())) + ")");
+
+			if (event.getEntityPlayer() != null)
+			{
+				boolean isCurrentlyEdible = AppleCoreAPI.accessor.canPlayerEatFood(event.getItemStack(), event.getEntityPlayer());
+				event.getToolTip().add(isCurrentlyEdible ? "Can currently be eaten" : "Can not currently be eaten");
+			}
 		}
 	}
 }

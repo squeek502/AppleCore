@@ -23,6 +23,21 @@ public interface IAppleCoreAccessor
 	boolean isFood(@Nonnull ItemStack food);
 
 	/**
+	 * Check if the given ItemStack can currently be eaten by the player, taking into account their
+	 * max hunger, and if the food item is always edible.<br>
+	 * <br>
+	 * In particular, this method will always return {@code true} if
+	 * {@link net.minecraft.util.FoodStats#getFoodLevel} {@code <} {@link #getMaxHunger}
+	 * or if this ItemStack's Item is an instance of ItemFood and has its alwaysEdible field set.<br>
+	 * <br>
+	 * Note: {@link ItemStack#EMPTY} can be passed to this function in order to check whether
+	 * the player's hunger is currently below maximum.
+	 *
+	 * @return {@code true} if the player is currently able to eat the food item, {@code false} otherwise.
+	 */
+	boolean canPlayerEatFood(@Nonnull ItemStack food, @Nonnull EntityPlayer player);
+	
+	/**
 	 * Get player-agnostic food values.
 	 * 
 	 * @return The food values, or {@link ItemStack#EMPTY} if none were found.

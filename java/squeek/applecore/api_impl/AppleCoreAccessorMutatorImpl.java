@@ -6,6 +6,7 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.IAppleCoreAccessor;
 import squeek.applecore.api.IAppleCoreMutator;
@@ -19,6 +20,7 @@ import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.util.IAppleCoreFoodStats;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.Field;
 
 public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCoreMutator
 {
@@ -50,6 +52,29 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 
 		// assume Block-based foods are edible
 		return AppleCoreAPI.registry.getEdibleBlockFromItem(food.getItem()) != null;
+	}
+
+	@Override
+	public boolean canPlayerEatFood(@Nonnull ItemStack food, @Nonnull EntityPlayer player)
+	{
+		return player.getFoodStats().getFoodLevel() < getMaxHunger(player) || isAlwaysEdible(food);
+	}
+
+	protected static final Field itemFoodAlwaysEdible = ReflectionHelper.findField(ItemFood.class, "alwaysEdible", "field_77852_bZ", "e");
+
+	private boolean isAlwaysEdible(@Nonnull ItemStack food)
+	{
+		if (food == ItemStack.EMPTY || !(food.getItem() instanceof ItemFood))
+			return false;
+
+		try
+		{
+			return itemFoodAlwaysEdible.getBoolean(food.getItem());
+		}
+		catch (IllegalAccessException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
