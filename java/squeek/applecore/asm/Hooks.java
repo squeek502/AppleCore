@@ -314,6 +314,16 @@ public class Hooks
 		return event.deltaExhaustion;
 	}
 
+	public static float getExhaustionCap(FoodStats foodStats)
+	{
+		verifyFoodStats(foodStats, null);
+
+		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
+		ExhaustionEvent.GetExhaustionCap event = new ExhaustionEvent.GetExhaustionCap(player);
+		MinecraftForge.EVENT_BUS.post(event);
+		return event.exhaustionLevelCap;
+	}
+
 	public static float fireExhaustingActionEvent(EntityPlayer player, ExhaustionEvent.ExhaustingActions source, float deltaExhaustion)
 	{
 		ExhaustionEvent.ExhaustingAction event = new ExhaustionEvent.ExhaustingAction(player, source, deltaExhaustion);

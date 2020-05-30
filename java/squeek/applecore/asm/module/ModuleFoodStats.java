@@ -361,6 +361,19 @@ public class ModuleFoodStats implements IClassTransformerModule
 		toInject.add(new VarInsnNode(FSTORE, 1));
 
 		addExhaustionMethodNode.instructions.insertBefore(ASMHelper.findFirstInstruction(addExhaustionMethodNode), toInject);
+
+		// Replace the 40.0f constant with GetExhaustionCap call
+		InsnList replacement = new InsnList();
+		replacement.add(new VarInsnNode(ALOAD, 0));
+		replacement.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.toInternalClassName(ASMConstants.HOOKS), "getExhaustionCap", ASMHelper.toMethodDescriptor("F", ASMConstants.FOOD_STATS), false));
+
+		InsnList needle = new InsnList();
+		needle.add(new LdcInsnNode(new Float("40.0")));
+
+		if (ASMHelper.findAndReplaceAll(addExhaustionMethodNode.instructions, needle, replacement) == 0)
+		{
+			throw new RuntimeException("Failed to inject GetExhaustionCap");
+		}
 	}
 
 	private boolean tryAddFieldGetter(ClassNode classNode, String methodName, String fieldName, String fieldDescriptor)

@@ -67,7 +67,7 @@ public class FoodStatsModifications extends FoodStats
 	{
 		exhaustion = Hooks.onExhaustionAdded(this, exhaustion);
 
-		// the body of the base function
+		this.foodExhaustionLevel = Math.min(this.foodExhaustionLevel + exhaustion, Hooks.getExhaustionCap(this));
 	}
 
 	// start unmodified

@@ -174,4 +174,25 @@ public abstract class ExhaustionEvent extends Event
 				deltaHunger = 0;
 		}
 	}
+
+	/**
+	 * Fired every time the exhaustion level is capped to allow control over the cap.
+	 *
+	 * This event is fired in {@link FoodStats#addExhaustion}.<br>
+	 * <br>
+	 * {@link #exhaustionLevelCap} contains the exhaustion level that will be used to cap the exhaustion level.<br>
+	 * <br>
+	 * This event is not {@link Cancelable}.<br>
+	 * <br>
+	 * This event does not have a result. {@link HasResult}<br>
+	 */
+	public static class GetExhaustionCap extends ExhaustionEvent
+	{
+		public float exhaustionLevelCap = 40f;
+
+		public GetExhaustionCap(EntityPlayer player)
+		{
+			super(player);
+		}
+	}
 }
