@@ -1,26 +1,23 @@
 package squeek.applecore.asm;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.ItemFood;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.UseAction;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.FoodStats;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.fml.common.eventhandler.Event.Result;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.eventbus.api.Event.Result;
 import squeek.applecore.api.AppleCoreAPI;
 import squeek.applecore.api.food.FoodEvent;
 import squeek.applecore.api.food.FoodValues;
-import squeek.applecore.api.food.ItemFoodProxy;
 import squeek.applecore.api.hunger.ExhaustionEvent;
 import squeek.applecore.api.hunger.HealthRegenEvent;
 import squeek.applecore.api.hunger.HungerRegenEvent;
@@ -28,33 +25,32 @@ import squeek.applecore.api.hunger.StarvationEvent;
 import squeek.applecore.asm.util.IAppleCoreFoodStats;
 
 import javax.annotation.Nonnull;
-import java.util.Random;
 
 public class Hooks
 {
-	private static void verifyFoodStats(FoodStats foodStats, EntityPlayer player)
+	private static void verifyFoodStats(FoodStats foodStats, PlayerEntity player)
 	{
 		if (!(foodStats instanceof IAppleCoreFoodStats))
 		{
-			String playerName = player != null ? player.getName() : "<unknown>";
+			String playerName = player != null ? player.getName().getString() : "<unknown>";
 			String className = foodStats.getClass().getName();
-			throw new RuntimeException("FoodStats does not implement IAppleCoreFoodStats on player '"+playerName+"' (class = "+className+"). This likely means that AppleCore has failed catastrophically in some way.");
+			throw new RuntimeException("FoodStats does not implement IAppleCoreFoodStats on player '" + playerName + "' (class = " + className + "). This likely means that AppleCore has failed catastrophically in some way.");
 		}
-		if (((IAppleCoreFoodStats)foodStats).getPlayer() == null)
+		if (((IAppleCoreFoodStats) foodStats).getPlayer() == null)
 		{
 			// attempt to salvage the situation by setting the field here
 			if (player != null)
 			{
-				((IAppleCoreFoodStats)foodStats).setPlayer(player);
+				((IAppleCoreFoodStats) foodStats).setPlayer(player);
 				return;
 			}
 			String playerName = "<unknown>";
 			String className = foodStats.getClass().getName();
-			throw new RuntimeException("FoodStats has a null player field (this field is added by AppleCore at runtime) on player '"+playerName+"' (class = "+className+"). This likely means that some mod has overloaded FoodStats, which is incompatible with AppleCore.");
+			throw new RuntimeException("FoodStats has a null player field (this field is added by AppleCore at runtime) on player '" + playerName + "' (class = " + className + "). This likely means that some mod has overloaded FoodStats, which is incompatible with AppleCore.");
 		}
 	}
 
-	public static boolean onAppleCoreFoodStatsUpdate(FoodStats foodStats, EntityPlayer player)
+	public static boolean onAppleCoreFoodStatsUpdate(FoodStats foodStats, PlayerEntity player)
 	{
 		verifyFoodStats(foodStats, player);
 
@@ -76,7 +72,7 @@ public class Hooks
 			}
 		}
 
-		boolean hasNaturalRegen = player.world.getGameRules().getBoolean("naturalRegeneration");
+		boolean hasNaturalRegen = player.world.getGameRules().getBoolean(GameRules.NATURAL_REGENERATION);
 
 		Result allowSaturatedRegenResult = Hooks.fireAllowSaturatedRegenEvent(player);
 		boolean shouldDoSaturatedRegen = allowSaturatedRegenResult == Result.ALLOW || (allowSaturatedRegenResult == Result.DEFAULT && hasNaturalRegen && foodStats.getSaturationLevel() > 0.0F && player.shouldHeal() && foodStats.getFoodLevel() >= 20);
@@ -140,125 +136,125 @@ public class Hooks
 		return true;
 	}
 
-	public static FoodValues onFoodStatsAdded(FoodStats foodStats, @Nonnull ItemFood itemFood, @Nonnull ItemStack itemStack, EntityPlayer player)
+	public static FoodValues onFoodStatsAdded(FoodStats foodStats, @Nonnull Item itemFood, @Nonnull ItemStack itemStack, PlayerEntity player)
 	{
 		verifyFoodStats(foodStats, player);
 		return AppleCoreAPI.accessor.getFoodValuesForPlayer(itemStack, player);
 	}
 
-	public static void onPostFoodStatsAdded(FoodStats foodStats, @Nonnull ItemFood itemFood, @Nonnull ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded, EntityPlayer player)
+	public static void onPostFoodStatsAdded(FoodStats foodStats, @Nonnull Item itemFood, @Nonnull ItemStack itemStack, FoodValues foodValues, int hungerAdded, float saturationAdded, PlayerEntity player)
 	{
 		verifyFoodStats(foodStats, player);
 		MinecraftForge.EVENT_BUS.post(new FoodEvent.FoodEaten(player, itemStack, foodValues, hungerAdded, saturationAdded));
 	}
 
-	public static int getItemInUseMaxCount(EntityLivingBase entityLiving, int savedMaxDuration)
+	public static int getItemInUseMaxCount(LivingEntity entityLiving, int savedMaxDuration)
 	{
-		EnumAction useAction = entityLiving.getActiveItemStack().getItemUseAction();
-		if (useAction == EnumAction.EAT || useAction == EnumAction.DRINK)
+		UseAction useAction = entityLiving.getActiveItemStack().getUseAction();
+		if (useAction == UseAction.EAT || useAction == UseAction.DRINK)
 			return savedMaxDuration;
 		else
-			return entityLiving.getActiveItemStack().getMaxItemUseDuration();
+			return entityLiving.getActiveItemStack().getUseDuration();
 	}
 
-	public static void onBlockFoodEaten(Block block, World world, EntityPlayer player)
+	public static void onBlockFoodEaten(Block block, World world, PlayerEntity player)
 	{
-		squeek.applecore.api.food.IEdible edibleBlock = (squeek.applecore.api.food.IEdible)block;
+		squeek.applecore.api.food.IEdible edibleBlock = (squeek.applecore.api.food.IEdible) block;
 		ItemStack itemStack = new ItemStack(AppleCoreAPI.registry.getItemFromEdibleBlock(block));
-		new ItemFoodProxy(edibleBlock).onEaten(itemStack, player);
+		player.getFoodStats().consume(itemStack.getItem(), itemStack);
 	}
 
-	public static Result fireAllowExhaustionEvent(EntityPlayer player)
+	public static Result fireAllowExhaustionEvent(PlayerEntity player)
 	{
 		ExhaustionEvent.AllowExhaustion event = new ExhaustionEvent.AllowExhaustion(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getResult();
 	}
 
-	public static float fireExhaustionTickEvent(EntityPlayer player, float foodExhaustionLevel)
+	public static float fireExhaustionTickEvent(PlayerEntity player, float foodExhaustionLevel)
 	{
 		return AppleCoreAPI.accessor.getMaxExhaustion(player);
 	}
 
-	public static ExhaustionEvent.Exhausted fireExhaustionMaxEvent(EntityPlayer player, float maxExhaustionLevel, float foodExhaustionLevel)
+	public static ExhaustionEvent.Exhausted fireExhaustionMaxEvent(PlayerEntity player, float maxExhaustionLevel, float foodExhaustionLevel)
 	{
 		ExhaustionEvent.Exhausted event = new ExhaustionEvent.Exhausted(player, maxExhaustionLevel, foodExhaustionLevel);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
 
-	public static Result fireAllowRegenEvent(EntityPlayer player)
+	public static Result fireAllowRegenEvent(PlayerEntity player)
 	{
 		HealthRegenEvent.AllowRegen event = new HealthRegenEvent.AllowRegen(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getResult();
 	}
 
-	public static Result fireAllowSaturatedRegenEvent(EntityPlayer player)
+	public static Result fireAllowSaturatedRegenEvent(PlayerEntity player)
 	{
 		HealthRegenEvent.AllowSaturatedRegen event = new HealthRegenEvent.AllowSaturatedRegen(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getResult();
 	}
 
-	public static int fireRegenTickEvent(EntityPlayer player)
+	public static int fireRegenTickEvent(PlayerEntity player)
 	{
 		return AppleCoreAPI.accessor.getHealthRegenTickPeriod(player);
 	}
 
-	public static int fireSaturatedRegenTickEvent(EntityPlayer player)
+	public static int fireSaturatedRegenTickEvent(PlayerEntity player)
 	{
 		return AppleCoreAPI.accessor.getSaturatedHealthRegenTickPeriod(player);
 	}
 
-	public static HealthRegenEvent.Regen fireRegenEvent(EntityPlayer player)
+	public static HealthRegenEvent.Regen fireRegenEvent(PlayerEntity player)
 	{
 		HealthRegenEvent.Regen event = new HealthRegenEvent.Regen(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
 
-	public static HealthRegenEvent.SaturatedRegen fireSaturatedRegenEvent(EntityPlayer player)
+	public static HealthRegenEvent.SaturatedRegen fireSaturatedRegenEvent(PlayerEntity player)
 	{
 		HealthRegenEvent.SaturatedRegen event = new HealthRegenEvent.SaturatedRegen(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
 
-	public static HealthRegenEvent.PeacefulRegen firePeacefulRegenEvent(EntityPlayer player)
+	public static HealthRegenEvent.PeacefulRegen firePeacefulRegenEvent(PlayerEntity player)
 	{
 		HealthRegenEvent.PeacefulRegen event = new HealthRegenEvent.PeacefulRegen(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
 
-	public static HungerRegenEvent.PeacefulRegen firePeacefulHungerRegenEvent(EntityPlayer player)
+	public static HungerRegenEvent.PeacefulRegen firePeacefulHungerRegenEvent(PlayerEntity player)
 	{
 		HungerRegenEvent.PeacefulRegen event = new HungerRegenEvent.PeacefulRegen(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
 
-	public static Result fireAllowStarvation(EntityPlayer player)
+	public static Result fireAllowStarvation(PlayerEntity player)
 	{
 		StarvationEvent.AllowStarvation event = new StarvationEvent.AllowStarvation(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.getResult();
 	}
 
-	public static int fireStarvationTickEvent(EntityPlayer player)
+	public static int fireStarvationTickEvent(PlayerEntity player)
 	{
 		return AppleCoreAPI.accessor.getStarveDamageTickPeriod(player);
 	}
 
-	public static StarvationEvent.Starve fireStarveEvent(EntityPlayer player)
+	public static StarvationEvent.Starve fireStarveEvent(PlayerEntity player)
 	{
 		StarvationEvent.Starve event = new StarvationEvent.Starve(player);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
 
-	public static boolean fireFoodStatsAdditionEvent(EntityPlayer player, FoodValues foodValuesToBeAdded)
+	public static boolean fireFoodStatsAdditionEvent(PlayerEntity player, FoodValues foodValuesToBeAdded)
 	{
 		FoodEvent.FoodStatsAddition event = new FoodEvent.FoodStatsAddition(player, foodValuesToBeAdded);
 		MinecraftForge.EVENT_BUS.post(event);
@@ -275,11 +271,11 @@ public class Hooks
 	{
 		verifyFoodStats(foodStats, null);
 
-		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
+		PlayerEntity player = ((IAppleCoreFoodStats) foodStats).getPlayer();
 		return AppleCoreAPI.accessor.getMaxHunger(player);
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static int getHungerForDisplay(FoodStats foodStats)
 	{
 		if (!(foodStats instanceof IAppleCoreFoodStats))
@@ -287,7 +283,7 @@ public class Hooks
 
 		// return a scaled value so that the HUD can still use the same logic
 		// as if the max was 20
-		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
+		PlayerEntity player = ((IAppleCoreFoodStats) foodStats).getPlayer();
 		float scale = 20f / AppleCoreAPI.accessor.getMaxHunger(player);
 		int realHunger = foodStats.getFoodLevel();
 
@@ -308,13 +304,13 @@ public class Hooks
 	{
 		verifyFoodStats(foodStats, null);
 
-		EntityPlayer player = ((IAppleCoreFoodStats) foodStats).getPlayer();
+		PlayerEntity player = ((IAppleCoreFoodStats) foodStats).getPlayer();
 		ExhaustionEvent.ExhaustionAddition event = new ExhaustionEvent.ExhaustionAddition(player, deltaExhaustion);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event.deltaExhaustion;
 	}
 
-	public static float fireExhaustingActionEvent(EntityPlayer player, ExhaustionEvent.ExhaustingActions source, float deltaExhaustion)
+	public static float fireExhaustingActionEvent(PlayerEntity player, ExhaustionEvent.ExhaustingActions source, float deltaExhaustion)
 	{
 		ExhaustionEvent.ExhaustingAction event = new ExhaustionEvent.ExhaustingAction(player, source, deltaExhaustion);
 		MinecraftForge.EVENT_BUS.post(event);

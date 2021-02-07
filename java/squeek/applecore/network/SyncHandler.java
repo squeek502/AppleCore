@@ -3,12 +3,10 @@ package squeek.applecore.network;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -50,12 +48,12 @@ public class SyncHandler
 	}
 
 	@SubscribeEvent
-	public void onWorldTick(WorldTickEvent event)
+	public void onWorldTick(TickEvent.WorldTickEvent event)
 	{
 		if (event.phase != TickEvent.Phase.END)
 			return;
 
-		if (event.world instanceof ServerWorld)
+		if (event.type == TickEvent.Type.SERVER)
 		{
 			if (this.lastDifficultySetting != event.world.getDifficulty())
 			{
