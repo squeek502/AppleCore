@@ -1,6 +1,8 @@
 package squeek.applecore;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -8,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import squeek.applecore.api_impl.AppleCoreAccessorMutatorImpl;
 import squeek.applecore.api_impl.AppleCoreRegistryImpl;
+import squeek.applecore.commands.CommandHunger;
 import squeek.applecore.network.SyncHandler;
 
 @Mod(ModInfo.MODID)
@@ -32,11 +35,9 @@ public class AppleCore
 		SyncHandler.init();
 	}
 
-	/* TODO
-	@EventHandler
-	public void onServerStarting(FMLServerStartingEvent event)
+	@SubscribeEvent
+	public void onCommandRegistering(RegisterCommandsEvent event)
 	{
-		Commands.init(event.getServer());
+		CommandHunger.register(event.getDispatcher());
 	}
-	*/
 }

@@ -14,8 +14,8 @@ public enum AppleCoreRegistryImpl implements IAppleCoreRegistry
 {
 	INSTANCE;
 
-	private Map<Block, Item> edibleBlockToItem = new HashMap<Block, Item>();
-	private Map<Item, Block> edibleItemToBlock = new HashMap<Item, Block>();
+	private Map<Block, Item> edibleBlockToItem = new HashMap<>();
+	private Map<Item, Block> edibleItemToBlock = new HashMap<>();
 
 	private AppleCoreRegistryImpl()
 	{

@@ -1,5 +1,7 @@
 package squeek.applecore.network;
 
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.Difficulty;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -27,9 +29,10 @@ public class MessageDifficultySync
 
 	public static void handle(final MessageDifficultySync message, Supplier<NetworkEvent.Context> ctx)
 	{
-		ctx.get().enqueueWork(() -> {
-			NetworkHelper.getSidedPlayer(ctx.get()).world.getWorldInfo().setDifficulty(message.difficulty);
-		});
+		PlayerEntity player = NetworkHelper.getSidedPlayer(ctx.get());
+		if (player instanceof ServerPlayerEntity) {
+			ctx.get().enqueueWork(() -> ((ServerPlayerEntity) player).getServerWorld().getServer().getServerConfiguration().setDifficulty(message.difficulty));
+		}
 		ctx.get().setPacketHandled(true);
 	}
 }

@@ -1,57 +1,38 @@
 package squeek.applecore.commands;
 
-public class CommandHunger
-{
-	/* TODO
-	@Override
-	@Nonnull
-	public String getName()
-	{
-		return "hunger";
-	}
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.TranslationTextComponent;
+import squeek.applecore.api.AppleCoreAPI;
 
-	@Override
-	@Nonnull
-	public String getUsage(@Nonnull ICommandSender sender)
-	{
-		return "applecore.commands.hunger.usage";
-	}
+public class CommandHunger {
 
-	@Override
-	public int getRequiredPermissionLevel()
-	{
-		return 4;
-	}
+    public static void register(CommandDispatcher<CommandSource> dispatcher)
+    {
+        dispatcher.register(Commands.literal("hunger").requires((p) -> p.hasPermissionLevel(4)).executes(c -> sendUsage(c.getSource()))
+                .then(Commands.argument("newHunger", IntegerArgumentType.integer()).executes(c -> execute(c.getSource(), IntegerArgumentType.getInteger(c, "newHunger")))));
+    }
 
-	@Override
-	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender commandSender, @Nonnull String[] args) throws CommandException
-	{
-		if (args.length > 0)
-		{
-			ServerPlayerEntity playerToActOn = args.length >= 2 ? getPlayer(server, commandSender, args[1]) : getCommandSenderAsPlayer(commandSender);
-			int maxHunger = AppleCoreAPI.accessor.getMaxHunger(playerToActOn);
-			int newHunger = args.length >= 2 ? parseInt(args[1], 0, maxHunger) : parseInt(args[0], 0, maxHunger);
+    private static int sendUsage(CommandSource source)
+    {
+        source.sendFeedback(new TranslationTextComponent("applecore.commands.hunger.usage"), true);
+        return 0;
+    }
 
-			AppleCoreAPI.mutator.setHunger(playerToActOn, newHunger);
-			if (playerToActOn.getFoodStats().getSaturationLevel() > newHunger)
-				AppleCoreAPI.mutator.setSaturation(playerToActOn, newHunger);
 
-			notifyCommandListener(commandSender, this, 1, "applecore.commands.hunger.set.hunger.to", playerToActOn.getDisplayName(), newHunger);
-		}
-		else
-		{
-			throw new WrongUsageException(getUsage(commandSender));
-		}
-	}
+    private static int execute(CommandSource source, int newHunger) throws CommandSyntaxException
+    {
+        ServerPlayerEntity playerToActOn = source.asPlayer();
 
-	@Override
-	@Nonnull
-	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
-	{
-		if (args.length == 1)
-			return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
-		else
-			return Collections.emptyList();
-	}
-	*/
+        AppleCoreAPI.mutator.setHunger(playerToActOn, newHunger);
+        if (playerToActOn.getFoodStats().getSaturationLevel() > newHunger)
+            AppleCoreAPI.mutator.setSaturation(playerToActOn, newHunger);
+
+        source.sendFeedback(new TranslationTextComponent("applecore.commands.hunger.set.hunger.to", playerToActOn.getDisplayName(), newHunger), true);
+        return 0;
+    }
 }

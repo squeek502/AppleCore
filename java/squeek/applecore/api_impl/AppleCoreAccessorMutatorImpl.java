@@ -65,13 +65,13 @@ public enum AppleCoreAccessorMutatorImpl implements IAppleCoreAccessor, IAppleCo
 				return getItemFoodValues(food.getItem().getFood(), food);
 
 			Block block = AppleCoreAPI.registry.getEdibleBlockFromItem(food.getItem());
-			if (block != null && block instanceof IEdible)
+			if (block instanceof IEdible)
 				return ((IEdible) block).getFoodValues(food);
 		}
 		return null;
 	}
 
-	private FoodValues getItemFoodValues(@Nonnull Food food, @Nonnull ItemStack itemStack)
+	private FoodValues getItemFoodValues(@Nonnull Food food, @Nonnull ItemStack stack)
 	{
 		return new FoodValues(food.getHealing(), food.getSaturation());
 	}

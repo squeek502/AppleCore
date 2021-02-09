@@ -95,7 +95,7 @@ public abstract class HealthRegenEvent extends Event
 	 * Fired every second for each player while in Peaceful difficulty,
 	 * in order to control how much health to passively regenerate.
 	 * 
-	 * This event is fired in {@link PlayerEntity#onLivingUpdate}.<br>
+	 * This event is fired in {@link PlayerEntity#livingTick}.<br>
 	 * <br>
 	 * This event is never fired if the game rule "naturalRegeneration" is false.<br>
 	 * <br>

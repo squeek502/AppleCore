@@ -26,7 +26,7 @@ import squeek.applecore.asm.util.IAppleCoreFoodStats;
 
 import javax.annotation.Nonnull;
 
-public class Hooks
+public class Hooks //TODO. Quite a bit of unused stuff in there
 {
 	private static void verifyFoodStats(FoodStats foodStats, PlayerEntity player)
 	{

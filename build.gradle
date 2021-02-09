@@ -5,7 +5,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: false
 	}
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -19,8 +19,6 @@ minecraft {
 	runs {
 		client {
 			workingDirectory project.file('run')
-			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-			property 'forge.logging.console.level', 'debug'
 			mods {
 				applecore {
 					source sourceSets.main
@@ -30,8 +28,6 @@ minecraft {
 
 		server {
 			workingDirectory project.file('run')
-			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-			property 'forge.logging.console.level', 'debug'
 			mods {
 				applecore {
 					source sourceSets.main
@@ -84,27 +80,10 @@ artifacts {
 	archives sourcesArtifact
 }
 
-processResources {
-	inputs.property "vars", project.version + project.minecraft_version + api_version
-	from(sourceSets.main.resources.srcDirs) {
-		include '**/mods.toml'
-		expand 'version':project.version, 'mcversion':project.minecraft_version, 'apiversion':api_version
-	}
-	from(sourceSets.main.resources.srcDirs) {
-		exclude '**/mods.toml'
-	}
-}
-
 jar {
 	manifest {
 		attributes([
-			"Specification-Title": "applecore",
-			"Specification-Vendor": "squeek",
-			"Specification-Version": "1", // We are version 1 of ourselves
-			"Implementation-Title": project.name,
-			"Implementation-Version": "${version}",
-			"Implementation-Vendor" :"squeek",
-			"Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+			"Implementation-Version": project.version,
 		])
 	}
 }

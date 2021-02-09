@@ -1,6 +1,7 @@
 modLoader="javafml"
-loaderVersion="[27,)"
+loaderVersion="[35,)"
 issueTrackerURL="https://github.com/squeek502/AppleCore"
+license="Unlicense"
 
 [[mods]]
 modId="applecore"
